@@ -1,0 +1,301 @@
+{
+  "version": "1.7.8",
+  "name": "WebDJRadio Console",
+  "releaseDate": "2026-08-31",
+  "changelog": [
+    {
+      "version": "1.7.8",
+      "date": "2026-08-31",
+      "title": "Metadata Persistence & Engine Stability Patch",
+      "changes": [
+        "**Metadata Stability & Null-Safety Patch**",
+        "====================:)====================",
+        "Null-Safe Track Matching: Fixed TypeError in isSameTrack and library search filtering by guarding all title, artist, and key property accesses against undefined values.",
+        "Engine Deck Synchronization: Added direct loadedTrackId matching and safe property propagation across loaded decks and cued playlist queues upon saving metadata edits.",
+        "Modern Slider Standards: Eliminated browser deprecation warnings by replacing non-standard slider-vertical styling with standard vertical-lr writing mode.",
+        "Console Health: Fixed crossfader element reference in the broadcasting metadata tap and added an inline SVG favicon to prevent 404 network warnings."
+      ]
+    },
+    {
+      "version": "1.7.7",
+      "date": "2026-08-31",
+      "title": "Interactive Track Metadata & Cover Art Editor",
+      "changes": [
+        "**Track Metadata Editing & Management**",
+        "====================:)====================",
+        "Metadata Editor Modal: Open via ✏️ button on any track row, toolbar '✏️ Edit Info' button, or double-clicking any track row in the library table.",
+        "Editable Track Properties: Adjust Track Title, Artist Name, Album/Release, BPM (Tempo), and Musical Key (Camelot notation dropdown).",
+        "Artwork Replacement & Removal: Directly upload or replace cover images (JPEG/PNG/WEBP/GIF) or remove existing artwork with live visual preview.",
+        "One-Click DSP Tempo & Key Re-Analysis: Built-in '⚡ DSP' trigger inside the editor to re-calculate tempo and harmonic key on demand.",
+        "Live Deck & Playlist Synchronization: Saving updates instantly propagates metadata and artwork to active Deck A/B headers, overview strips, and cued playlist queues."
+      ]
+    },
+    {
+      "version": "1.7.6",
+      "date": "2026-08-31",
+      "title": "Embedded Album Artwork Extraction & Deck Display",
+      "changes": [
+        "**Album Cover Art Integration**",
+        "====================:)====================",
+        "Binary Artwork Extraction: Built parser for ID3v2 APIC (v2.3/v2.4), ID3v2 PIC (v2.2), MP4/M4A covr atom, and FLAC Picture block to extract embedded cover images (JPEG/PNG/WebP).",
+        "Deck Faceplate Album Badges: Added glowing artwork display badges to Deck A and Deck B headers that dynamically display the loaded track's album cover art.",
+        "Track Library Artwork Thumbnails: Added dedicated ART column in the track library table with rounded cover art thumbnails and musical placeholder badges.",
+        "Cued Playlist Artwork Integration: Miniature cover art thumbnails displayed next to each queued track in Deck A and Deck B playlists."
+      ]
+    },
+    {
+      "version": "1.7.5",
+      "date": "2026-08-31",
+      "title": "Native ID3 Metadata Parser & DSP BPM / Key Analyzer",
+      "changes": [
+        "**ID3 Tag Extraction & Harmonic Analysis**",
+        "====================:)====================",
+        "Binary Metadata Tag Parser: Built client-side binary parser for ID3v2.2, ID3v2.3, ID3v2.4, ID3v1, MP4/M4A atoms, FLAC Vorbis comments, and WAV RIFF INFO chunks.",
+        "Automatic Metadata Ingestion: Directly reads real Artist (TPE1), Title (TIT2), Album (TALB), BPM (TBPM / tmpo), and Musical Key (TKEY / initialkey) from MP3 headers upon import.",
+        "DSP Onset Beat Detector: Fast autocorrelation algorithm with 150Hz low-pass bass filtering to accurately detect real-world BPM when ID3 tags are missing.",
+        "DSP Chromagram Key Estimator: 12-semitone Pitch Class Profile (PCP) harmonic analysis correlated against Krumhansl-Kessler Major/Minor musical profiles.",
+        "Camelot Wheel Notation: Normalizes all musical keys into standard DJ harmonic mixing format (e.g. 8A (Am), 8B (C), 11B (A)).",
+        "Deck Faceplate Key Readout: Added dedicated KEY readout boxes to Deck A and Deck B headers beside BPM and TIME."
+      ]
+    },
+    {
+      "version": "1.7.4",
+      "date": "2026-08-23",
+      "title": "End-of-Track Visual Warning (10s Alert)",
+      "changes": [
+        "**Studio DJ Broadcast Alerts**",
+        "====================:)====================",
+        "10-Second End-of-Track Red Alert: When a playing track has 10 seconds or less remaining, the deck triggers an unmistakable broadcasting visual alert.",
+        "Flashing Track Meta: The track title pulses in glowing neon alert red (#ff1744) to warn the presenter/DJ that the song is finishing.",
+        "Flashing Time Readout: The deck's TIME readout badge illuminates and flashes red with high-contrast text.",
+        "Waveform Progress Glow: The overview waveform progress bar turns red with an intense neon drop shadow.",
+        "Deck Perimeter Glow: The active deck panel pulses with an ambient red border glow until the song ends or a new track transitions in."
+      ]
+    },
+    {
+      "version": "1.7.3",
+      "date": "2026-08-23",
+      "title": "On-Deck FX Right-Click Parameter Switcher",
+      "changes": [
+        "**Contextual FX Parameter Assignment**",
+        "====================:)====================",
+        "Right-Click Context Menu: Right-clicking any on-deck FX dial or left-clicking its sublabel opens a popup menu allowing instant assignment of alternate effect parameters.",
+        "Echo & Delay Parameters: Select between Feedback (FDBK), Dry/Wet Mix (W/D), Delay Timing (TIME), and Tape Low-Pass Damping (DAMP).",
+        "Studio Reverb Parameters: Select between Dry/Wet Mix (W/D) and Decay Time (DECAY).",
+        "Flanger & Phaser Parameters: Select between Feedback Resonance (FDBK), Dry/Wet Mix (W/D), LFO Speed (RATE), and Modulation Depth (DEPTH).",
+        "Lo-Fi Bitcrusher Parameters: Select between Dry/Wet Mix (W/D) and Bit Depth Crush (BITS).",
+        "Auto-Recalibration & Persistence: The rotary knob angle dynamically rescales to the chosen parameter's minimum/maximum range, updates the sublabel badge, and saves preferences across sessions in localStorage."
+      ]
+    },
+    {
+      "version": "1.7.2",
+      "date": "2026-08-22",
+      "title": "On-Deck Quick FX Strips & Simplified Rotary Dials",
+      "changes": [
+        "**On-Deck Hardware Quick FX**",
+        "====================:)====================",
+        "Deck-Integrated FX Strips: Added dedicated hardware-style mini FX strips to Deck A and Deck B for instant performance manipulation without opening modals.",
+        "Simplified Rotary Controls: Echo & Delay Feedback (FDBK), Studio Reverb Wet/Dry (W/D), Flanger & Phaser Feedback (FDBK), and Lo-Fi Bitcrusher Wet/Dry (W/D) rotary dials with drag gestures and double-click reset.",
+        "Individual ON/OFF Buttons: High-contrast toggle buttons with glowing LED status indicators for each of the 4 effects on both decks.",
+        "Bi-Directional Synchronization: Real-time state synchronization between on-deck quick dials/LEDs, main Software FX rack modal, and USB MIDI controllers."
+      ]
+    },
+    {
+      "version": "1.7.1",
+      "date": "2026-08-22",
+      "title": "Modal Control Stabilization & UI Optimization",
+      "changes": [
+        "**Modal & UI Enhancements**",
+        "====================:)====================",
+        "Broadcast & Software FX Modals: Resolved element listener execution order and guarded button bindings ensuring instant modal opening from both header buttons and mixer triggers.",
+        "Header Actions Streamlining: Removed deprecated 'Generate Demo Beat' button from the top navigation bar.",
+        "Modal Keyboard Shortcuts: Added direct hotkeys: 'B' to toggle Broadcast / Streaming panel, 'X' to toggle Software FX Rack, 'M' for MIDI controller settings, and 'Esc' to close any modal.",
+        "MIDI Momentary Beat Roll Release: Enabled Note-Off and CC zero-velocity release handlers so holding a hardware performance pad loops the selected beat division, and releasing the pad immediately disengages the loop to continue normal forward playback smoothly."
+      ]
+    },
+    {
+      "version": "1.7.0",
+      "date": "2026-08-22",
+      "title": "Studio Software FX Rack & Real-Time Performance Effects",
+      "changes": [
+        "**Studio Software FX Engine**",
+        "====================:)====================",
+        "Dual Filter (HPF / LPF): Bi-directional mixer filter knobs with resonance and sweep controls (-100% LPF ... 0 Neutral ... +100% HPF).",
+        "Echo & BPM-Synced Delay: Tempo-locked delay timing (1/8, 1/4, 1/2, 3/4, 1, 2 beats), analog tape high-cut damping, feedback, and dry/wet mixing.",
+        "Studio Reverb: Real-time algorithmic impulse convolver with Room, Studio, Club, Hall, and Arena spaces, decay time scaling, and mix control.",
+        "Flanger / Phaser: Sweeping LFO modulation (0.1 - 5.0 Hz), variable feedback, depth, and stereo motion.",
+        "Lo-Fi Bitcrusher: 2-bit to 16-bit step quantization crunch and dynamic drive for chiptune and vintage sampler texture.",
+        "Performance Beat Roll (Slip Mode): Momentary slip-loop performance pads (1/16 to 4 beats) that roll seamlessly and resume at the exact real-time playback position upon release.",
+        "MIDI Controller Integration: Full MIDI mappings and Learn support for dual filters, FX dry/wet, and beat roll performance pads."
+      ]
+    },
+    {
+      "version": "1.6.2",
+      "date": "2026-08-20",
+      "title": "Myriad Cloud Streaming Support & B.U.T.T. Audio Output Routing",
+      "changes": [
+        "**Myriad Cloud (Broadcast Radio) & B.U.T.T. Integration**",
+        "====================:)====================",
+        "B.U.T.T. Direct Audio Routing: Added Master Audio Output Soundcard selector allowing routing to BlackHole 2ch, Loopback, or Virtual Cable for 100% stable, zero-CORS streaming to Myriad Cloud.",
+        "Icecast Relay Bridge: Added local 'icecast-bridge.js' companion relay for direct browser WebSocket-to-Icecast TCP streaming.",
+        "Broadcast Modal B.U.T.T. Tab: Dedicated step-by-step setup walkthrough with real-time audio device enumeration and switching."
+      ]
+    },
+    {
+      "version": "1.6.1",
+      "date": "2026-08-20",
+      "title": "B.U.T.T.-Aligned Icecast Configuration & Stream Diagnostics",
+      "changes": [
+        "**Icecast 2 & BUTT Alignment**",
+        "====================:)====================",
+        "B.U.T.T. Settings Parity: Replaced monolithic URL field with standard BUTT fields: Address/Host, Port, Icecast User, Password, Mountpoint, and SSL/HTTPS.",
+        "Custom Source Authentication: Added explicit Icecast User field (default 'source') for servers with custom administrator or DJ accounts.",
+        "Diagnostic Error Categorization: Specific feedback for HTTP 401 (Auth Failed), HTTP 404 (Mount Not Found), and browser CORS / preflight restrictions.",
+        "Dual Streaming Modes: Direct HTTP PUT and WebSocket Relay Bridge support."
+      ]
+    },
+    {
+      "version": "1.6.0",
+      "date": "2026-08-20",
+      "title": "Live Radio Broadcasting & Streaming (WebRTC WHIP, Icecast 2, Shoutcast & P2P)",
+      "changes": [
+        "**Live Radio Broadcasting & Streaming Engine**",
+        "====================:)====================",
+        "WebRTC WHIP Streaming: Ultra-low latency broadcast ingestion to Cloudflare Stream, OvenMediaEngine, Janus, LiveKit, MediaSoup, and WHIP-compatible radio distribution networks.",
+        "Icecast 2 Streaming: Direct HTTP chunked PUT & WebSocket bridge streaming in high-fidelity Ogg Opus/WebM audio (up to 320 kbps) with custom mount points and source authentication.",
+        "Shoutcast v1/v2 Streaming: Dedicated Shoutcast streaming client with SID and password authentication.",
+        "WebRTC P2P Direct Stream: Zero-server peer broadcast mode allowing direct browser-to-browser listening.",
+        "Live Master Audio Tapping: Captures the live mix from masterGain and equal-power crossfader directly into Web Audio MediaStreamDestination.",
+        "Mixer & Header ON AIR Console: Dynamic '🔴 ON AIR' flashing status indicator, uptime timer, live bitrate, MBs sent, and stream diagnostics modal."
+      ]
+    },
+    {
+      "version": "1.5.1",
+      "date": "2026-08-18",
+      "title": "Instant Track Duration Extraction & Cumulative Cued Playlist Times",
+      "changes": [
+        "**Track & Playlist Duration Engine**",
+        "====================:)====================",
+        "Instant Audio Metadata Duration: Automatically extracts and displays precise track durations for all scanned, uploaded, and dropped music files in the Track Library and Cued Playlists.",
+        "Individual Queue Total Time: Real-time duration badges on Deck A and Deck B cued playlist headers showing total runtime.",
+        "Combined Setlist Total Time: Dedicated total duration pill badge on the Cued Playlists toolbar displaying cumulative setlist time (Total = Deck A + Deck B).",
+        "Dynamic Duration Sync: Sample-accurate duration updates when tracks are decoded into Web Audio decks."
+      ]
+    },
+    {
+      "version": "1.5.0",
+      "date": "2026-08-18",
+      "title": "Cued Playlist Saving, Saved Setlists Manager & JSON Export/Import",
+      "changes": [
+        "**Cued Playlist Saving & JSON Export/Import**",
+        "====================:)====================",
+        "Local Setlist Storage: Save cued setlists to browser storage with custom names, dates, and track breakdown.",
+        "Saved Setlists Manager: Dedicated modal to view, recall (Load Both, Load Deck A only, Load Deck B only), export, or delete saved playlists.",
+        "JSON File Export: One-click export of complete cued setlists into structured, portable JSON files.",
+        "JSON File Import: Import any previously exported JSON playlist directly back into active deck queues and local storage.",
+        "Automatic Library Matcher: Attaches local audio sources to imported playlist items whenever tracks exist in the current library."
+      ]
+    },
+    {
+      "version": "1.4.1",
+      "date": "2026-08-18",
+      "title": "Duplicate Track Detection & Highlighting in Cued Playlists",
+      "changes": [
+        "**Duplicate Track Highlighting**",
+        "====================:)====================",
+        "Cross-Deck Duplicate Detection: Automatically detects and highlights if a track is cued in both Deck A and Deck B playlists with a distinct amber warning badge.",
+        "Intra-Deck Duplicate Detection: Detects if the same track is queued multiple times in the same deck with a red warning badge.",
+        "Live Tab Warning Indicator: The Cued Playlists tab badge displays a warning icon (⚠️) and count whenever duplicate tracks exist in either queue.",
+        "Status Feedback: Real-time notification when adding a song that is already queued in the opposite deck."
+      ]
+    },
+    {
+      "version": "1.4.0",
+      "date": "2026-08-17",
+      "title": "Separate Deck A & Deck B Cued Playlists and Tabbed Library",
+      "changes": [
+        "**Separate Deck A & Deck B Cued Playlists**",
+        "====================:)====================",
+        "Dedicated Deck Queues: Build, curate, and manage separate playlist queues for Deck A and Deck B independently.",
+        "Nested Tab Navigation: Seamlessly switch between the full 'Track Library' and the dual 'Cued Playlists' view with live badge counts.",
+        "Queue Control Actions: Re-order tracks (Move Up / Down), instant load (⚡ Load Now), individual item removal, playlist shuffle, and clear queue.",
+        "Quick Library Queue Buttons: Added '+Q A' and '+Q B' action buttons directly on each row in the Track Library table.",
+        "Auto-Deck Relay Integration: Continuous Auto-Deck playback now automatically draws from each deck's dedicated cued playlist first."
+      ]
+    },
+    {
+      "version": "1.3.0",
+      "date": "2026-08-17",
+      "title": "Continuous Auto-Deck Relay Play & Auto-Queue",
+      "changes": [
+        "**Auto-Deck Relay Play**",
+        "====================:)====================",
+        "Automatic Deck Handoff: When a track finishes playing on Deck A, Deck B starts playing automatically (and vice versa).",
+        "Zero Dead Air: Seamless track completion detection using sample-accurate Web Audio onended event monitoring.",
+        "Smooth Auto-Crossfade: Optional animated equal-power crossfader transition that smoothly glides to the active deck.",
+        "Continuous Auto-Queue: Automatically loads the next unplayed track from the library into the idle deck so radio playback continues indefinitely.",
+        "Mixer Relay Console: Dedicated toggle button with active neon LED indicator, Auto-XFade, and Auto-Queue controls on central mixer.",
+        "MIDI & Keyboard Shortcuts: Support for MIDI mapping (auto_relay action) and keyboard shortcut (Key P)."
+      ]
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-08-13",
+      "title": "USB midi controller support and correction to visuals",
+      "changes": [
+        "**Real-Time Dynamic Scrolling Waveform**",
+        "====================:)====================",
+        "Web MIDI API : navigator.requestMIDIAccess() with hot-plug detection (devices shown live as you plug in).",
+        "Built-in presets : Pioneer DDJ-200, DDJ-400, Numark Party Mix, Behringer CMD Studio/Micro.",
+        "Auto-detect : Matches device name automatically and loads the right preset.",
+        "MIDI Learn : Select any action → click Start Learn → move a knob/button on controller → mapping saved.",
+        "Persistence : Mappings stored in localStorage and survive page reloads.",
+        "Mapped controls : Play/Pause, Cue, Sync, Loop, Hot Cues 1–4, Pitch, Volume, EQ High/Mid/Low, Jog Wheel, Crossfader, Master Volume.",
+        "Activity log :  Live monitor showing every incoming MIDI message with action name and deck.",
+        "UI sync : CC changes mirror back to on-screen sliders (volume, pitch, crossfader).",
+        "Access it via the 🎛 MIDI Controller button in the header.",
+        "**✅ Knob Rotation Fix** ",
+        "====================:)====================",
+        "The pointer indicator now pivots correctly from the centre of the knob circle using CSS transform-origin: 50% 17px on .rotary-pointer matching exactly where the knob's physical centre is relative to the line's top position."
+
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-08-11",
+      "title": "Real-Time Dynamic Scrolling Waveform",
+      "changes": [
+        "Implemented 60fps smooth scrolling zoomed waveform display centered at the active playhead position",
+        "Added beat grid lines overlay synchronized with track BPM",
+        "Added Hot Cue markers rendering directly on the scrolling waveform display",
+        "Added overview waveform strip showing full-track progress and macro seeking",
+        "Dual scrubbing support: Micro-nudge on scrolling canvas + Macro-seek on overview bar"
+      ]
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-08-11",
+      "title": "AudioBuffer Loading & Demo Synth Fix",
+      "changes": [
+        "Fixed loadTrack to accept pre-rendered AudioBuffer instances directly",
+        "Resolved 'Unsupported audio source format' error when auto-loading or generating demo synth beats"
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-08-11",
+      "title": "Initial Production Release",
+      "changes": [
+        "Dual-deck Web Audio engine adhering to codebible.md specs",
+        "3-Band BiquadFilter EQ per deck (320Hz Low, 1000Hz Mid, 3200Hz High)",
+        "Equal-Power Crossfader curve (cos/sin gain control)",
+        "Local file upload & File System Access API directory scanner",
+        "Built-in Web Audio demo beat synthesizer (House, Techno, Disco)",
+        "Interactive Waveform canvas scrubber and jog wheel scratch gesture",
+        "4 Hot Cues & 1, 2, 4, 8 beat auto-looping per deck",
+        "Real-time stereo VU level meters for channels and master",
+        "Keyboard shortcuts for professional DJ workflow"
+      ]
+    }
+  ]
+}
