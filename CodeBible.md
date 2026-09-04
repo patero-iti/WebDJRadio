@@ -1,14 +1,14 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `1.9.9`  
+> **Version:** `2.0.0`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
-> **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation, Broadcast CART Wall, Studio Hub & Radio Console
+> **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation, Broadcast CART Wall, Studio Hub, Zero-Scroll Tabbed Workspace & Radio Console
 
 ---
 
 ## 1. Executive Summary & System Overview
 
-**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a 4-slot broadcast CART Wall pad controller with dedicated audio routing, a triple-layout visual subsystem (**DJ Console**, **Radio Presenter**, and **Radio Presenter B Pure Mixer + Cart Wall**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
+**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a 4-slot broadcast CART Wall pad controller with dedicated audio routing, a Universal Design **Zero-Scroll Tabbed Workspace** with primary views (**🎙️ On-Air Studio** and **🗃️ Music Management**), layout customization (**Radio A**, **Radio B**, **Radio C**, and **DJ Console**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
 
 ---
 
@@ -246,12 +246,23 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 4. Enable **TALK** if you want automatic $-9\text{ dB}$ music ducking while speaking over tracks.
 5. Press <kbd>M</kbd> (or click the glowing **MIC** button) to go live on air!
 
+### 4.4. Zero-Scroll Tabbed Workspace & Mini On-Air Monitor Workflow
+1. Use the top **Primary View Switcher** (`🎙️ ON-AIR STUDIO` vs. `🗃️ MUSIC`) or press <kbd>Tab</kbd> / <kbd>`</kbd> to toggle between your live performance console and your music library workspace.
+2. In **MUSIC** view, the console expands to full height (`58vh` table container) for effortless searching, tag editing, playlist cueing, and CART Wall assignment.
+3. The **Sticky Mini On-Air Monitor Bar** at the top of Music view keeps live broadcast status in view:
+   - Live Deck A & Deck B track titles, artist names, and album art thumbnails.
+   - Real-time `-MM:SS.d` countdown time remaining gauges and 10s flashing ending alerts.
+   - 1-click Deck A / Deck B play/pause controls and active CART counters with master stop.
+   - Immediate **↩ Return to Studio** button (<kbd>Esc</kbd>).
+
 ---
 
 ## 5. Keyboard Shortcuts Reference
 
 | Key / Combination | Scope | Action |
 | :--- | :--- | :--- |
+| <kbd>Tab</kbd> or <kbd>`</kbd> | Global | Toggle between **On-Air Studio** and **Music** views |
+| <kbd>Esc</kbd> | Global | Return to **On-Air Studio** view / Close active modal dialog |
 | <kbd>Space</kbd> | Deck A | Play / Pause Deck A |
 | <kbd>Enter</kbd> | Deck B | Play / Pause Deck B |
 | <kbd>M</kbd> | Mixer | Toggle Live Microphone On / Mute |
@@ -265,7 +276,6 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 | <kbd>P</kbd> | Global | Toggle Auto-Deck Continuous Relay Play |
 | <kbd>B</kbd> | Header | Open Live Radio Broadcasting Modal |
 | <kbd>X</kbd> | Header | Open Studio Software FX Rack |
-| <kbd>Esc</kbd> | Global | Close any active modal dialog |
 
 ---
 

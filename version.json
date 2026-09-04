@@ -1,8 +1,23 @@
 {
-  "version": "1.9.9",
+  "version": "2.0.0",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-05",
   "changelog": [
+    {
+      "version": "2.0.0",
+      "date": "2026-09-05",
+      "title": "Zero-Scroll Tabbed Workspace, Primary View Switcher & Mini On-Air Monitor",
+      "changes": [
+        "**Zero-Scroll Tabbed Workspace (Universal Design & Broadcast Ergonomics)**",
+        "====================:)====================",
+        "Zero-Scroll Unified Viewport: Eliminated vertical page scrolling entirely by decoupling the studio performance console from the music and media workspace into clean, full-height primary views.",
+        "Primary View Switcher: Added top-level primary view switcher buttons in the header to effortlessly toggle between `🎙️ ON-AIR STUDIO` (Radio A, Radio B, Radio C, DJ Console) and `🗃️ MUSIC` (Track Library, Cued Playlists, and CART Library).",
+        "100% Seamless Web Audio Playback: Switching views uses zero-interruption DOM container toggling without affecting the underlying Web Audio graphs, deck playback, live microphones, talkover ducking, streaming, or active CARTS.",
+        "Sticky Mini On-Air Monitor Bar: When managing music, playlists, or carts, a high-contrast sticky monitor bar keeps broadcasters in full control with live Deck A & Deck B track titles, artist names, album art thumbnails, live `-MM:SS.d` countdown gauges, 10s flashing ending red alerts, quick play/pause triggers, active CART counters, master CART stop button, and an instant return to studio button.",
+        "Universal Design Keyboard Hotkeys: Broadcasters can press <kbd>Tab</kbd> or <kbd>`</kbd> to toggle instantly between Studio and Music views, or press <kbd>Esc</kbd> to return to the Studio console at any moment (ignoring keystrokes when editing text in inputs).",
+        "Full-Height Library Workspace: Expanded the Track Library, Cued Playlists, and CART Library table containers to `58vh` for effortless browsing, tagging, searching, and queue management without cramped vertical constraints."
+      ]
+    },
     {
       "version": "1.9.9",
       "date": "2026-09-05",

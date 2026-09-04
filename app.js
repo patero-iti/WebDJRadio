@@ -27,6 +27,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLayoutRadioB = document.getElementById('btn-layout-radio-b');
   const btnLayoutRadioC = document.getElementById('btn-layout-radio-c');
 
+  // DOM Elements - Primary View Switcher (On-Air Studio vs Music Management)
+  const btnViewStudio = document.getElementById('btn-view-studio');
+  const btnViewMusic = document.getElementById('btn-view-music');
+  const viewContainerStudio = document.getElementById('view-container-studio');
+  const viewContainerMusic = document.getElementById('view-container-music');
+  const viewMusicCountBadge = document.getElementById('view-music-count-badge');
+  const btnMiniReturnStudio = document.getElementById('btn-mini-return-studio');
+
+  // DOM Elements - Mini On-Air Monitor Bar
+  const miniOnAirElements = {
+    stripA: document.getElementById('mini-strip-a'),
+    artImgA: document.getElementById('mini-art-img-a'),
+    artPlaceholderA: document.getElementById('mini-art-placeholder-a'),
+    titleA: document.getElementById('mini-title-a'),
+    artistA: document.getElementById('mini-artist-a'),
+    timeBadgeA: document.getElementById('mini-time-badge-a'),
+    timeValA: document.getElementById('mini-time-val-a'),
+    btnPlayA: document.getElementById('btn-mini-play-a'),
+
+    cartsVal: document.getElementById('mini-carts-active-val'),
+    btnCartStop: document.getElementById('btn-mini-cart-stop'),
+
+    stripB: document.getElementById('mini-strip-b'),
+    artImgB: document.getElementById('mini-art-img-b'),
+    artPlaceholderB: document.getElementById('mini-art-placeholder-b'),
+    titleB: document.getElementById('mini-title-b'),
+    artistB: document.getElementById('mini-artist-b'),
+    timeBadgeB: document.getElementById('mini-time-badge-b'),
+    timeValB: document.getElementById('mini-time-val-b'),
+    btnPlayB: document.getElementById('btn-mini-play-b')
+  };
+
   // DOM Elements - Studio Hub & Now Playing (Radio C Layout)
   const studioHubElements = {
     panel: document.getElementById('panel-studio-info'),
@@ -353,6 +385,88 @@ document.addEventListener('DOMContentLoaded', () => {
   applyLayoutVisibility();
 
   // -------------------------------------------------------------
+  // 2b. Primary View Switcher (On-Air Studio vs. Music Management)
+  // -------------------------------------------------------------
+  function setPrimaryView(view) {
+    const isStudio = view === 'studio';
+    const isMusic = view === 'music';
+
+    if (btnViewStudio) btnViewStudio.classList.toggle('active', isStudio);
+    if (btnViewMusic) btnViewMusic.classList.toggle('active', isMusic);
+
+    if (viewContainerStudio) viewContainerStudio.style.display = isStudio ? 'flex' : 'none';
+    if (viewContainerMusic) viewContainerMusic.style.display = isMusic ? 'flex' : 'none';
+
+    document.body.classList.toggle('view-studio-active', isStudio);
+    document.body.classList.toggle('view-music-active', isMusic);
+
+    localStorage.setItem('webdj_primary_view', view);
+
+    // If switching to studio view, trigger resize event so canvas visualizers and waveforms re-render
+    if (isStudio) {
+      window.dispatchEvent(new Event('resize'));
+    }
+  }
+
+  if (btnViewStudio) {
+    btnViewStudio.addEventListener('click', () => setPrimaryView('studio'));
+  }
+  if (btnViewMusic) {
+    btnViewMusic.addEventListener('click', () => setPrimaryView('music'));
+  }
+  if (btnMiniReturnStudio) {
+    btnMiniReturnStudio.addEventListener('click', () => setPrimaryView('studio'));
+  }
+
+  // Mini Play/Pause Deck controls
+  if (miniOnAirElements.btnPlayA) {
+    miniOnAirElements.btnPlayA.addEventListener('click', () => {
+      engine.togglePlay('A');
+    });
+  }
+  if (miniOnAirElements.btnPlayB) {
+    miniOnAirElements.btnPlayB.addEventListener('click', () => {
+      engine.togglePlay('B');
+    });
+  }
+  if (miniOnAirElements.btnCartStop) {
+    miniOnAirElements.btnCartStop.addEventListener('click', () => {
+      engine.stopAllCarts();
+    });
+  }
+
+  // Global Keyboard Hotkeys:
+  // Tab or Backquote (`) toggles between Studio & Music Management
+  // Esc returns to Studio
+  window.addEventListener('keydown', (e) => {
+    const activeEl = document.activeElement;
+    const isInput = activeEl && (
+      activeEl.tagName === 'INPUT' ||
+      activeEl.tagName === 'TEXTAREA' ||
+      activeEl.tagName === 'SELECT' ||
+      activeEl.isContentEditable
+    );
+    if (isInput) return;
+
+    if (e.key === 'Tab' || e.key === '`') {
+      e.preventDefault();
+      const currentView = localStorage.getItem('webdj_primary_view') || 'studio';
+      const targetView = currentView === 'studio' ? 'music' : 'studio';
+      setPrimaryView(targetView);
+    } else if (e.key === 'Escape') {
+      const currentView = localStorage.getItem('webdj_primary_view') || 'studio';
+      if (currentView !== 'studio') {
+        e.preventDefault();
+        setPrimaryView('studio');
+      }
+    }
+  });
+
+  // Restore saved primary view (default to studio)
+  const savedPrimaryView = localStorage.getItem('webdj_primary_view') || 'studio';
+  setPrimaryView(savedPrimaryView);
+
+  // -------------------------------------------------------------
   // 3. Audio Engine Unlock & Readiness
   // -------------------------------------------------------------
   async function unlockAudioContext() {
@@ -484,6 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateQueueBadges() {
     if (libraryCountBadge) libraryCountBadge.textContent = libraryTracks.length;
+    if (viewMusicCountBadge) viewMusicCountBadge.textContent = libraryTracks.length;
     
     // Calculate total durations for Deck A, Deck B, and Combined
     const durA = deckQueues.A.reduce((sum, t) => sum + (t.duration && !isNaN(t.duration) ? t.duration : 0), 0);
@@ -1823,6 +1938,41 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deckElem.mixerArtPlaceholder) deckElem.mixerArtPlaceholder.style.display = 'flex';
       }
 
+      // Update Mini On-Air Monitor Bar Metadata & Artwork
+      if (deckId === 'A') {
+        if (miniOnAirElements.titleA) miniOnAirElements.titleA.textContent = deck.title;
+        if (miniOnAirElements.artistA) miniOnAirElements.artistA.textContent = deck.artist;
+        if (trackObj.artworkUrl) {
+          if (miniOnAirElements.artImgA) {
+            miniOnAirElements.artImgA.src = trackObj.artworkUrl;
+            miniOnAirElements.artImgA.style.display = 'block';
+          }
+          if (miniOnAirElements.artPlaceholderA) miniOnAirElements.artPlaceholderA.style.display = 'none';
+        } else {
+          if (miniOnAirElements.artImgA) {
+            miniOnAirElements.artImgA.src = '';
+            miniOnAirElements.artImgA.style.display = 'none';
+          }
+          if (miniOnAirElements.artPlaceholderA) miniOnAirElements.artPlaceholderA.style.display = 'flex';
+        }
+      } else if (deckId === 'B') {
+        if (miniOnAirElements.titleB) miniOnAirElements.titleB.textContent = deck.title;
+        if (miniOnAirElements.artistB) miniOnAirElements.artistB.textContent = deck.artist;
+        if (trackObj.artworkUrl) {
+          if (miniOnAirElements.artImgB) {
+            miniOnAirElements.artImgB.src = trackObj.artworkUrl;
+            miniOnAirElements.artImgB.style.display = 'block';
+          }
+          if (miniOnAirElements.artPlaceholderB) miniOnAirElements.artPlaceholderB.style.display = 'none';
+        } else {
+          if (miniOnAirElements.artImgB) {
+            miniOnAirElements.artImgB.src = '';
+            miniOnAirElements.artImgB.style.display = 'none';
+          }
+          if (miniOnAirElements.artPlaceholderB) miniOnAirElements.artPlaceholderB.style.display = 'flex';
+        }
+      }
+
       // Update track duration, BPM and Key in library object and all queue instances
       if (deck.buffer && deck.buffer.duration) {
         trackObj.duration = deck.buffer.duration;
@@ -2621,6 +2771,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (deckAElements.overviewProgress) {
       deckAElements.overviewProgress.classList.toggle('ending-alert', isEndingA);
     }
+    // Sync Mini On-Air Bar Deck A Status
+    if (miniOnAirElements.btnPlayA) {
+      miniOnAirElements.btnPlayA.textContent = deckA.isPlaying ? '⏸' : '▶';
+      miniOnAirElements.btnPlayA.classList.toggle('playing', deckA.isPlaying);
+    }
+    if (miniOnAirElements.timeValA) {
+      miniOnAirElements.timeValA.textContent = durA > 0 ? `-${formatTime(remA)}` : '--:--';
+    }
+    if (miniOnAirElements.stripA) {
+      miniOnAirElements.stripA.classList.toggle('playing', deckA.isPlaying);
+      miniOnAirElements.stripA.classList.toggle('track-ending-warning', isEndingA);
+    }
+    if (miniOnAirElements.timeBadgeA) {
+      miniOnAirElements.timeBadgeA.classList.toggle('ending-alert', isEndingA);
+    }
     renderScrollingWaveform('A');
 
     if (deckA.isPlaying) {
@@ -2660,6 +2825,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (deckBElements.overviewProgress) {
       deckBElements.overviewProgress.classList.toggle('ending-alert', isEndingB);
+    }
+    // Sync Mini On-Air Bar Deck B Status
+    if (miniOnAirElements.btnPlayB) {
+      miniOnAirElements.btnPlayB.textContent = deckB.isPlaying ? '⏸' : '▶';
+      miniOnAirElements.btnPlayB.classList.toggle('playing', deckB.isPlaying);
+    }
+    if (miniOnAirElements.timeValB) {
+      miniOnAirElements.timeValB.textContent = durB > 0 ? `-${formatTime(remB)}` : '--:--';
+    }
+    if (miniOnAirElements.stripB) {
+      miniOnAirElements.stripB.classList.toggle('playing', deckB.isPlaying);
+      miniOnAirElements.stripB.classList.toggle('track-ending-warning', isEndingB);
+    }
+    if (miniOnAirElements.timeBadgeB) {
+      miniOnAirElements.timeBadgeB.classList.toggle('ending-alert', isEndingB);
     }
     renderScrollingWaveform('B');
 
@@ -2712,6 +2892,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (mixerCartsActiveVal) {
       mixerCartsActiveVal.textContent = `${activeCartsCount} / 4`;
+    }
+    if (miniOnAirElements.cartsVal) {
+      miniOnAirElements.cartsVal.textContent = `${activeCartsCount} / 4`;
     }
 
     // Studio Hub Now Playing Active Deck Sync

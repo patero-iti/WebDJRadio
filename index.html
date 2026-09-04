@@ -38,6 +38,19 @@
     </div>
 
     <div class="header-actions">
+      <!-- Primary View Switcher: On-Air Studio vs Music Management -->
+      <div class="primary-view-nav" id="primary-view-nav">
+        <button class="btn-primary-view active" id="btn-view-studio" data-view="studio" type="button" title="Switch to On-Air Studio & Performance Console (Radio A, Radio B, DJ)">
+          <span class="view-icon">🎙️</span>
+          <span>ON-AIR STUDIO</span>
+        </button>
+        <button class="btn-primary-view" id="btn-view-music" data-view="music" type="button" title="Switch to Music Library, Cued Playlists & CART Library (Tab / `)">
+          <span class="view-icon">🗃️</span>
+          <span>MUSIC</span>
+          <span class="view-badge" id="view-music-count-badge">0</span>
+        </button>
+      </div>
+
       <!-- Layout Mode Switcher Container with Visibility Customization -->
       <div class="layout-mode-container" id="layout-mode-container">
         <div class="layout-mode-selector" id="layout-mode-selector" title="Switch between active layouts">
@@ -112,8 +125,10 @@
   <!-- Workspace -->
   <main class="workspace">
 
-    <!-- DJ Dual-Deck Console -->
-    <div class="dj-console">
+    <!-- VIEW 1: ON-AIR STUDIO / PERFORMANCE CONSOLE -->
+    <div class="main-view-container main-view-studio" id="view-container-studio">
+      <!-- DJ Dual-Deck Console -->
+      <div class="dj-console">
 
       <!-- DECK A PANEL -->
       <section class="deck-panel deck-a" id="panel-deck-a">
@@ -859,10 +874,65 @@
         </div>
       </section>
 
+      </div>
     </div>
 
-    <!-- Music Library & Cued Playlists Section -->
-    <section class="library-panel">
+    <!-- VIEW 2: MUSIC & MEDIA MANAGEMENT (Full Height Workspace) -->
+    <div class="main-view-container main-view-music" id="view-container-music" style="display: none;">
+      
+      <!-- Mini On-Air Status & Monitor Bar -->
+      <div class="mini-onair-bar" id="mini-onair-bar">
+        <!-- Deck A Mini Monitor -->
+        <div class="mini-deck-strip mini-deck-a" id="mini-strip-a">
+          <span class="mini-deck-badge">DECK A</span>
+          <div class="mini-art-thumb" id="mini-art-badge-a">
+            <img id="mini-art-img-a" style="display: none;" alt="Deck A Art">
+            <span id="mini-art-placeholder-a">🎵</span>
+          </div>
+          <div class="mini-deck-meta">
+            <div class="mini-track-title" id="mini-title-a">No Track Loaded</div>
+            <div class="mini-track-artist" id="mini-artist-a">Deck A Ready</div>
+          </div>
+          <div class="mini-time-badge" id="mini-time-badge-a">
+            <span class="mini-time-label">LEFT</span>
+            <span class="mini-time-val" id="mini-time-val-a">--:--</span>
+          </div>
+          <button class="btn-mini-play" id="btn-mini-play-a" type="button" title="Play / Pause Deck A">▶</button>
+        </div>
+
+        <!-- CARTS Mini Status -->
+        <div class="mini-carts-strip" id="mini-strip-carts">
+          <span class="mini-carts-label">CARTS</span>
+          <span class="mini-carts-val" id="mini-carts-active-val">0 / 4</span>
+          <button class="btn-mini-cart-stop" id="btn-mini-cart-stop" type="button" title="Kill / Stop All Active CARTS">⏹ STOP</button>
+        </div>
+
+        <!-- Deck B Mini Monitor -->
+        <div class="mini-deck-strip mini-deck-b" id="mini-strip-b">
+          <button class="btn-mini-play" id="btn-mini-play-b" type="button" title="Play / Pause Deck B">▶</button>
+          <div class="mini-time-badge" id="mini-time-badge-b">
+            <span class="mini-time-label">LEFT</span>
+            <span class="mini-time-val" id="mini-time-val-b">--:--</span>
+          </div>
+          <div class="mini-deck-meta">
+            <div class="mini-track-title" id="mini-title-b">No Track Loaded</div>
+            <div class="mini-track-artist" id="mini-artist-b">Deck B Ready</div>
+          </div>
+          <div class="mini-art-thumb" id="mini-art-badge-b">
+            <img id="mini-art-img-b" style="display: none;" alt="Deck B Art">
+            <span id="mini-art-placeholder-b">🎵</span>
+          </div>
+          <span class="mini-deck-badge">DECK B</span>
+        </div>
+
+        <!-- Return to Studio Button -->
+        <button class="btn-mini-return-studio" id="btn-mini-return-studio" type="button" title="Switch back to Studio / DJ Console (Tab / Esc)">
+          <span>↩ Return to Studio</span>
+        </button>
+      </div>
+
+      <!-- Music Library & Cued Playlists Section -->
+      <section class="library-panel" id="library-panel">
       <!-- Tab Navigation Bar -->
       <div class="panel-tabs-bar">
         <div class="panel-tabs-group">
@@ -1033,6 +1103,7 @@
         </div>
       </div>
     </section>
+  </div>
 
   </main>
 
