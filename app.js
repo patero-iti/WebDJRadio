@@ -91,6 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const crossfader = document.getElementById('crossfader');
   const vuMaster = document.getElementById('vu-master');
 
+  // DOM Elements - Microphone / Live Input
+  const micElements = {
+    volSlider: document.getElementById('vol-mic'),
+    vuFill: document.getElementById('vu-mic'),
+    btnToggle: document.getElementById('btn-mic-toggle'),
+    btnText: document.getElementById('mic-btn-text'),
+    led: document.getElementById('mic-led'),
+    btnTalkover: document.getElementById('btn-talkover-toggle')
+  };
+
   // DOM Elements - Auto-Deck Relay
   const btnAutoRelay = document.getElementById('btn-auto-relay');
   const chkAutoCrossfade = document.getElementById('chk-auto-crossfade');
@@ -1522,6 +1532,60 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // -------------------------------------------------------------
+  // 5.1. Microphone / Live Audio Input Mixer Channel
+  // -------------------------------------------------------------
+  const savedMicVolume = localStorage.getItem('webdj_mic_volume');
+  if (savedMicVolume !== null && micElements.volSlider) {
+    micElements.volSlider.value = savedMicVolume;
+    engine.setMicVolume(parseFloat(savedMicVolume));
+  }
+
+  if (micElements.volSlider) {
+    micElements.volSlider.addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      engine.setMicVolume(vol);
+      localStorage.setItem('webdj_mic_volume', vol);
+    });
+  }
+
+  async function updateMicUIState(isActive) {
+    if (micElements.btnToggle) {
+      micElements.btnToggle.classList.toggle('active', isActive);
+    }
+    if (micElements.btnText) {
+      micElements.btnText.textContent = isActive ? 'ON AIR' : 'MIC';
+    }
+    const modalTestBtn = document.getElementById('btn-modal-test-mic');
+    if (modalTestBtn) {
+      modalTestBtn.textContent = isActive ? '🔴 Mute Mic (Live)' : '🎙️ Connect / Test Mic';
+      modalTestBtn.style.background = isActive ? 'rgba(255, 23, 68, 0.2)' : '';
+      modalTestBtn.style.borderColor = isActive ? '#ff1744' : '';
+    }
+    audioStatusText.textContent = isActive
+      ? 'Microphone: LIVE (ON AIR - Mixed to Master & Stream)'
+      : 'Microphone: MUTED';
+  }
+
+  if (micElements.btnToggle) {
+    micElements.btnToggle.addEventListener('click', async () => {
+      await unlockAudioContext();
+      const newState = await engine.setMicActive(!engine.isMicActive);
+      updateMicUIState(newState);
+    });
+  }
+
+  if (micElements.btnTalkover) {
+    micElements.btnTalkover.addEventListener('click', () => {
+      const newState = !engine.talkoverDucking;
+      engine.setTalkoverDucking(newState);
+      micElements.btnTalkover.classList.toggle('active', newState);
+      audioStatusText.textContent = newState
+        ? 'Talkover Auto-Ducking: ENABLED (-9dB music ducking when mic active)'
+        : 'Talkover Auto-Ducking: DISABLED';
+    });
+  }
+
+  // -------------------------------------------------------------
   // 6.1. Auto-Deck Relay Play & Auto-Queue Controller
   // -------------------------------------------------------------
   let crossfadeAnimId = null;
@@ -1874,8 +1938,12 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       }
       case 'KeyM': {
-        const mm = document.getElementById('midi-modal');
-        if (mm) mm.style.display = (mm.style.display === 'none' || !mm.style.display) ? 'flex' : 'none';
+        if (e.shiftKey) {
+          const mm = document.getElementById('midi-modal');
+          if (mm) mm.style.display = (mm.style.display === 'none' || !mm.style.display) ? 'flex' : 'none';
+        } else {
+          if (micElements.btnToggle) micElements.btnToggle.click();
+        }
         break;
       }
       case 'Escape':
@@ -1894,13 +1962,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const deckA = engine.decks.A;
     const curA = engine.getCurrentTime('A');
     const durA = deckA.buffer ? deckA.buffer.duration : 0;
-    const remA = durA > 0 ? (durA - curA) : 999;
-    const isEndingA = deckA.isPlaying && durA > 0 && remA <= 10.0 && remA >= 0;
+    const isEndingA = deckA.isPlaying && durA > 0 && (durA - curA) <= 10.0 && (durA - curA) > 0;
 
     deckAElements.btnPlay.classList.toggle('playing', deckA.isPlaying);
     deckAElements.time.textContent = formatTime(curA);
-    deckAElements.title.classList.toggle('track-ending-flash', isEndingA);
-    if (deckAElements.time.parentElement) {
+    if (deckAElements.title) {
+      deckAElements.title.parentElement.classList.toggle('track-ending-warning', isEndingA);
+    }
+    if (deckAElements.time) {
       deckAElements.time.parentElement.classList.toggle('time-ending-flash', isEndingA);
     }
     if (deckAElements.panel) {
@@ -1920,13 +1989,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const deckB = engine.decks.B;
     const curB = engine.getCurrentTime('B');
     const durB = deckB.buffer ? deckB.buffer.duration : 0;
-    const remB = durB > 0 ? (durB - curB) : 999;
-    const isEndingB = deckB.isPlaying && durB > 0 && remB <= 10.0 && remB >= 0;
+    const isEndingB = deckB.isPlaying && durB > 0 && (durB - curB) <= 10.0 && (durB - curB) > 0;
 
     deckBElements.btnPlay.classList.toggle('playing', deckB.isPlaying);
     deckBElements.time.textContent = formatTime(curB);
-    deckBElements.title.classList.toggle('track-ending-flash', isEndingB);
-    if (deckBElements.time.parentElement) {
+    if (deckBElements.title) {
+      deckBElements.title.parentElement.classList.toggle('track-ending-warning', isEndingB);
+    }
+    if (deckBElements.time) {
       deckBElements.time.parentElement.classList.toggle('time-ending-flash', isEndingB);
     }
     if (deckBElements.panel) {
@@ -1946,9 +2016,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const levelA = engine.getDeckPeakLevel('A');
     const levelB = engine.getDeckPeakLevel('B');
     const levelMaster = engine.getMasterPeakLevel();
+    const levelMic = (engine.getMicPeakLevel ? engine.getMicPeakLevel() : 0);
 
     deckAElements.vuFill.style.height = `${Math.min(100, levelA * 150)}%`;
     deckBElements.vuFill.style.height = `${Math.min(100, levelB * 150)}%`;
+    if (micElements.vuFill) micElements.vuFill.style.height = `${Math.min(100, levelMic * 150)}%`;
     vuMaster.style.height = `${Math.min(100, levelMaster * 150)}%`;
   }
 
@@ -3228,6 +3300,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (key === 'butt') {
         refreshAudioOutputDevices();
+        refreshAudioInputDevices();
       }
     }
 
@@ -3288,8 +3361,85 @@ document.addEventListener('DOMContentLoaded', () => {
       btnRefreshAudioDevices.addEventListener('click', () => refreshAudioOutputDevices(true));
     }
 
+    // Audio Input Device Routing (Microphone, Bluetooth, Audio Interface In)
+    const audioInputSelect = document.getElementById('bcast-audio-input-select');
+    const btnRefreshAudioInputs = document.getElementById('btn-refresh-audio-inputs');
+    const audioInputStatus = document.getElementById('audio-input-status');
+    const btnModalTestMic = document.getElementById('btn-modal-test-mic');
+
+    async function refreshAudioInputDevices(requestPermission = false) {
+      if (!audioInputSelect) return;
+      try {
+        const devices = await WebRadioDecksEngine.getAudioInputDevices(requestPermission);
+        const savedInput = localStorage.getItem('webdj_mic_device');
+        const currentVal = audioInputSelect.value || savedInput || '';
+        audioInputSelect.innerHTML = '<option value="">Default Audio Input (Internal Microphone)</option>';
+        
+        let hasBlankLabels = false;
+        devices.forEach(d => {
+          if (d.deviceId === 'default') return;
+          const opt = document.createElement('option');
+          opt.value = d.deviceId;
+          if (!d.label) {
+            hasBlankLabels = true;
+            opt.textContent = `Microphone / Input (${d.deviceId.slice(0, 8)}...)`;
+          } else {
+            opt.textContent = d.label;
+          }
+          if (d.deviceId === currentVal) opt.selected = true;
+          audioInputSelect.appendChild(opt);
+        });
+
+        if (audioInputStatus) {
+          if (hasBlankLabels) {
+            audioInputStatus.innerHTML = `⚠️ Input names hidden. Click <strong>🔄 Refresh</strong> & allow microphone permission to show Bluetooth / Audio Interface names.`;
+          } else if (audioInputSelect.value) {
+            const selectedText = audioInputSelect.options[audioInputSelect.selectedIndex]?.text || 'Custom Input';
+            audioInputStatus.textContent = `Active Input: ${selectedText}`;
+          } else {
+            audioInputStatus.textContent = `Active Input: System Default (Internal Mic)`;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not enumerate audio inputs:', err);
+      }
+    }
+
+    if (audioInputSelect) {
+      audioInputSelect.addEventListener('change', async () => {
+        const deviceId = audioInputSelect.value;
+        localStorage.setItem('webdj_mic_device', deviceId);
+        await engine.setAudioInputDevice(deviceId);
+        if (audioInputStatus) {
+          const selectedText = audioInputSelect.options[audioInputSelect.selectedIndex]?.text || 'System Default';
+          audioInputStatus.textContent = `Active Input: ${selectedText}`;
+        }
+      });
+    }
+
+    if (btnRefreshAudioInputs) {
+      btnRefreshAudioInputs.addEventListener('click', () => refreshAudioInputDevices(true));
+    }
+
+    if (btnModalTestMic) {
+      btnModalTestMic.addEventListener('click', async () => {
+        await unlockAudioContext();
+        const newState = await engine.setMicActive(!engine.isMicActive);
+        updateMicUIState(newState);
+      });
+    }
+
+    // Initial load of saved input device
+    const initialSavedMicDevice = localStorage.getItem('webdj_mic_device');
+    if (initialSavedMicDevice) {
+      engine.micDeviceId = initialSavedMicDevice;
+    }
+
     if (navigator.mediaDevices && typeof navigator.mediaDevices.addEventListener === 'function') {
-      navigator.mediaDevices.addEventListener('devicechange', () => refreshAudioOutputDevices(false));
+      navigator.mediaDevices.addEventListener('devicechange', () => {
+        refreshAudioOutputDevices(false);
+        refreshAudioInputDevices(false);
+      });
     }
 
     Object.entries(tabs).forEach(([k, tab]) => {

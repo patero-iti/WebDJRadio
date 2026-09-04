@@ -22,6 +22,25 @@ class WebRadioDecksEngine {
     this.masterGain.connect(this.masterAnalyser);
     this.masterAnalyser.connect(this.ctx.destination);
     
+    // Live Microphone / Audio Input Node Chain
+    this.micStream = null;
+    this.micSourceNode = null;
+    this.micGain = this.ctx.createGain();
+    this.micGain.gain.value = 0.0; // starts muted/inactive
+    this.micVolume = 1.0;
+    this.isMicActive = false;
+    this.micDeviceId = '';
+    this.talkoverDucking = false;
+    this.duckingGain = 0.35; // -9dB music ducking when talkover is active
+    
+    // Analyser Node for Mic VU Meter
+    this.micAnalyser = this.ctx.createAnalyser();
+    this.micAnalyser.fftSize = 256;
+    this.micAnalyser.smoothingTimeConstant = 0.7;
+
+    this.micGain.connect(this.micAnalyser);
+    this.micAnalyser.connect(this.masterGain);
+
     // Crossfader position: 0.0 (Deck A full) to 1.0 (Deck B full)
     this.crossfaderPosition = 0.5;
 
@@ -448,7 +467,7 @@ class WebRadioDecksEngine {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           stream.getTracks().forEach(track => track.stop());
         } catch (permErr) {
-          console.warn('Audio device permission prompt declined or unavailable:', permErr);
+          console.warn('Audio output device permission prompt declined:', permErr);
         }
       }
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -458,14 +477,124 @@ class WebRadioDecksEngine {
     }
   }
 
+  // Set and connect Live Microphone / Audio Input Device (Bluetooth, Interface, Line-In)
+  async setAudioInputDevice(deviceId) {
+    this.micDeviceId = deviceId || '';
+
+    // Stop active stream tracks if any
+    if (this.micStream) {
+      try {
+        this.micStream.getTracks().forEach(t => t.stop());
+      } catch (_) {}
+      this.micStream = null;
+    }
+    if (this.micSourceNode) {
+      try {
+        this.micSourceNode.disconnect();
+      } catch (_) {}
+      this.micSourceNode = null;
+    }
+
+    try {
+      const constraints = {
+        audio: this.micDeviceId
+          ? { deviceId: { exact: this.micDeviceId }, echoCancellation: true, noiseSuppression: true }
+          : { echoCancellation: true, noiseSuppression: true }
+      };
+      this.micStream = await navigator.mediaDevices.getUserMedia(constraints);
+      this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
+      this.micSourceNode.connect(this.micGain);
+
+      // If mic is active, apply gain
+      if (this.isMicActive) {
+        this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
+      }
+      return true;
+    } catch (err) {
+      console.warn('Could not connect audio input device:', err);
+      return false;
+    }
+  }
+
+  // Set Microphone Volume / Gain (0.0 to 1.5)
+  setMicVolume(volume) {
+    this.micVolume = Math.max(0, Math.min(2.0, parseFloat(volume) || 0));
+    if (this.isMicActive) {
+      this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
+    }
+  }
+
+  // Toggle or Set Microphone Active State (Mute / Unmute / ON AIR)
+  async setMicActive(active) {
+    this.isMicActive = !!active;
+
+    // Connect stream on first activation if needed
+    if (this.isMicActive && !this.micStream) {
+      const ok = await this.setAudioInputDevice(this.micDeviceId);
+      if (!ok) {
+        this.isMicActive = false;
+        return false;
+      }
+    }
+
+    const targetGain = this.isMicActive ? this.micVolume : 0.0;
+    this.micGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.03);
+
+    // Apply auto-ducking to music if talkover is enabled
+    this._applyTalkoverDucking();
+    return this.isMicActive;
+  }
+
+  // Toggle Talkover Ducking
+  setTalkoverDucking(enabled) {
+    this.talkoverDucking = !!enabled;
+    this._applyTalkoverDucking();
+  }
+
+  _applyTalkoverDucking() {
+    const duckFactor = (this.talkoverDucking && this.isMicActive) ? this.duckingGain : 1.0;
+    const gainA = Math.cos(this.crossfaderPosition * 0.5 * Math.PI) * duckFactor;
+    const gainB = Math.sin(this.crossfaderPosition * 0.5 * Math.PI) * duckFactor;
+
+    this.decks.A.nodes.xfadeGain.gain.setTargetAtTime(gainA, this.ctx.currentTime, 0.04);
+    this.decks.B.nodes.xfadeGain.gain.setTargetAtTime(gainB, this.ctx.currentTime, 0.04);
+  }
+
+  getMicPeakLevel() {
+    if (!this.isMicActive || !this.micStream) return 0;
+    const data = new Uint8Array(this.micAnalyser.frequencyBinCount);
+    this.micAnalyser.getByteFrequencyData(data);
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+      sum += data[i];
+    }
+    return Math.min(1.0, (sum / data.length) / 180 * (this.micVolume || 1.0));
+  }
+
+  static async getAudioInputDevices(requestPermission = false) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      return [];
+    }
+    try {
+      if (requestPermission && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(track => track.stop());
+        } catch (permErr) {
+          console.warn('Audio input device permission prompt declined:', permErr);
+        }
+      }
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      return devices.filter(d => d.kind === 'audioinput');
+    } catch (_) {
+      return [];
+    }
+  }
+
   // Equal-Power Crossfader Curve (0.0 = Deck A, 1.0 = Deck B)
   setCrossfader(position) {
     this.crossfaderPosition = Math.max(0, Math.min(1, parseFloat(position)));
-    const gainA = Math.cos(this.crossfaderPosition * 0.5 * Math.PI);
-    const gainB = Math.sin(this.crossfaderPosition * 0.5 * Math.PI);
-
-    this.decks.A.nodes.xfadeGain.gain.setTargetAtTime(gainA, this.ctx.currentTime, 0.01);
-    this.decks.B.nodes.xfadeGain.gain.setTargetAtTime(gainB, this.ctx.currentTime, 0.01);
+    this._applyTalkoverDucking();
   }
 
   // Pitch / Playback Rate slider setting (e.g., rate = 1.0 for 100%, 1.08 for +8%)

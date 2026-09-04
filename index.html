@@ -6,7 +6,7 @@
   <title>WebDJRadio - Dual-Deck Web Audio DJ Workstation</title>
   <meta name="description" content="Sample-accurate dual-deck web DJ application with zero-latency Web Audio engine, 3-band EQ, equal-power crossfader, and local folder scanner.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-  <link rel="stylesheet" href="style.css?v=1.7.7">
+  <link rel="stylesheet" href="style.css?v=1.7.9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -303,8 +303,23 @@
             <div class="vu-meter-bar">
               <div class="vu-fill" id="vu-a"></div>
             </div>
-            <input type="range" class="vertical-fader" id="vol-a" min="0" max="1" step="0.01" value="1">
+            <input type="range" class="vertical-fader" id="vol-a" min="0" max="1" step="0.01" value="1" title="Deck A Volume">
             <span class="strip-label">CH A</span>
+          </div>
+
+          <!-- Mic / Live Input Fader & Controls -->
+          <div class="channel-fader-strip mic-strip">
+            <div class="vu-meter-bar">
+              <div class="vu-fill" id="vu-mic"></div>
+            </div>
+            <input type="range" class="vertical-fader mic-fader" id="vol-mic" min="0" max="1.5" step="0.01" value="1" title="Microphone / Live Input Gain">
+            <button class="btn-mic-toggle" id="btn-mic-toggle" title="Toggle Live Microphone (Key: M)">
+              <span class="mic-led" id="mic-led"></span>
+              <span class="mic-btn-text" id="mic-btn-text">MIC</span>
+            </button>
+            <button class="btn-talkover-toggle" id="btn-talkover-toggle" title="Auto-duck music volume when mic is active">
+              <span>TALK</span>
+            </button>
           </div>
 
           <!-- Master Stereo VU -->
@@ -320,7 +335,7 @@
             <div class="vu-meter-bar">
               <div class="vu-fill" id="vu-b"></div>
             </div>
-            <input type="range" class="vertical-fader" id="vol-b" min="0" max="1" step="0.01" value="1">
+            <input type="range" class="vertical-fader" id="vol-b" min="0" max="1" step="0.01" value="1" title="Deck B Volume">
             <span class="strip-label">CH B</span>
           </div>
         </div>
@@ -885,15 +900,16 @@
         <div class="broadcast-tab-content" id="bcontent-butt" style="display: none;">
           <div class="butt-integration-card" style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
             <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 6px;">
-              🎙️ Stream to Myriad Cloud using B.U.T.T. (100% Reliable &amp; Low Latency)
+              🎙️ Audio Hardware Routing &amp; Stream Ingestion (B.U.T.T. / Soundcards)
             </div>
             <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;">
-              Because commercial Icecast servers like <strong>Myriad Cloud (Broadcast Radio)</strong> require raw TCP sockets and block browser web requests (CORS), the professional standard way to stream from a web console to Myriad Cloud is by piping WebDJRadio's audio directly into <strong>B.U.T.T.</strong> using a free virtual audio device (like <em>BlackHole</em> or <em>Loopback</em> on Mac).
+              Configure master output soundcard routing (for B.U.T.T., BlackHole, Loopback) and select your live broadcast input device (Microphone, Bluetooth headset, Audio Interface / Line-In).
             </p>
 
             <div class="form-grid" style="margin-bottom: 12px;">
+              <!-- Master Audio Output Device -->
               <div class="form-group full-width">
-                <label>Master Audio Output Device</label>
+                <label>🎧 Master Audio Output Device</label>
                 <div style="display: flex; gap: 8px;">
                   <select id="bcast-audio-device-select" style="flex: 1;">
                     <option value="">Default Audio Output (Speakers / Headphones)</option>
@@ -902,13 +918,28 @@
                 </div>
                 <small class="field-hint" id="audio-device-status">Active Output: System Default</small>
               </div>
+
+              <!-- Live Microphone / Audio Input Device -->
+              <div class="form-group full-width" style="margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+                <label>🎙️ Live Microphone / Audio Input Device</label>
+                <div style="display: flex; gap: 8px;">
+                  <select id="bcast-audio-input-select" style="flex: 1;">
+                    <option value="">Default Audio Input (Internal Microphone)</option>
+                  </select>
+                  <button class="btn btn-sm" id="btn-refresh-audio-inputs" type="button" title="Refresh available microphone / input soundcards">🔄 Refresh</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                  <small class="field-hint" id="audio-input-status">Active Input: Not Connected (Click 'Connect Mic' or the MIC button on mixer)</small>
+                  <button class="btn btn-sm" id="btn-modal-test-mic" type="button" style="font-size: 11px; padding: 2px 8px;">🎙️ Connect / Test Mic</button>
+                </div>
+              </div>
             </div>
 
             <div class="setup-steps" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 10px 12px; font-size: 12px; line-height: 1.6;">
-              <div style="font-weight: 700; color: #00f0ff; margin-bottom: 4px;">Quick 3-Step Setup for Myriad Cloud:</div>
-              <div><strong>1.</strong> In the dropdown above, select your virtual audio cable (e.g. <code>BlackHole 2ch</code>, <code>Loopback</code>, or <code>VB-Cable</code>).</div>
+              <div style="font-weight: 700; color: #00f0ff; margin-bottom: 4px;">Quick 3-Step Setup for Myriad Cloud &amp; B.U.T.T.:</div>
+              <div><strong>1.</strong> In the Master Output dropdown above, select your virtual audio cable (e.g. <code>BlackHole 2ch</code>, <code>Loopback</code>, or <code>VB-Cable</code>).</div>
               <div><strong>2.</strong> Open <strong>B.U.T.T.</strong> &rarr; <strong>Settings</strong> &rarr; <strong>Audio</strong> &rarr; Set <strong>Audio Device</strong> to the same virtual cable.</div>
-              <div><strong>3.</strong> In B.U.T.T., click <strong>Play / Connect</strong> to go live to Myriad Cloud!</div>
+              <div><strong>3.</strong> In B.U.T.T., click <strong>Play / Connect</strong> to go live to Myriad Cloud with full music and mic mixing!</div>
             </div>
           </div>
         </div>
@@ -1271,6 +1302,7 @@
     <div class="keyboard-hints">
       <span><span class="key-cap">Space</span> Play/Pause A</span>
       <span><span class="key-cap">Enter</span> Play/Pause B</span>
+      <span><span class="key-cap">M</span> Mic On/Mute</span>
       <span><span class="key-cap">Q/W/E/R</span> Hot Cues A</span>
       <span><span class="key-cap">1/2/3/4</span> Hot Cues B</span>
       <span><span class="key-cap">← / →</span> Crossfader</span>
@@ -1278,10 +1310,10 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="audio-analysis.js?v=1.7.8"></script>
-  <script src="WebRadioDecksEngine.js?v=1.7.8"></script>
-  <script src="broadcast.js?v=1.7.8"></script>
-  <script src="midi.js?v=1.7.8"></script>
-  <script src="app.js?v=1.7.8"></script>
+  <script src="audio-analysis.js?v=1.7.9"></script>
+  <script src="WebRadioDecksEngine.js?v=1.7.9"></script>
+  <script src="broadcast.js?v=1.7.9"></script>
+  <script src="midi.js?v=1.7.9"></script>
+  <script src="app.js?v=1.7.9"></script>
 </body>
 </html>

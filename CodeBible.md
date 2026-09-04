@@ -1,6 +1,6 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `1.7.8`  
+> **Version:** `1.7.9`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
 > **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation & Broadcasting Console
 
@@ -8,66 +8,66 @@
 
 ## 1. Executive Summary & System Overview
 
-**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, USB MIDI controller hardware integration, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
+**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
 
 ---
 
 ## 2. Complete Web Audio Graph Architecture
 
-Each deck operates an independent, non-blocking Web Audio DSP chain that feeds into an equal-power crossfader, master gain stage, real-time analyser, and live broadcast destination:
+Each deck operates an independent Web Audio DSP chain, while live microphone & auxiliary inputs feed through a dedicated gain and analysis stage directly into the master bus and live broadcast stream:
 
 ```
-                            ┌────────────────────────────────────────────────────────┐
-                            │                    WebDJRadio UI                       │
-                            └───────────┬────────────────────────────────┬───────────┘
-                                        │                                │
-                                        ▼                                ▼
-                        ┌───────────────────────────────┐  ┌───────────────────────────────┐
-                        │         Deck A Audio          │  │         Deck B Audio          │
-                        │    (BufferSourceNode)         │  │    (BufferSourceNode)         │
-                        └───────────────┬───────────────┘  └───────────────┬───────────────┘
-                                        │                                  │
-                                        ▼                                  ▼
-                        ┌───────────────────────────────┐  ┌───────────────────────────────┐
-                        │ 3-Band Equalizer (Low/Mid/Hi) │  │ 3-Band Equalizer (Low/Mid/Hi) │
-                        └───────────────┬───────────────┘  └───────────────┬───────────────┘
-                                        │                                  │
-                                        ▼                                  ▼
-                        ┌───────────────────────────────┐  ┌───────────────────────────────┐
-                        │ Dual Filter (HPF / LPF Sweep) │  │ Dual Filter (HPF / LPF Sweep) │
-                        └───────────────┬───────────────┘  └───────────────┬───────────────┘
-                                        │                                  │
-                                        ▼                                  ▼
-                        ┌───────────────────────────────┐  ┌───────────────────────────────┐
-                        │ Studio Software FX Unit:      │  │ Studio Software FX Unit:      │
-                        │ - BPM-Synced Delay            │  │ - BPM-Synced Delay            │
-                        │ - Algorithmic Reverb          │  │ - Algorithmic Reverb          │
-                        │ - Flanger / Phaser            │  │ - Flanger / Phaser            │
-                        │ - Lo-Fi Bitcrusher            │  │ - Lo-Fi Bitcrusher            │
-                        └───────────────┬───────────────┘  └───────────────┬───────────────┘
-                                        │                                  │
-                                        ▼                                  ▼
-                        ┌───────────────────────────────┐  ┌───────────────────────────────┐
-                        │ Volume Gain & Peak Analyser   │  │ Volume Gain & Peak Analyser   │
-                        └───────────────┬───────────────┘  └───────────────┬───────────────┘
-                                        │                                  │
-                                        ▼                                  ▼
-                        ┌──────────────────────────────────────────────────────────────────┐
-                        │             Equal-Power Crossfader (cos/sin Gain)                │
-                        └───────────────┬──────────────────────────────────┘
-                                        │
-                                        ▼
-                        ┌──────────────────────────────────────────────────────────────────┐
-                        │             Master Gain Stage & Master Peak Analyser             │
-                        └───────────────┬──────────────────────────────────┬───────────────┘
-                                        │                                  │
-                                        ▼                                  ▼
-                        ┌───────────────────────────────────────┐  ┌───────────────────────────────────┐
-                        │           Local Audio Output          │  │        Radio Broadcast Stream     │
-                        │  - AudioContext.destination           │  │  - WebRTC WHIP / P2P Mesh         │
-                        │  - AudioContext.setSinkId (B.U.T.T.)  │  │  - Icecast 2 & Shoutcast Streams  │
-                        └───────────────────────────────────────┘  │  - Live Broadcast Ingestion Tap   │
-                                                                   └───────────────────────────────────┘
+                            ┌────────────────────────────────────────────────────────────────────────┐
+                            │                             WebDJRadio UI                              │
+                            └───────────┬───────────────────────────────┬────────────────┬───────────┘
+                                        │                               │                │
+                                        ▼                               ▼                ▼
+                        ┌───────────────────────────────┐ ┌───────────────────────────┐ ┌───────────────────────────────┐
+                        │         Deck A Audio          │ │   Live Microphone / Input │ │         Deck B Audio          │
+                        │    (BufferSourceNode)         │ │   (MediaStreamAudioSource)│ │    (BufferSourceNode)         │
+                        └───────────────┬───────────────┘ └─────────────┬─────────────┘ └───────────────┬───────────────┘
+                                        │                               │                               │
+                                        ▼                               ▼                               ▼
+                        ┌───────────────────────────────┐ ┌───────────────────────────┐ ┌───────────────────────────────┐
+                        │ 3-Band Equalizer (Low/Mid/Hi) │ │ Mic Gain Node (0% - 150%) │ │ 3-Band Equalizer (Low/Mid/Hi) │
+                        └───────────────┬───────────────┘ └─────────────┬─────────────┘ └───────────────┬───────────────┘
+                                        │                               │                               │
+                                        ▼                               ▼                               ▼
+                        ┌───────────────────────────────┐ ┌───────────────────────────┐ ┌───────────────────────────────┐
+                        │ Dual Filter (HPF / LPF Sweep) │ │ Mic Analyser (VU Peak)    │ │ Dual Filter (HPF / LPF Sweep) │
+                        └───────────────┬───────────────┘ └─────────────┬─────────────┘ └───────────────┬───────────────┘
+                                        │                               │                               │
+                                        ▼                               │                               ▼
+                        ┌───────────────────────────────┐               │               ┌───────────────────────────────┐
+                        │ Studio Software FX Unit:      │               │               │ Studio Software FX Unit:      │
+                        │ - BPM-Synced Delay            │               │               │ - BPM-Synced Delay            │
+                        │ - Algorithmic Reverb          │               │               │ - Algorithmic Reverb          │
+                        │ - Flanger / Phaser            │               │               │ - Flanger / Phaser            │
+                        │ - Lo-Fi Bitcrusher            │               │               │ - Lo-Fi Bitcrusher            │
+                        └───────────────┬───────────────┘               │               └───────────────┬───────────────┘
+                                        │                               │                               │
+                                        ▼                               │                               ▼
+                        ┌───────────────────────────────┐               │               ┌───────────────────────────────┐
+                        │ Volume Gain & Peak Analyser   │               │               │ Volume Gain & Peak Analyser   │
+                        └───────────────┬───────────────┘               │               └───────────────┬───────────────┘
+                                        │                               │                               │
+                                        ▼                               │                               ▼
+                        ┌───────────────────────────────────────────────┴───────────────────────────────┐
+                        │             Equal-Power Crossfader (cos/sin Gain + Talkover Ducking)          │
+                        └───────────────────────────────────────────────┬───────────────────────────────┘
+                                                                        │
+                                                                        ▼
+                        ┌───────────────────────────────────────────────────────────────────────────────┐
+                        │                   Master Gain Stage & Master Peak Analyser                    │
+                        └───────────────┬───────────────────────────────────────────────┬───────────────┘
+                                        │                                               │
+                                        ▼                                               ▼
+                        ┌───────────────────────────────────────┐       ┌───────────────────────────────────┐
+                        │           Local Audio Output          │       │        Radio Broadcast Stream     │
+                        │  - AudioContext.destination           │       │  - WebRTC WHIP / P2P Mesh         │
+                        │  - AudioContext.setSinkId (B.U.T.T.)  │       │  - Icecast 2 & Shoutcast Streams  │
+                        └───────────────────────────────────────┘       │  - Live Broadcast Ingestion Tap   │
+                                                                        └───────────────────────────────────┘
 ```
 
 ---
@@ -163,7 +163,22 @@ Each deck operates an independent, non-blocking Web Audio DSP chain that feeds i
   $$\text{Progress}(t) = \begin{cases} 4t^3 & \text{if } t < 0.5 \\ 1 - \frac{(-2t + 2)^3}{2} & \text{if } t \ge 0.5 \end{cases}$$
 * **Auto-Queue**: Automatically pulls upcoming tracks from each deck's dedicated cued playlist (or library) to ensure 24/7 continuous broadcast play.
 
-### 3.6. Live Radio Broadcasting Subsystem (`broadcast.js`)
+### 3.6. Live Microphone, Host & Audio Input Subsystem (`WebRadioDecksEngine.js`)
+* **Hardware Input Enumeration**: Dynamically queries and populates `navigator.mediaDevices.enumerateDevices()` (`kind === 'audioinput'`) for USB audio interfaces (Focusrite, PreSonus, Rode), Bluetooth headsets/AirPods, and internal mics.
+* **Dedicated Mixer Channel Strip (`.mic-strip`)**:
+  * Precision vertical gain fader ($0\% \dots 150\%$) with persistent volume memory.
+  * Real-time 60 FPS LED peak VU meter bar isolated to incoming voice amplitude.
+  * Illuminated **MIC ON / ON AIR** toggle button with glowing pulsating broadcast red indicator.
+* **Talkover Auto-Ducking Engine**:
+  * Smooth $-9\text{ dB}$ (gain factor $0.35$) automatic attenuation of music channels (Deck A & Deck B) whenever the presenter speaks.
+  * Instantaneous ramp-restoration when the microphone is muted or released.
+* **Full Stream & Soundcard Distribution**:
+  * Taps microphone audio directly into `masterGain` and `masterStreamDest`, broadcasting host voice across all active output targets (Local Speakers, B.U.T.T. virtual soundcards, WebRTC WHIP, Icecast, Shoutcast, and P2P).
+* **Hotplug & Permission Handling**:
+  * Automatic soundcard re-enumeration on USB connect/disconnect via `devicechange` events.
+  * One-click permission prompt and test signal trigger in the B.U.T.T. / Audio Routing modal.
+
+### 3.7. Live Radio Broadcasting Subsystem (`broadcast.js`)
 * **1. WebRTC WHIP Streaming**: Ultra-low latency broadcast ingestion to WHIP endpoints (Cloudflare Stream, OvenMediaEngine, Janus, LiveKit, MediaSoup).
 * **2. Icecast 2 Streaming**: High-fidelity Ogg Opus/WebM audio chunked streaming with mountpoint and source password authentication. Includes companion WebSocket TCP bridge relay (`icecast-bridge.js`).
 * **3. Shoutcast v1/v2 Streaming**: Direct Shoutcast ingestion with SID and admin password authentication.
@@ -174,7 +189,7 @@ Each deck operates an independent, non-blocking Web Audio DSP chain that feeds i
   * Dynamic hotplug detection via `navigator.mediaDevices.ondevicechange`.
 * **Live Broadcast Diagnostics**: Real-time elapsed timer, live bitrate readout, MBs sent counter, pulsing ON AIR indicator, and diagnostic log terminal.
 
-### 3.7. USB MIDI Controller Hardware Support (`midi.js`)
+### 3.8. USB MIDI Controller Hardware Support (`midi.js`)
 * **Web MIDI API Integration**: Automatic device detection, connection status badges, and message parsing.
 * **Controller Presets**: Out-of-the-box mappings for **Pioneer DDJ-200**, **Pioneer DDJ-400**, **Numark Party Mix**, and **Behringer CMD Studio/Micro**.
 * **Interactive MIDI Learn**: Click "Start Learn", move any physical control, and automatically bind to any mixer function.
@@ -198,6 +213,13 @@ Each deck operates an independent, non-blocking Web Audio DSP chain that feeds i
 4. In **B.U.T.T.**, set Audio Device to **BlackHole 2ch**, configure your Myriad Cloud / Icecast credentials, and click **Play / Connect**.
 5. Enable **AUTO-DECK RELAY** (<kbd>P</kbd>) and populate Cued Playlists for unattended continuous broadcasting.
 
+### 4.3. Presenter Voiceover & Live Host Workflow
+1. Open **📡 Broadcast** $\rightarrow$ **🎧 B.U.T.T. / Audio Routing** and choose your preferred *Live Microphone / Audio Input Device* (e.g. Focusrite USB, Bluetooth Headset, or Internal Mic).
+2. Click **🎙️ Connect / Test Mic** to grant microphone access.
+3. On the central mixer, adjust the **MIC** vertical fader to set your voice level.
+4. Enable **TALK** if you want automatic $-9\text{ dB}$ music ducking while speaking over tracks.
+5. Press <kbd>M</kbd> (or click the glowing **MIC** button) to go live on air!
+
 ---
 
 ## 5. Keyboard Shortcuts Reference
@@ -206,6 +228,8 @@ Each deck operates an independent, non-blocking Web Audio DSP chain that feeds i
 | :--- | :--- | :--- |
 | <kbd>Space</kbd> | Deck A | Play / Pause Deck A |
 | <kbd>Enter</kbd> | Deck B | Play / Pause Deck B |
+| <kbd>M</kbd> | Mixer | Toggle Live Microphone On / Mute |
+| <kbd>Shift</kbd> + <kbd>M</kbd> | Header | Open MIDI Controller Mapping Panel |
 | <kbd>C</kbd> | Deck A | Trigger / Hold Cue Point Deck A |
 | <kbd>V</kbd> | Deck B | Trigger / Hold Cue Point Deck B |
 | <kbd>Q</kbd> / <kbd>W</kbd> / <kbd>E</kbd> / <kbd>R</kbd> | Deck A | Trigger Hot Cue Slots 1, 2, 3, 4 (Deck A) |
@@ -213,7 +237,6 @@ Each deck operates an independent, non-blocking Web Audio DSP chain that feeds i
 | <kbd>←</kbd> (Left Arrow) | Mixer | Nudge Crossfader towards Deck A |
 | <kbd>→</kbd> (Right Arrow) | Mixer | Nudge Crossfader towards Deck B |
 | <kbd>P</kbd> | Global | Toggle Auto-Deck Continuous Relay Play |
-| <kbd>M</kbd> | Header | Open MIDI Controller Mapping Panel |
 | <kbd>B</kbd> | Header | Open Live Radio Broadcasting Modal |
 | <kbd>X</kbd> | Header | Open Studio Software FX Rack |
 | <kbd>Esc</kbd> | Global | Close any active modal dialog |

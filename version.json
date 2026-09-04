@@ -1,8 +1,22 @@
 {
-  "version": "1.7.8",
+  "version": "1.7.9",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-08-31",
+  "releaseDate": "2026-09-04",
   "changelog": [
+    {
+      "version": "1.7.9",
+      "date": "2026-09-04",
+      "title": "Live Microphone / Audio Input Routing & Mixer Channel",
+      "changes": [
+        "**Live Microphone & External Audio Input Integration**",
+        "====================:)====================",
+        "Audio Input Device Selector: Added real-time device enumeration to the 'B.U.T.T. / Audio Routing' panel supporting internal mics, bluetooth headsets, audio interfaces, and line-in devices.",
+        "Web Radio Mixer Mic Channel: Added a dedicated MIC channel strip in the central mixer featuring a precision gain fader (0%–150%), real-time LED peak VU meter, and glowing ON AIR button.",
+        "Talkover Auto-Ducking: Built-in 'TALK' toggle automatically ducks deck music by -9dB when the presenter speaks.",
+        "Master & Broadcast Graph Mixing: Mic audio is mixed directly into the master Web Audio graph, feeding local speakers, soundcard outputs, and live radio streams (WebRTC, Icecast, Shoutcast, B.U.T.T.).",
+        "Hotkeys & Device Change: Added 'M' keyboard shortcut for instant mic toggling and automated device re-enumeration on USB plug/unplug events."
+      ]
+    },
     {
       "version": "1.7.8",
       "date": "2026-08-31",
