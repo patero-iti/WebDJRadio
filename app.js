@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const libraryTbody = document.getElementById('library-tbody');
   const btnLayoutDj = document.getElementById('btn-layout-dj');
   const btnLayoutRadio = document.getElementById('btn-layout-radio');
+  const btnLayoutRadioB = document.getElementById('btn-layout-radio-b');
 
   // DOM Elements - Tabs & Cued Playlists
   const tabBtnLibrary = document.getElementById('tab-btn-library');
@@ -48,8 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
     time: document.getElementById('deck-a-time'),
     artImg: document.getElementById('deck-a-art'),
     artPlaceholder: document.getElementById('deck-a-art-placeholder'),
+    mixerStrip: document.getElementById('mixer-strip-a'),
     mixerArtImg: document.getElementById('mixer-art-img-a'),
     mixerArtPlaceholder: document.getElementById('mixer-art-placeholder-a'),
+    mixerTrackInfo: document.getElementById('mixer-track-info-a'),
+    mixerTitle: document.getElementById('mixer-track-title-a'),
+    mixerArtist: document.getElementById('mixer-track-artist-a'),
     waveformScrolling: document.getElementById('waveform-scrolling-a'),
     waveformOverview: document.getElementById('waveform-overview-a'),
     overviewProgress: document.getElementById('overview-progress-a'),
@@ -77,8 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
     time: document.getElementById('deck-b-time'),
     artImg: document.getElementById('deck-b-art'),
     artPlaceholder: document.getElementById('deck-b-art-placeholder'),
+    mixerStrip: document.getElementById('mixer-strip-b'),
     mixerArtImg: document.getElementById('mixer-art-img-b'),
     mixerArtPlaceholder: document.getElementById('mixer-art-placeholder-b'),
+    mixerTrackInfo: document.getElementById('mixer-track-info-b'),
+    mixerTitle: document.getElementById('mixer-track-title-b'),
+    mixerArtist: document.getElementById('mixer-track-artist-b'),
     waveformScrolling: document.getElementById('waveform-scrolling-b'),
     waveformOverview: document.getElementById('waveform-overview-b'),
     overviewProgress: document.getElementById('overview-progress-b'),
@@ -123,20 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const jogAngles = { A: 0, B: 0 };
 
   // -------------------------------------------------------------
-  // 2. Layout Mode Switcher (DJ Console vs Radio Presenter)
+  // 2. Layout Mode Switcher (DJ Console vs Radio Presenter vs Radio Presenter B)
   // -------------------------------------------------------------
   function setLayoutMode(mode) {
+    const isDj = mode === 'dj';
     const isRadio = mode === 'radio';
+    const isRadioB = mode === 'radio-b';
+
+    document.body.classList.toggle('mode-dj', isDj);
     document.body.classList.toggle('mode-radio', isRadio);
-    document.body.classList.toggle('mode-dj', !isRadio);
+    document.body.classList.toggle('mode-radio-b', isRadioB);
     
-    if (btnLayoutDj) btnLayoutDj.classList.toggle('active', !isRadio);
+    if (btnLayoutDj) btnLayoutDj.classList.toggle('active', isDj);
     if (btnLayoutRadio) btnLayoutRadio.classList.toggle('active', isRadio);
+    if (btnLayoutRadioB) btnLayoutRadioB.classList.toggle('active', isRadioB);
 
     localStorage.setItem('webdj_layout_mode', mode);
 
-    // In Radio Presenter mode, center the crossfader so both deck channel volume faders are 100% active
-    if (isRadio && crossfader) {
+    // In Radio Presenter and Radio Presenter B modes, center the crossfader so both deck channel volume faders are 100% active
+    if ((isRadio || isRadioB) && crossfader) {
       crossfader.value = 0.5;
       engine.setCrossfader(0.5);
     }
@@ -147,6 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (btnLayoutRadio) {
     btnLayoutRadio.addEventListener('click', () => setLayoutMode('radio'));
+  }
+  if (btnLayoutRadioB) {
+    btnLayoutRadioB.addEventListener('click', () => setLayoutMode('radio-b'));
   }
 
   // Restore saved layout mode or default to DJ Console
@@ -1060,6 +1077,9 @@ document.addEventListener('DOMContentLoaded', () => {
         deckA.key = track.key;
         deckAElements.title.textContent = track.title;
         deckAElements.artist.textContent = track.artist;
+        if (deckAElements.mixerTitle) deckAElements.mixerTitle.textContent = track.title;
+        if (deckAElements.mixerArtist) deckAElements.mixerArtist.textContent = track.artist;
+        if (deckAElements.mixerTrackInfo) deckAElements.mixerTrackInfo.title = `Loaded: ${track.title} — ${track.artist}`;
         deckAElements.bpm.textContent = track.bpm ? track.bpm.toFixed(1) : '124.0';
         if (deckAElements.key) deckAElements.key.textContent = track.key || '--';
         if (track.artworkUrl) {
@@ -1097,6 +1117,9 @@ document.addEventListener('DOMContentLoaded', () => {
         deckB.key = track.key;
         deckBElements.title.textContent = track.title;
         deckBElements.artist.textContent = track.artist;
+        if (deckBElements.mixerTitle) deckBElements.mixerTitle.textContent = track.title;
+        if (deckBElements.mixerArtist) deckBElements.mixerArtist.textContent = track.artist;
+        if (deckBElements.mixerTrackInfo) deckBElements.mixerTrackInfo.title = `Loaded: ${track.title} — ${track.artist}`;
         deckBElements.bpm.textContent = track.bpm ? track.bpm.toFixed(1) : '124.0';
         if (deckBElements.key) deckBElements.key.textContent = track.key || '--';
         if (track.artworkUrl) {
@@ -1255,6 +1278,9 @@ document.addEventListener('DOMContentLoaded', () => {
       deck.loadedTrackId = trackObj.id;
       deckElem.title.textContent = deck.title;
       deckElem.artist.textContent = deck.artist;
+      if (deckElem.mixerTitle) deckElem.mixerTitle.textContent = deck.title;
+      if (deckElem.mixerArtist) deckElem.mixerArtist.textContent = deck.artist;
+      if (deckElem.mixerTrackInfo) deckElem.mixerTrackInfo.title = `Loaded: ${deck.title} — ${deck.artist}`;
       deckElem.bpm.textContent = deck.bpm ? deck.bpm.toFixed(1) : '124.0';
       if (deckElem.key) deckElem.key.textContent = deck.key || '--';
       
@@ -2050,6 +2076,13 @@ document.addEventListener('DOMContentLoaded', () => {
     deckAElements.btnPlay.classList.toggle('playing', deckA.isPlaying);
     if (deckAElements.mixerBtnPlay) deckAElements.mixerBtnPlay.classList.toggle('playing', deckA.isPlaying);
     if (deckAElements.mixerPlayIcon) deckAElements.mixerPlayIcon.textContent = deckA.isPlaying ? '⏸' : '▶';
+    if (deckAElements.mixerStrip) {
+      deckAElements.mixerStrip.classList.toggle('track-ending-warning', isEndingA);
+    }
+    if (deckAElements.mixerTrackInfo) {
+      deckAElements.mixerTrackInfo.classList.toggle('playing', deckA.isPlaying);
+      deckAElements.mixerTrackInfo.classList.toggle('track-ending-warning', isEndingA);
+    }
     deckAElements.time.textContent = formatTime(curA);
     if (deckAElements.title) {
       deckAElements.title.parentElement.classList.toggle('track-ending-warning', isEndingA);
@@ -2079,6 +2112,13 @@ document.addEventListener('DOMContentLoaded', () => {
     deckBElements.btnPlay.classList.toggle('playing', deckB.isPlaying);
     if (deckBElements.mixerBtnPlay) deckBElements.mixerBtnPlay.classList.toggle('playing', deckB.isPlaying);
     if (deckBElements.mixerPlayIcon) deckBElements.mixerPlayIcon.textContent = deckB.isPlaying ? '⏸' : '▶';
+    if (deckBElements.mixerStrip) {
+      deckBElements.mixerStrip.classList.toggle('track-ending-warning', isEndingB);
+    }
+    if (deckBElements.mixerTrackInfo) {
+      deckBElements.mixerTrackInfo.classList.toggle('playing', deckB.isPlaying);
+      deckBElements.mixerTrackInfo.classList.toggle('track-ending-warning', isEndingB);
+    }
     deckBElements.time.textContent = formatTime(curB);
     if (deckBElements.title) {
       deckBElements.title.parentElement.classList.toggle('track-ending-warning', isEndingB);

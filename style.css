@@ -3171,8 +3171,8 @@ input[type=range].crossfader-slider:active::-moz-range-thumb {
 }
 
 /* ==========================================================================
-   Radio Presenter Layout Mode (body.mode-radio)
-   Minimal, streamlined broadcast studio console for radio hosts
+   Radio Presenter Layout Modes (body.mode-radio & body.mode-radio-b)
+   Minimal, streamlined broadcast studio consoles for radio hosts
    ========================================================================== */
 body.mode-radio .jog-container,
 body.mode-radio .hotcues-bar,
@@ -3180,8 +3180,28 @@ body.mode-radio .loops-bar,
 body.mode-radio .roll-bar,
 body.mode-radio .deck-fx-strip,
 body.mode-radio .eq-rack,
-body.mode-radio .crossfader-container {
+body.mode-radio .crossfader-container,
+body.mode-radio-b .jog-container,
+body.mode-radio-b .hotcues-bar,
+body.mode-radio-b .loops-bar,
+body.mode-radio-b .roll-bar,
+body.mode-radio-b .deck-fx-strip,
+body.mode-radio-b .eq-rack,
+body.mode-radio-b .crossfader-container {
   display: none !important;
+}
+
+body.mode-radio-b .deck-panel {
+  display: none !important;
+}
+
+body.mode-radio-b .dj-console {
+  display: flex !important;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 body.mode-radio .dj-console {
@@ -3258,7 +3278,8 @@ body.mode-radio .pitch-slider {
 }
 
 /* Radio Presenter Focused Mixer Console */
-body.mode-radio .mixer-panel {
+body.mode-radio .mixer-panel,
+body.mode-radio-b .mixer-panel {
   padding: 20px 18px;
   gap: 16px;
   background: linear-gradient(180deg, #101626 0%, #0a0e18 100%);
@@ -3266,7 +3287,16 @@ body.mode-radio .mixer-panel {
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-body.mode-radio .mixer-header {
+body.mode-radio-b .mixer-panel {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 22px;
+  gap: 18px;
+}
+
+body.mode-radio .mixer-header,
+body.mode-radio-b .mixer-header {
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 2.5px;
@@ -3280,7 +3310,8 @@ body.mode-radio .faders-section {
   align-items: stretch;
 }
 
-body.mode-radio .channel-fader-strip {
+body.mode-radio .channel-fader-strip,
+body.mode-radio-b .channel-fader-strip {
   flex: 1;
   padding: 12px 8px;
   background: rgba(0, 0, 0, 0.38);
@@ -3291,55 +3322,66 @@ body.mode-radio .channel-fader-strip {
   height: 100%;
 }
 
-body.mode-radio .channel-fader-strip.deck-a {
+body.mode-radio .channel-fader-strip.deck-a,
+body.mode-radio-b .channel-fader-strip.deck-a {
   border-color: rgba(0, 240, 255, 0.35);
   box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.05);
 }
 
-body.mode-radio .channel-fader-strip.deck-b {
+body.mode-radio .channel-fader-strip.deck-b,
+body.mode-radio-b .channel-fader-strip.deck-b {
   border-color: rgba(255, 0, 127, 0.35);
   box-shadow: inset 0 0 12px rgba(255, 0, 127, 0.05);
 }
 
-body.mode-radio .channel-fader-strip.mic-strip {
+body.mode-radio .channel-fader-strip.mic-strip,
+body.mode-radio-b .channel-fader-strip.mic-strip {
   border-color: rgba(255, 23, 68, 0.35);
   box-shadow: inset 0 0 12px rgba(255, 23, 68, 0.05);
 }
 
-body.mode-radio .channel-fader-strip.master-strip {
+body.mode-radio .channel-fader-strip.master-strip,
+body.mode-radio-b .channel-fader-strip.master-strip {
   border-color: rgba(255, 255, 255, 0.15);
   flex: 0 0 52px;
 }
 
-body.mode-radio .mixer-ch-art {
+body.mode-radio .mixer-ch-art,
+body.mode-radio-b .mixer-ch-art {
   width: 48px;
   height: 48px;
   border-radius: 8px;
 }
 
 body.mode-radio .mixer-art-placeholder,
-body.mode-radio .mixer-art-icon {
+body.mode-radio .mixer-art-icon,
+body.mode-radio-b .mixer-art-placeholder,
+body.mode-radio-b .mixer-art-icon {
   font-size: 22px;
 }
 
-body.mode-radio .fader-and-meter {
+body.mode-radio .fader-and-meter,
+body.mode-radio-b .fader-and-meter {
   height: 160px;
   gap: 10px;
   flex-shrink: 0;
 }
 
-body.mode-radio .vu-meter-bar {
+body.mode-radio .vu-meter-bar,
+body.mode-radio-b .vu-meter-bar {
   height: 160px;
   width: 10px;
   border-radius: 4px;
 }
 
-body.mode-radio .master-vu-bar {
+body.mode-radio .master-vu-bar,
+body.mode-radio-b .master-vu-bar {
   height: 160px;
   width: 14px;
 }
 
-body.mode-radio input[type=range].vertical-fader {
+body.mode-radio input[type=range].vertical-fader,
+body.mode-radio-b input[type=range].vertical-fader {
   height: 160px;
   width: 18px;
   border-radius: 9px;
@@ -3347,60 +3389,217 @@ body.mode-radio input[type=range].vertical-fader {
   padding: 0;
 }
 
-body.mode-radio input[type=range].vertical-fader::-webkit-slider-thumb {
+body.mode-radio input[type=range].vertical-fader::-webkit-slider-thumb,
+body.mode-radio-b input[type=range].vertical-fader::-webkit-slider-thumb {
   width: 30px;
   height: 30px;
 }
 
-body.mode-radio input[type=range].vertical-fader::-moz-range-thumb {
+body.mode-radio input[type=range].vertical-fader::-moz-range-thumb,
+body.mode-radio-b input[type=range].vertical-fader::-moz-range-thumb {
   width: 30px;
   height: 30px;
 }
 
-body.mode-radio .master-bottom-placeholder {
+body.mode-radio .master-bottom-placeholder,
+body.mode-radio-b .master-bottom-placeholder {
   width: 100%;
   height: 48px;
   border-radius: 8px;
 }
 
-body.mode-radio .btn-channel-square {
+body.mode-radio .btn-channel-square,
+body.mode-radio-b .btn-channel-square {
   width: 100%;
   height: 48px;
   border-radius: 8px;
 }
 
-body.mode-radio .btn-square-icon {
+body.mode-radio .btn-square-icon,
+body.mode-radio-b .btn-square-icon {
   font-size: 18px;
 }
 
-body.mode-radio .btn-square-sublabel {
+body.mode-radio .btn-square-sublabel,
+body.mode-radio-b .btn-square-sublabel {
   font-size: 9px;
   font-weight: 800;
 }
 
-body.mode-radio .btn-mic-toggle {
+body.mode-radio .btn-mic-toggle,
+body.mode-radio-b .btn-mic-toggle {
   width: 100%;
   height: 48px;
   border-radius: 8px;
 }
 
-body.mode-radio .btn-talkover-toggle {
+body.mode-radio .btn-talkover-toggle,
+body.mode-radio-b .btn-talkover-toggle {
   padding: 4px 6px;
   font-size: 9px;
   border-radius: 4px;
 }
 
-body.mode-radio .relay-container {
+body.mode-radio .relay-container,
+body.mode-radio-b .relay-container {
   width: 100%;
   padding-top: 12px;
   border-top: 1px solid var(--border-color);
 }
 
-body.mode-radio .btn-relay {
+body.mode-radio .btn-relay,
+body.mode-radio-b .btn-relay {
   padding: 12px 16px;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1px;
+}
+
+/* Base Mixer Track Info (Hidden in DJ and Standard Radio modes) */
+.mixer-track-info {
+  display: none !important;
+}
+
+/* Radio Presenter B Focused Track Metadata Monitors */
+body.mode-radio-b .faders-section {
+  gap: 14px;
+  min-height: 380px;
+  height: auto;
+  align-items: stretch;
+}
+
+body.mode-radio-b .mixer-track-info {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 130px;
+  text-align: center;
+  margin: 2px 0 4px 0;
+  padding: 5px 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-info {
+  border-color: rgba(0, 240, 255, 0.25);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-info {
+  border-color: rgba(255, 0, 127, 0.25);
+  background: rgba(255, 0, 127, 0.06);
+}
+
+body.mode-radio-b .channel-fader-strip.master-strip .mixer-track-info,
+body.mode-radio-b .channel-fader-strip.mic-strip .mixer-track-info {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.mode-radio-b .mixer-track-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-title {
+  color: #00f0ff;
+  text-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
+}
+
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-title {
+  color: #ff007f;
+  text-shadow: 0 0 6px rgba(255, 0, 127, 0.3);
+}
+
+body.mode-radio-b .mixer-track-artist {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #8e9aa8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  letter-spacing: 0.2px;
+  margin-top: 1px;
+}
+
+body.mode-radio-b .mixer-track-info.playing {
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+  border-color: rgba(0, 240, 255, 0.6);
+}
+
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-info.playing {
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+  border-color: rgba(255, 0, 127, 0.6);
+}
+
+body.mode-radio-b .mixer-track-info.track-ending-warning {
+  animation: pulse-ending-alert 1s infinite alternate;
+  border-color: #ff1744 !important;
+  background: rgba(255, 23, 68, 0.15) !important;
+}
+
+body.mode-radio-b .mixer-track-info.track-ending-warning .mixer-track-title {
+  color: #ff1744 !important;
+  text-shadow: 0 0 8px rgba(255, 23, 68, 0.8) !important;
+}
+
+/* ==========================================================================
+   Mixer Channel Strip 10-Second End-of-Track Flash Alert
+   (Radio Presenter, Radio Presenter B, and DJ Console modes)
+   ========================================================================== */
+@keyframes mixerStripEndingPulse {
+  0%, 100% {
+    border-color: #ff1744 !important;
+    box-shadow: inset 0 0 22px rgba(255, 23, 68, 0.35), 0 0 24px rgba(255, 23, 68, 0.6) !important;
+    background: rgba(255, 23, 68, 0.12) !important;
+  }
+  50% {
+    border-color: rgba(255, 23, 68, 0.35) !important;
+    box-shadow: inset 0 0 6px rgba(255, 23, 68, 0.08), 0 0 8px rgba(255, 23, 68, 0.15) !important;
+    background: rgba(0, 0, 0, 0.38) !important;
+  }
+}
+
+.channel-fader-strip.track-ending-warning,
+body.mode-radio .channel-fader-strip.track-ending-warning,
+body.mode-radio-b .channel-fader-strip.track-ending-warning {
+  animation: mixerStripEndingPulse 0.5s ease-in-out infinite !important;
+}
+
+.channel-fader-strip.track-ending-warning .strip-label,
+body.mode-radio .channel-fader-strip.track-ending-warning .strip-label,
+body.mode-radio-b .channel-fader-strip.track-ending-warning .strip-label {
+  color: #ff1744 !important;
+  text-shadow: 0 0 10px rgba(255, 23, 68, 0.9) !important;
+}
+
+.channel-fader-strip.track-ending-warning .mixer-ch-art,
+body.mode-radio .channel-fader-strip.track-ending-warning .mixer-ch-art,
+body.mode-radio-b .channel-fader-strip.track-ending-warning .mixer-ch-art {
+  border-color: #ff1744 !important;
+  box-shadow: 0 0 14px rgba(255, 23, 68, 0.7) !important;
+}
+
+.channel-fader-strip.track-ending-warning .btn-mixer-play,
+body.mode-radio .channel-fader-strip.track-ending-warning .btn-mixer-play,
+body.mode-radio-b .channel-fader-strip.track-ending-warning .btn-mixer-play {
+  border-color: #ff1744 !important;
+  box-shadow: 0 0 14px rgba(255, 23, 68, 0.7) !important;
+  color: #ff1744 !important;
 }
 
 

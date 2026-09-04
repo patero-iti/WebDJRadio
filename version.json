@@ -1,8 +1,49 @@
 {
-  "version": "1.9.2",
+  "version": "1.9.5",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-04",
   "changelog": [
+    {
+      "version": "1.9.5",
+      "date": "2026-09-04",
+      "title": "10-Second End-of-Track Flashing Red Alert on Mixer Channel Strips (CH A & CH B)",
+      "changes": [
+        "**Channel Strip Red Flashing Broadcast Alert**",
+        "====================:)====================",
+        "Broadcast-Grade Ending Warning: When a track has 10 seconds or less remaining on CH A or CH B, the corresponding mixer channel strip card pulses with an unmistakable flashing neon red alert (#ff1744).",
+        "Universal Layout Support: Flashes vividly across both '🎙️ Radio Presenter' and '📻 Radio Presenter B' (as well as DJ Console) layouts, alerting hosts and presenters even when deck faceplates are hidden.",
+        "Full Component Alert Highlighting: Synchronizes glowing red alert pulses across the channel card border, card background glow, album artwork badge, 'CH A'/'CH B' strip title label, track info badges, and square Play/Pause buttons.",
+        "Real-Time Glitch-Free Monitoring: Powered by the 60fps Web Audio playback time monitor, instantly engaging and resetting seamlessly on deck transitions."
+      ]
+    },
+    {
+      "version": "1.9.4",
+      "date": "2026-09-04",
+      "title": "Loaded & Playing Track Displays in Web Radio Mixer (Radio Presenter B Mode)",
+      "changes": [
+        "**Channel Strip Track Information Monitors (Radio Presenter B)**",
+        "====================:)====================",
+        "Dedicated Track Info Badges: Integrated compact real-time track metadata badges directly inside Channel A (CH A) and Channel B (CH B) mixer strips beneath the album artwork.",
+        "Exclusive to Radio Presenter B: Seamlessly displays the loaded/playing track title and artist name exclusively when in '📻 Radio Presenter B' mode, remaining hidden in DJ Console and standard Radio Presenter modes.",
+        "Live Playback Glow & Alert Warning: Active tracks illuminate with dynamic color-matched neon glow (Cyan for CH A, Magenta for CH B) and flash high-visibility alert red when less than 10 seconds remain on the playing track.",
+        "Metadata Synchronization: Automatically reflects instant updates from ID3 tag parsing, track loading, playlist queue progression, and track info editor changes.",
+        "Symmetrical Channel Layout: Preserves uniform height alignment across Master Output (MST), Channel A (CH A), Microphone (MIC), and Channel B (CH B) strips."
+      ]
+    },
+    {
+      "version": "1.9.3",
+      "date": "2026-09-04",
+      "title": "Radio Presenter B (Dedicated Web Radio Mixer Layout)",
+      "changes": [
+        "**Pure Web Radio Mixer Layout Mode (Radio Presenter B)**",
+        "====================:)====================",
+        "Dedicated Pure Mixer View: Added a 3rd layout mode '📻 Radio Presenter B' to the top header switcher that exclusively presents the central Web Radio Mixer while cleanly hiding Deck A and Deck B panels.",
+        "Full Studio Mixer Controls: Offers a focused, centered 4-channel broadcast interface (MST -> CH A -> MIC -> CH B) with luxury vertical volume faders, real-time stereo peak VU meters, album art badges, and the Auto-Deck Relay controller.",
+        "Direct Transport Control: Full track playback control directly from the mixer's square Play/Pause buttons (CH A / CH B) and live microphone ON AIR button without requiring bulky deck faceplates on screen.",
+        "Automatic Crossfader Protection: Automatically centers the crossfader (0.5) so both audio channels operate at full unattenuated volume.",
+        "Session Persistence: Saves layout preference in localStorage, restoring automatically on launch."
+      ]
+    },
     {
       "version": "1.9.2",
       "date": "2026-09-04",
