@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const fileInputGlobal = document.getElementById('file-input-global');
   const searchLibrary = document.getElementById('search-library');
   const libraryTbody = document.getElementById('library-tbody');
+  const btnLayoutDj = document.getElementById('btn-layout-dj');
+  const btnLayoutRadio = document.getElementById('btn-layout-radio');
 
   // DOM Elements - Tabs & Cued Playlists
   const tabBtnLibrary = document.getElementById('tab-btn-library');
@@ -46,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     time: document.getElementById('deck-a-time'),
     artImg: document.getElementById('deck-a-art'),
     artPlaceholder: document.getElementById('deck-a-art-placeholder'),
+    mixerArtImg: document.getElementById('mixer-art-img-a'),
+    mixerArtPlaceholder: document.getElementById('mixer-art-placeholder-a'),
     waveformScrolling: document.getElementById('waveform-scrolling-a'),
     waveformOverview: document.getElementById('waveform-overview-a'),
     overviewProgress: document.getElementById('overview-progress-a'),
@@ -55,6 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPlay: document.getElementById('btn-play-a'),
     btnCue: document.getElementById('btn-cue-a'),
     btnSync: document.getElementById('btn-sync-a'),
+    mixerBtnPlay: document.getElementById('btn-mixer-play-a'),
+    mixerPlayIcon: document.getElementById('mixer-play-icon-a'),
     pitchSlider: document.getElementById('pitch-a'),
     pitchVal: document.getElementById('deck-a-pitch-val'),
     volSlider: document.getElementById('vol-a'),
@@ -71,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
     time: document.getElementById('deck-b-time'),
     artImg: document.getElementById('deck-b-art'),
     artPlaceholder: document.getElementById('deck-b-art-placeholder'),
+    mixerArtImg: document.getElementById('mixer-art-img-b'),
+    mixerArtPlaceholder: document.getElementById('mixer-art-placeholder-b'),
     waveformScrolling: document.getElementById('waveform-scrolling-b'),
     waveformOverview: document.getElementById('waveform-overview-b'),
     overviewProgress: document.getElementById('overview-progress-b'),
@@ -80,6 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPlay: document.getElementById('btn-play-b'),
     btnCue: document.getElementById('btn-cue-b'),
     btnSync: document.getElementById('btn-sync-b'),
+    mixerBtnPlay: document.getElementById('btn-mixer-play-b'),
+    mixerPlayIcon: document.getElementById('mixer-play-icon-b'),
     pitchSlider: document.getElementById('pitch-b'),
     pitchVal: document.getElementById('deck-b-pitch-val'),
     volSlider: document.getElementById('vol-b'),
@@ -98,7 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnToggle: document.getElementById('btn-mic-toggle'),
     btnText: document.getElementById('mic-btn-text'),
     led: document.getElementById('mic-led'),
-    btnTalkover: document.getElementById('btn-talkover-toggle')
+    btnTalkover: document.getElementById('btn-talkover-toggle'),
+    artBox: document.getElementById('mixer-art-mic'),
+    artPlaceholder: document.getElementById('mixer-art-placeholder-mic')
   };
 
   // DOM Elements - Auto-Deck Relay
@@ -111,7 +123,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const jogAngles = { A: 0, B: 0 };
 
   // -------------------------------------------------------------
-  // 2. Audio Engine Unlock & Readiness
+  // 2. Layout Mode Switcher (DJ Console vs Radio Presenter)
+  // -------------------------------------------------------------
+  function setLayoutMode(mode) {
+    const isRadio = mode === 'radio';
+    document.body.classList.toggle('mode-radio', isRadio);
+    document.body.classList.toggle('mode-dj', !isRadio);
+    
+    if (btnLayoutDj) btnLayoutDj.classList.toggle('active', !isRadio);
+    if (btnLayoutRadio) btnLayoutRadio.classList.toggle('active', isRadio);
+
+    localStorage.setItem('webdj_layout_mode', mode);
+
+    // In Radio Presenter mode, center the crossfader so both deck channel volume faders are 100% active
+    if (isRadio && crossfader) {
+      crossfader.value = 0.5;
+      engine.setCrossfader(0.5);
+    }
+  }
+
+  if (btnLayoutDj) {
+    btnLayoutDj.addEventListener('click', () => setLayoutMode('dj'));
+  }
+  if (btnLayoutRadio) {
+    btnLayoutRadio.addEventListener('click', () => setLayoutMode('radio'));
+  }
+
+  // Restore saved layout mode or default to DJ Console
+  const savedLayoutMode = localStorage.getItem('webdj_layout_mode') || 'dj';
+  setLayoutMode(savedLayoutMode);
+
+  // -------------------------------------------------------------
+  // 3. Audio Engine Unlock & Readiness
   // -------------------------------------------------------------
   async function unlockAudioContext() {
     await engine.unlockAudio();
@@ -1025,12 +1068,22 @@ document.addEventListener('DOMContentLoaded', () => {
             deckAElements.artImg.style.display = 'block';
           }
           if (deckAElements.artPlaceholder) deckAElements.artPlaceholder.style.display = 'none';
+          if (deckAElements.mixerArtImg) {
+            deckAElements.mixerArtImg.src = track.artworkUrl;
+            deckAElements.mixerArtImg.style.display = 'block';
+          }
+          if (deckAElements.mixerArtPlaceholder) deckAElements.mixerArtPlaceholder.style.display = 'none';
         } else {
           if (deckAElements.artImg) {
             deckAElements.artImg.src = '';
             deckAElements.artImg.style.display = 'none';
           }
           if (deckAElements.artPlaceholder) deckAElements.artPlaceholder.style.display = 'flex';
+          if (deckAElements.mixerArtImg) {
+            deckAElements.mixerArtImg.src = '';
+            deckAElements.mixerArtImg.style.display = 'none';
+          }
+          if (deckAElements.mixerArtPlaceholder) deckAElements.mixerArtPlaceholder.style.display = 'flex';
         }
       }
 
@@ -1052,12 +1105,22 @@ document.addEventListener('DOMContentLoaded', () => {
             deckBElements.artImg.style.display = 'block';
           }
           if (deckBElements.artPlaceholder) deckBElements.artPlaceholder.style.display = 'none';
+          if (deckBElements.mixerArtImg) {
+            deckBElements.mixerArtImg.src = track.artworkUrl;
+            deckBElements.mixerArtImg.style.display = 'block';
+          }
+          if (deckBElements.mixerArtPlaceholder) deckBElements.mixerArtPlaceholder.style.display = 'none';
         } else {
           if (deckBElements.artImg) {
             deckBElements.artImg.src = '';
             deckBElements.artImg.style.display = 'none';
           }
           if (deckBElements.artPlaceholder) deckBElements.artPlaceholder.style.display = 'flex';
+          if (deckBElements.mixerArtImg) {
+            deckBElements.mixerArtImg.src = '';
+            deckBElements.mixerArtImg.style.display = 'none';
+          }
+          if (deckBElements.mixerArtPlaceholder) deckBElements.mixerArtPlaceholder.style.display = 'flex';
         }
       }
 
@@ -1195,19 +1258,29 @@ document.addEventListener('DOMContentLoaded', () => {
       deckElem.bpm.textContent = deck.bpm ? deck.bpm.toFixed(1) : '124.0';
       if (deckElem.key) deckElem.key.textContent = deck.key || '--';
       
-      // Update Album Artwork on Deck Faceplate
+      // Update Album Artwork on Deck Faceplate & Mixer Channel Strip
       if (trackObj.artworkUrl) {
         if (deckElem.artImg) {
           deckElem.artImg.src = trackObj.artworkUrl;
           deckElem.artImg.style.display = 'block';
         }
         if (deckElem.artPlaceholder) deckElem.artPlaceholder.style.display = 'none';
+        if (deckElem.mixerArtImg) {
+          deckElem.mixerArtImg.src = trackObj.artworkUrl;
+          deckElem.mixerArtImg.style.display = 'block';
+        }
+        if (deckElem.mixerArtPlaceholder) deckElem.mixerArtPlaceholder.style.display = 'none';
       } else {
         if (deckElem.artImg) {
           deckElem.artImg.src = '';
           deckElem.artImg.style.display = 'none';
         }
         if (deckElem.artPlaceholder) deckElem.artPlaceholder.style.display = 'flex';
+        if (deckElem.mixerArtImg) {
+          deckElem.mixerArtImg.src = '';
+          deckElem.mixerArtImg.style.display = 'none';
+        }
+        if (deckElem.mixerArtPlaceholder) deckElem.mixerArtPlaceholder.style.display = 'flex';
       }
 
       // Update track duration, BPM and Key in library object and all queue instances
@@ -1425,6 +1498,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Mixer Channel Strip Square Play/Pause Button
+    if (deckElem.mixerBtnPlay) {
+      deckElem.mixerBtnPlay.addEventListener('click', () => {
+        deckElem.btnPlay.click();
+      });
+    }
+
     // Cue button
     deckElem.btnCue.addEventListener('click', () => {
       engine.cue(deckId);
@@ -1554,6 +1634,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (micElements.btnText) {
       micElements.btnText.textContent = isActive ? 'ON AIR' : 'MIC';
+    }
+    if (micElements.artBox) {
+      micElements.artBox.classList.toggle('active-on-air', isActive);
     }
     const modalTestBtn = document.getElementById('btn-modal-test-mic');
     if (modalTestBtn) {
@@ -1965,6 +2048,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const isEndingA = deckA.isPlaying && durA > 0 && (durA - curA) <= 10.0 && (durA - curA) > 0;
 
     deckAElements.btnPlay.classList.toggle('playing', deckA.isPlaying);
+    if (deckAElements.mixerBtnPlay) deckAElements.mixerBtnPlay.classList.toggle('playing', deckA.isPlaying);
+    if (deckAElements.mixerPlayIcon) deckAElements.mixerPlayIcon.textContent = deckA.isPlaying ? '⏸' : '▶';
     deckAElements.time.textContent = formatTime(curA);
     if (deckAElements.title) {
       deckAElements.title.parentElement.classList.toggle('track-ending-warning', isEndingA);
@@ -1992,6 +2077,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const isEndingB = deckB.isPlaying && durB > 0 && (durB - curB) <= 10.0 && (durB - curB) > 0;
 
     deckBElements.btnPlay.classList.toggle('playing', deckB.isPlaying);
+    if (deckBElements.mixerBtnPlay) deckBElements.mixerBtnPlay.classList.toggle('playing', deckB.isPlaying);
+    if (deckBElements.mixerPlayIcon) deckBElements.mixerPlayIcon.textContent = deckB.isPlaying ? '⏸' : '▶';
     deckBElements.time.textContent = formatTime(curB);
     if (deckBElements.title) {
       deckBElements.title.parentElement.classList.toggle('track-ending-warning', isEndingB);
@@ -3366,6 +3453,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnRefreshAudioInputs = document.getElementById('btn-refresh-audio-inputs');
     const audioInputStatus = document.getElementById('audio-input-status');
     const btnModalTestMic = document.getElementById('btn-modal-test-mic');
+    const chkMicRawMode = document.getElementById('chk-mic-raw-mode');
+    const chkMicEchoCancel = document.getElementById('chk-mic-echo-cancel');
+    const chkMicNoiseSuppress = document.getElementById('chk-mic-noise-suppress');
+
+    function getMicProcessingOptions() {
+      const isRaw = chkMicRawMode ? chkMicRawMode.checked : true;
+      if (isRaw) {
+        return {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
+        };
+      }
+      return {
+        echoCancellation: chkMicEchoCancel ? chkMicEchoCancel.checked : false,
+        noiseSuppression: chkMicNoiseSuppress ? chkMicNoiseSuppress.checked : false,
+        autoGainControl: false
+      };
+    }
+
+    async function applyMicDeviceAndOptions() {
+      const deviceId = audioInputSelect ? audioInputSelect.value : (engine.micDeviceId || '');
+      const opts = getMicProcessingOptions();
+      await engine.setAudioInputDevice(deviceId, opts);
+    }
+
+    if (chkMicRawMode) {
+      chkMicRawMode.addEventListener('change', () => {
+        if (chkMicRawMode.checked) {
+          if (chkMicEchoCancel) chkMicEchoCancel.checked = false;
+          if (chkMicNoiseSuppress) chkMicNoiseSuppress.checked = false;
+        }
+        applyMicDeviceAndOptions();
+      });
+    }
+
+    if (chkMicEchoCancel) {
+      chkMicEchoCancel.addEventListener('change', () => {
+        if (chkMicEchoCancel.checked && chkMicRawMode) {
+          chkMicRawMode.checked = false;
+        }
+        applyMicDeviceAndOptions();
+      });
+    }
+
+    if (chkMicNoiseSuppress) {
+      chkMicNoiseSuppress.addEventListener('change', () => {
+        if (chkMicNoiseSuppress.checked && chkMicRawMode) {
+          chkMicRawMode.checked = false;
+        }
+        applyMicDeviceAndOptions();
+      });
+    }
+
+    const chkMicLocalMonitor = document.getElementById('chk-mic-local-monitor');
+    if (chkMicLocalMonitor) {
+      chkMicLocalMonitor.addEventListener('change', () => {
+        engine.setMicLocalMonitor(chkMicLocalMonitor.checked);
+        localStorage.setItem('webdj_mic_local_monitor', chkMicLocalMonitor.checked ? 'true' : 'false');
+      });
+      const savedMonitor = localStorage.getItem('webdj_mic_local_monitor');
+      if (savedMonitor !== null) {
+        chkMicLocalMonitor.checked = savedMonitor === 'true';
+        engine.setMicLocalMonitor(chkMicLocalMonitor.checked);
+      }
+    }
 
     async function refreshAudioInputDevices(requestPermission = false) {
       if (!audioInputSelect) return;
@@ -3409,7 +3562,7 @@ document.addEventListener('DOMContentLoaded', () => {
       audioInputSelect.addEventListener('change', async () => {
         const deviceId = audioInputSelect.value;
         localStorage.setItem('webdj_mic_device', deviceId);
-        await engine.setAudioInputDevice(deviceId);
+        await applyMicDeviceAndOptions();
         if (audioInputStatus) {
           const selectedText = audioInputSelect.options[audioInputSelect.selectedIndex]?.text || 'System Default';
           audioInputStatus.textContent = `Active Input: ${selectedText}`;

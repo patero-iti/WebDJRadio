@@ -12,15 +12,13 @@ class WebRadioDecksEngine {
     this.ctx = new AudioCtx({ latencyHint: 'interactive' });
     
     // Master Output & Master Gain Node
+    this.musicBus = this.ctx.createGain();
     this.masterGain = this.ctx.createGain();
     
     // Master Analyser Node for VU Meter
     this.masterAnalyser = this.ctx.createAnalyser();
     this.masterAnalyser.fftSize = 256;
     this.masterAnalyser.smoothingTimeConstant = 0.8;
-    
-    this.masterGain.connect(this.masterAnalyser);
-    this.masterAnalyser.connect(this.ctx.destination);
     
     // Live Microphone / Audio Input Node Chain
     this.micStream = null;
@@ -30,16 +28,35 @@ class WebRadioDecksEngine {
     this.micVolume = 1.0;
     this.isMicActive = false;
     this.micDeviceId = '';
+    this.micEchoCancellation = false; // Studio Clean (disables browser VAD / gating)
+    this.micNoiseSuppression = false;  // Full bandwidth audio
+    this.micAutoGainControl = false;   // Zero compression / volume ducking
+    this.micLocalMonitor = true;       // Hear own voice in local headphones/speakers
     this.talkoverDucking = false;
     this.duckingGain = 0.35; // -9dB music ducking when talkover is active
     
-    // Analyser Node for Mic VU Meter
+    // Analyser Node for Mic VU Meter (connected in parallel for 0ms delay)
     this.micAnalyser = this.ctx.createAnalyser();
     this.micAnalyser.fftSize = 256;
     this.micAnalyser.smoothingTimeConstant = 0.7;
-
     this.micGain.connect(this.micAnalyser);
-    this.micAnalyser.connect(this.masterGain);
+
+    // Local monitor gain node (controls mic level sent to local headphones/speakers)
+    this.localMonitorGain = this.ctx.createGain();
+    this.localMonitorGain.gain.value = 1.0;
+    this.micGain.connect(this.localMonitorGain);
+
+    // Audio routing into Master Output:
+    // 1. Music and local mic monitor feed local destination
+    this.musicBus.connect(this.masterGain);
+    this.localMonitorGain.connect(this.masterGain);
+    this.masterGain.connect(this.masterAnalyser);
+    this.masterAnalyser.connect(this.ctx.destination);
+
+    // 2. Broadcast stream bus (feeds WebRTC, Icecast, Shoutcast, B.U.T.T.)
+    this.broadcastBus = this.ctx.createGain();
+    this.musicBus.connect(this.broadcastBus);
+    this.micGain.connect(this.broadcastBus);
 
     // Crossfader position: 0.0 (Deck A full) to 1.0 (Deck B full)
     this.crossfaderPosition = 0.5;
@@ -198,8 +215,8 @@ class WebRadioDecksEngine {
     flangerOutput.connect(bitcrushInput);
     bitcrushOutput.connect(volumeGain);
     volumeGain.connect(xfadeGain);
-    xfadeGain.connect(analyser);
-    analyser.connect(this.masterGain);
+    xfadeGain.connect(this.musicBus);
+    xfadeGain.connect(analyser); // parallel tap for VU meter with zero DSP delay
 
     return {
       id,
@@ -432,13 +449,25 @@ class WebRadioDecksEngine {
   setMasterVolume(volume) {
     const val = Math.max(0, Math.min(1, parseFloat(volume)));
     this.masterGain.gain.setTargetAtTime(val, this.ctx.currentTime, 0.01);
+    if (this.broadcastBus) {
+      this.broadcastBus.gain.setTargetAtTime(val, this.ctx.currentTime, 0.01);
+    }
+  }
+
+  // Toggle local headphone/speaker monitoring for microphone
+  setMicLocalMonitor(enabled) {
+    this.micLocalMonitor = !!enabled;
+    const target = this.micLocalMonitor ? 1.0 : 0.0;
+    if (this.localMonitorGain) {
+      this.localMonitorGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.02);
+    }
   }
 
   // Live Master Audio Stream for Broadcasting / Streaming (WebRTC, Icecast, Shoutcast)
   getMasterMediaStream() {
     if (!this.masterStreamDest) {
       this.masterStreamDest = this.ctx.createMediaStreamDestination();
-      this.masterGain.connect(this.masterStreamDest);
+      (this.broadcastBus || this.masterGain).connect(this.masterStreamDest);
     }
     return this.masterStreamDest.stream;
   }
@@ -478,8 +507,11 @@ class WebRadioDecksEngine {
   }
 
   // Set and connect Live Microphone / Audio Input Device (Bluetooth, Interface, Line-In)
-  async setAudioInputDevice(deviceId) {
+  async setAudioInputDevice(deviceId, options = {}) {
     this.micDeviceId = deviceId || '';
+    if (typeof options.echoCancellation === 'boolean') this.micEchoCancellation = options.echoCancellation;
+    if (typeof options.noiseSuppression === 'boolean') this.micNoiseSuppression = options.noiseSuppression;
+    if (typeof options.autoGainControl === 'boolean') this.micAutoGainControl = options.autoGainControl;
 
     // Stop active stream tracks if any
     if (this.micStream) {
@@ -496,12 +528,19 @@ class WebRadioDecksEngine {
     }
 
     try {
-      const constraints = {
-        audio: this.micDeviceId
-          ? { deviceId: { exact: this.micDeviceId }, echoCancellation: true, noiseSuppression: true }
-          : { echoCancellation: true, noiseSuppression: true }
+      const audioConstraints = {
+        echoCancellation: !!this.micEchoCancellation,
+        noiseSuppression: !!this.micNoiseSuppression,
+        autoGainControl: !!this.micAutoGainControl,
+        channelCount: { ideal: 2 },
+        sampleRate: { ideal: 48000 },
+        latency: { ideal: 0.005 }
       };
-      this.micStream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (this.micDeviceId) {
+        audioConstraints.deviceId = { exact: this.micDeviceId };
+      }
+
+      this.micStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
       this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
       this.micSourceNode.connect(this.micGain);
 
@@ -511,8 +550,24 @@ class WebRadioDecksEngine {
       }
       return true;
     } catch (err) {
-      console.warn('Could not connect audio input device:', err);
-      return false;
+      // Fallback with unconstrained deviceId if strict audio options rejected
+      try {
+        const fallbackConstraints = {
+          audio: this.micDeviceId
+            ? { deviceId: this.micDeviceId, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+            : { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        };
+        this.micStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+        this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
+        this.micSourceNode.connect(this.micGain);
+        if (this.isMicActive) {
+          this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
+        }
+        return true;
+      } catch (fallbackErr) {
+        console.warn('Could not connect audio input device:', fallbackErr);
+        return false;
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `1.7.9`  
+> **Version:** `1.8.5`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
 > **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation & Broadcasting Console
 
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & System Overview
 
-**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
+**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a dual-layout visual subsystem (**DJ Console** vs. **Radio Presenter Minimal Broadcast Mode**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
 
 ---
 
@@ -194,6 +194,21 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 * **Controller Presets**: Out-of-the-box mappings for **Pioneer DDJ-200**, **Pioneer DDJ-400**, **Numark Party Mix**, and **Behringer CMD Studio/Micro**.
 * **Interactive MIDI Learn**: Click "Start Learn", move any physical control, and automatically bind to any mixer function.
 * **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, volume faders, master volume, 3-band EQ, dual filter knobs, pitch faders, and performance pads.
+
+### 3.9. Dual Layout Subsystem (DJ Workstation vs. Radio Presenter Mode)
+* **1. DJ Console Layout (`mode-dj`)**:
+  * Comprehensive performance interface equipped with dual vinyl/jog scratch wheels, 3-band rotary EQ, dual-filter sweeps, pitch tempo sliders, 4 Hot Cues, Beat Loops (1–8 beats), Beat Rolls, On-Deck Quick FX strips, and equal-power crossfader.
+* **2. Radio Presenter Minimal Broadcast Mode (`mode-radio`)**:
+  * Designed for radio talk hosts and station broadcasters seeking a clean, focused, distraction-free environment centered around the mixer console.
+  * **Broadcast Mixer Channel Strips**:
+    * **Top Square Album Artwork**: Dynamically displays loaded track cover art thumbnail (or fallback icon) for Deck A (CH A) and Deck B (CH B), and a pulsing studio microphone badge for the live mic channel.
+    * **Left-Aligned Peak VU Meters**: Stereo LED peak audio meters positioned immediately to the left of each channel's vertical slider volume control for real-time visual level monitoring.
+    * **Vertical Volume Faders**: Luxury 155px vertical throw volume sliders for precision broadcast gain adjustment.
+    * **Bottom Square Transport / Mic Buttons**: Oversized square Play/Pause buttons for Deck A & B with glowing active status indicators, and an ON AIR toggle button for the mic channel.
+  * **Retains**: Dual playback decks, track title/artist metadata, scrolling and overview waveforms with 10s end alert, channel volume faders, live microphone voiceover strip with peak LED meters & ON AIR indicator, **AUTO-DECK RELAY** controller, and dual cued playlist queues.
+  * **Hides**: Scratch jog wheels, loop bars, beat roll pads, on-deck quick FX knobs, 3-band EQ rack, pitch tempo faders, and crossfader.
+  * **Crossfader Safety**: Automatically centers the crossfader (`0.5`) upon entering Radio mode so both deck channel volume faders operate at unattenuated 100% gain.
+  * **State Persistence**: Remembers active layout preference in `localStorage.getItem('webdj_layout_mode')`.
 
 ---
 

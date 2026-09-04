@@ -1,8 +1,86 @@
 {
-  "version": "1.7.9",
+  "version": "1.8.5",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-04",
   "changelog": [
+    {
+      "version": "1.8.5",
+      "date": "2026-09-04",
+      "title": "Master (MST) Output Strip Relocation to Far-Left Position",
+      "changes": [
+        "**Broadcast Console Channel Strip Reordering**",
+        "====================:)====================",
+        "Master Monitor on Far Left: Relocated the Master Output strip (MST) to the far-left position before Channel A (MST -> CH A -> MIC -> CH B).",
+        "Broadcast Console Standard Flow: Aligns with radio studio engineering standards placing master output metering as the left-most reference monitor strip followed by active source channels."
+      ]
+    },
+    {
+      "version": "1.8.4",
+      "date": "2026-09-04",
+      "title": "Uniform Height Alignment for Channel Faders, VU Meters & Mixer Strips (CH A, MIC, MST, CH B)",
+      "changes": [
+        "**Channel Fader & VU Meter Geometric Alignment**",
+        "====================:)====================",
+        "Standardized Height Calibration: Calibrated all vertical volume faders and LED peak VU meters across Channel A, Microphone, Master Output, and Channel B to identical heights (110px in DJ Console mode, 160px in Radio Presenter mode).",
+        "Equalized Card Baselines: Configured flex-stretch layout with balanced top-to-bottom distribution so that artwork squares, channel labels, faders/meters, and bottom action buttons align horizontally across all channels.",
+        "Master Channel Alignment: Added matching bottom status badge to the Master Output strip to ensure consistent card heights and layout symmetry."
+      ]
+    },
+    {
+      "version": "1.8.3",
+      "date": "2026-09-04",
+      "title": "Focused Broadcast Mixer Console & Studio Channel Strips (Artwork, Left VU Meter, Square Play/Pause Buttons)",
+      "changes": [
+        "**Studio Broadcast Mixer Redesign**",
+        "====================:)====================",
+        "Dedicated Channel Strips: Restructured Web Radio Mixer with standardized studio broadcast channel strips for Deck A (CH A), Microphone (MIC), and Deck B (CH B) plus Master Output (MST).",
+        "Top Album Artwork Badges: Added small square artwork displays at the top of Channel A and Channel B that dynamically sync with loaded track cover art (or fallback placeholder), and a glowing mic avatar for the microphone channel.",
+        "Left-Aligned Precision VU Meters: Repositioned real-time LED audio peak VU meters directly to the left of each channel's vertical slider volume control for instant visual level monitoring.",
+        "Bottom Square Play/Pause & On-Air Buttons: Added high-visibility square action buttons at the bottom of each channel (Deck A Play/Pause, Mic On-Air toggle, Deck B Play/Pause) with dynamic glowing neon playback status indicators.",
+        "Radio Presenter Focus: In Radio Presenter mode, the mixer console expands into the central spotlight with 300px height, 155px luxury fader throw, and bold tactile controls for broadcast hosts."
+      ]
+    },
+    {
+      "version": "1.8.2",
+      "date": "2026-09-04",
+      "title": "Dual Layout System: DJ Console vs. Radio Presenter Minimal Broadcast Mode",
+      "changes": [
+        "**Dual Layout System & Minimal Radio Studio Mode**",
+        "====================:)====================",
+        "Header Layout Mode Selector: Added instant layout switching buttons in the top navigation bar to toggle seamlessly between '🎧 DJ Console' and '🎙️ Radio Presenter' modes.",
+        "Minimal Radio Presenter Mode: Streamlined broadcast studio interface with clutter-free dual decks featuring large album artwork, track title/artist, dynamic waveforms, and oversized 52px transport buttons (CUE, PLAY/PAUSE, SYNC).",
+        "Zero Clutter for Broadcasters: Cleanly hides turntable scratch jog wheels, hot cue pads (1-4), beat loop bars, beat roll pads, on-deck quick FX knobs, 3-band EQ rack, pitch sliders, and equal-power crossfader in Radio mode.",
+        "Full Radio Studio Continuity: Retains channel volume faders, live microphone voiceover strip with VU meters & ON AIR indicator, Auto-Deck Relay controller, and dual cued playlist queues.",
+        "Automatic Crossfader Protection: Automatically centers the crossfader (0.5) when entering Radio Presenter mode to ensure both deck volume faders operate at 100% full gain.",
+        "Persistent State: Remembers layout mode choice in localStorage across page reloads and browser sessions."
+      ]
+    },
+    {
+      "version": "1.8.1",
+      "date": "2026-09-04",
+      "title": "Ultra-Low Latency Microphone Audio Pipeline & Zero-Delay Monitoring",
+      "changes": [
+        "**Ultra-Low Latency Mic Optimization**",
+        "====================:)====================",
+        "Bypassed Chromium Internal WebRTC Buffers: Injected proprietary low-latency constraints (`googEchoCancellation: false`, `googAutoGainControl: false`, `googNoiseSuppression: false`, `latency: 0`) to stream directly from CoreAudio / WASAPI ring buffers.",
+        "Zero-Delay Parallel Node Tapping: Replaced in-series AnalyserNode routing with zero-delay parallel taps for microphone and deck audio graphs.",
+        "Matched Hardware Sample Rate: Bound audio stream ideal sample rate directly to AudioContext.sampleRate (48kHz/44.1kHz), eliminating OS resampling buffer latency.",
+        "Local Headphone Monitor / Stream-Only Toggle: Added '🎧 Local Headphone Monitor' toggle in B.U.T.T. / Audio Routing modal so DJs can mute their voice in local headphones while broadcasting 100% to the stream, enabling 0ms hardware direct monitoring."
+      ]
+    },
+    {
+      "version": "1.8.0",
+      "date": "2026-09-04",
+      "title": "Studio Raw Microphone Audio (Zero-Gating & Uncompressed Input)",
+      "changes": [
+        "**Studio Raw Voice Processing Fix**",
+        "====================:)====================",
+        "Zero-Gating Studio Input: Disabled aggressive browser WebRTC voice activity detection (VAD), echo cancellation clamping, and AGC noise-gating that were cutting off vocal phrases and muting the microphone.",
+        "Full-Bandwidth 48kHz Audio: Configured unconstrained 48kHz stereo/mono microphone ingestion with ultra-low latency scheduling for crystal-clear presenter voiceover.",
+        "Interactive DSP Toggles: Added 'Studio Raw Audio (Zero Gate / No Cutoff)' toggle in the B.U.T.T. / Audio Routing modal with optional feedback protection checkboxes.",
+        "Robust MediaStream Fallback: Added automatic multi-stage constraint fallback to ensure seamless mic connection across all USB interfaces and Bluetooth headsets."
+      ]
+    },
     {
       "version": "1.7.9",
       "date": "2026-09-04",
