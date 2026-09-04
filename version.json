@@ -18,7 +18,8 @@
         "Live Broadcast Weather Monitors: Fetches real-time temperature and weather conditions via Open-Meteo API for both the Perth WA broadcast station and the host's local broadcast location.",
         "Now Playing Metadata & Artwork: Displays high-visibility album artwork, title, artist, release year, record label, BPM, and musical key for the active track.",
         "Presenter Liner & Music Trivia Engine: Generates intelligent on-air talkover liners, harmonic mixing notes (Camelot wheel compatible), record release trivia, and artist biographies, complete with a '↺ Next Fact' presenter cycle button.",
-        "Live TheAudioDB & MusicBrainz Integration: Asynchronously enriches on-air trivia with real-world artist biographies, birth/formation history, country of origin, official record labels, and release discography notes via live public API queries with smart memory caching."
+        "Live TheAudioDB & MusicBrainz Integration: Asynchronously enriches on-air trivia with real-world artist biographies, birth/formation history, country of origin, official record labels, and release discography notes via live public API queries with smart memory caching.",
+        "Layout Visibility Customizer (Hide / Unhide): Added a '⚙️' customize popover allowing broadcasters to hide or unhide any layout mode dynamically in the top bar. 'Radio C' is hidden by default while remaining 100% preserved and instant to unhide anytime."
       ]
     },
     {

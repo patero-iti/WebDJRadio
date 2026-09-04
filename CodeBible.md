@@ -200,8 +200,12 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
   * **📂 Import JSON**: One-click file picker to load, validate, and restore saved MIDI mappings across any workstation or browser instance.
 * **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, volume faders, master volume, 3-band EQ, dual filter knobs, pitch faders, and performance pads.
 
-### 3.9. Quad Layout Subsystem (Radio A, Radio B, Radio C, DJ)
-* **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C ] -> [ 🎧 DJ ]`.
+### 3.9. Quad Layout Subsystem & Visibility Customizer (Radio A, Radio B, Radio C, DJ)
+* **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C (Hidden by Default) ] -> [ 🎧 DJ ] -> [ ⚙️ ]`.
+* **Layout Visibility Manager (`⚙️`)**:
+  * An interactive configuration popover on the top switcher bar that allows hosts to toggle the visibility of any layout (`Radio A`, `Radio B`, `Radio C`, `DJ`).
+  * **Radio C** is hidden by default to keep the interface focused, but remains completely intact in the codebase and can be restored or hidden instantly at any time.
+  * Preferences persist in `localStorage` (`webdj_layout_visibility`).
 * **1. Radio A Studio Hub & On-Air Trivia Layout (`mode-radio-c`)**:
   * Flagship live radio console featuring two vertically stacked studio information panels directly to the left of the Web Radio Mixer (together matching the full height of the Mixer and CART Wall):
     * **Top Panel ("Studio Hub")**: Real-time dual digital clocks for Local Host Time (with dynamic timezone city detection) and Perth Western Australia Time (AWST / UTC+8); live temperature and weather condition feeds for Perth Station and Local broadcast venue via Open-Meteo.

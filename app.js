@@ -198,8 +198,117 @@ document.addEventListener('DOMContentLoaded', () => {
   const jogAngles = { A: 0, B: 0 };
 
   // -------------------------------------------------------------
-  // 2. Layout Mode Switcher (DJ Console vs Radio Presenter vs Radio Presenter B)
+  // 2. Layout Mode Switcher & Visibility Customization
   // -------------------------------------------------------------
+  const btnLayoutConfig = document.getElementById('btn-layout-config');
+  const layoutConfigPopover = document.getElementById('layout-config-popover');
+  const btnCloseLayoutConfig = document.getElementById('btn-close-layout-config');
+
+  const layoutVisibilityCheckboxes = {
+    'radio-c': document.getElementById('chk-vis-radio-c'),
+    'radio-b': document.getElementById('chk-vis-radio-b'),
+    'radio': document.getElementById('chk-vis-radio'),
+    'dj': document.getElementById('chk-vis-dj')
+  };
+
+  const layoutButtons = {
+    'radio-c': btnLayoutRadioC,
+    'radio-b': btnLayoutRadioB,
+    'radio': btnLayoutRadio,
+    'dj': btnLayoutDj
+  };
+
+  // Default layout visibility: Radio A (visible), Radio B (visible), Radio C (hidden by default), DJ (visible)
+  const defaultLayoutVisibility = {
+    'radio-c': true,
+    'radio-b': true,
+    'radio': false,
+    'dj': true
+  };
+
+  let layoutVisibility = { ...defaultLayoutVisibility };
+  try {
+    const savedVis = localStorage.getItem('webdj_layout_visibility');
+    if (savedVis) {
+      layoutVisibility = { ...defaultLayoutVisibility, ...JSON.parse(savedVis) };
+    }
+  } catch (e) {
+    layoutVisibility = { ...defaultLayoutVisibility };
+  }
+
+  function applyLayoutVisibility() {
+    let currentMode = localStorage.getItem('webdj_layout_mode') || 'radio-c';
+
+    // Apply visibility styles to buttons & sync checkboxes
+    for (const [mode, isVisible] of Object.entries(layoutVisibility)) {
+      const btn = layoutButtons[mode];
+      const chk = layoutVisibilityCheckboxes[mode];
+      if (btn) {
+        btn.style.display = isVisible ? 'inline-flex' : 'none';
+      }
+      if (chk) {
+        chk.checked = !!isVisible;
+      }
+    }
+
+    // If current mode is now hidden, fallback to first visible mode
+    if (!layoutVisibility[currentMode]) {
+      const firstVisible = Object.keys(layoutVisibility).find(m => layoutVisibility[m]) || 'radio-c';
+      setLayoutMode(firstVisible);
+    }
+
+    localStorage.setItem('webdj_layout_visibility', JSON.stringify(layoutVisibility));
+  }
+
+  function toggleLayoutVisibility(mode, isVisible) {
+    // Ensure at least one layout remains visible
+    if (!isVisible) {
+      const visibleCount = Object.values(layoutVisibility).filter(v => v).length;
+      if (visibleCount <= 1) {
+        if (layoutVisibilityCheckboxes[mode]) layoutVisibilityCheckboxes[mode].checked = true;
+        return;
+      }
+    }
+
+    layoutVisibility[mode] = isVisible;
+    applyLayoutVisibility();
+  }
+
+  // Bind checkbox events
+  for (const [mode, chk] of Object.entries(layoutVisibilityCheckboxes)) {
+    if (chk) {
+      chk.addEventListener('change', () => {
+        toggleLayoutVisibility(mode, chk.checked);
+      });
+    }
+  }
+
+  // Popover Open / Close Handlers
+  if (btnLayoutConfig && layoutConfigPopover) {
+    btnLayoutConfig.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isClosed = layoutConfigPopover.style.display === 'none';
+      layoutConfigPopover.style.display = isClosed ? 'flex' : 'none';
+      btnLayoutConfig.classList.toggle('active', isClosed);
+    });
+  }
+
+  if (btnCloseLayoutConfig && layoutConfigPopover) {
+    btnCloseLayoutConfig.addEventListener('click', () => {
+      layoutConfigPopover.style.display = 'none';
+      if (btnLayoutConfig) btnLayoutConfig.classList.remove('active');
+    });
+  }
+
+  window.addEventListener('click', (e) => {
+    if (layoutConfigPopover && layoutConfigPopover.style.display !== 'none') {
+      if (!layoutConfigPopover.contains(e.target) && e.target !== btnLayoutConfig && !btnLayoutConfig.contains(e.target)) {
+        layoutConfigPopover.style.display = 'none';
+        if (btnLayoutConfig) btnLayoutConfig.classList.remove('active');
+      }
+    }
+  });
+
   function setLayoutMode(mode) {
     const isDj = mode === 'dj';
     const isRadio = mode === 'radio';
@@ -218,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     localStorage.setItem('webdj_layout_mode', mode);
 
-    // In Radio Presenter, Radio A, and Radio C modes, center the crossfader so both deck channel volume faders are 100% active
+    // In Radio A, Radio B, and Radio C modes, center the crossfader so both deck channel volume faders are 100% active
     if ((isRadio || isRadioB || isRadioC) && crossfader) {
       crossfader.value = 0.5;
       engine.setCrossfader(0.5);
@@ -238,9 +347,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btnLayoutRadioC.addEventListener('click', () => setLayoutMode('radio-c'));
   }
 
-  // Restore saved layout mode or default to DJ Console
-  const savedLayoutMode = localStorage.getItem('webdj_layout_mode') || 'dj';
+  // Restore saved layout mode or default to Radio A (radio-c) / DJ
+  const savedLayoutMode = localStorage.getItem('webdj_layout_mode') || 'radio-c';
   setLayoutMode(savedLayoutMode);
+  applyLayoutVisibility();
 
   // -------------------------------------------------------------
   // 3. Audio Engine Unlock & Readiness

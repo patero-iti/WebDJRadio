@@ -38,20 +38,56 @@
     </div>
 
     <div class="header-actions">
-      <!-- Layout Mode Switcher (Radio A vs Radio B vs Radio C vs DJ) -->
-      <div class="layout-mode-selector" id="layout-mode-selector" title="Switch between Radio A, Radio B, Radio C, and DJ layouts">
-        <button class="btn-layout-mode" id="btn-layout-radio-c" data-mode="radio-c" type="button" title="Radio A: Studio Hub, Live Trivia & Now Playing, Web Radio Mixer & CART Wall">
-          <span>🎙️ Radio A</span>
-        </button>
-        <button class="btn-layout-mode" id="btn-layout-radio-b" data-mode="radio-b" type="button" title="Radio B: Dedicated Web Radio Mixer & Broadcast CART Wall">
-          <span>📻 Radio B</span>
-        </button>
-        <button class="btn-layout-mode" id="btn-layout-radio" data-mode="radio" type="button" title="Radio C: Streamlined broadcast studio layout with dual decks & auto-relay">
-          <span>📻 Radio C</span>
-        </button>
-        <button class="btn-layout-mode active" id="btn-layout-dj" data-mode="dj" type="button" title="DJ: Full DJ console with scratch wheels, loops, rolls, hot cues, FX & crossfader">
-          <span>🎧 DJ</span>
-        </button>
+      <!-- Layout Mode Switcher Container with Visibility Customization -->
+      <div class="layout-mode-container" id="layout-mode-container">
+        <div class="layout-mode-selector" id="layout-mode-selector" title="Switch between active layouts">
+          <button class="btn-layout-mode" id="btn-layout-radio-c" data-mode="radio-c" type="button" title="Radio A: Studio Hub, Live Trivia & Now Playing, Web Radio Mixer & CART Wall">
+            <span>🎙️ Radio A</span>
+          </button>
+          <button class="btn-layout-mode" id="btn-layout-radio-b" data-mode="radio-b" type="button" title="Radio B: Dedicated Web Radio Mixer & Broadcast CART Wall">
+            <span>📻 Radio B</span>
+          </button>
+          <button class="btn-layout-mode" id="btn-layout-radio" data-mode="radio" type="button" title="Radio C: Streamlined broadcast studio layout with dual decks & auto-relay">
+            <span>📻 Radio C</span>
+          </button>
+          <button class="btn-layout-mode active" id="btn-layout-dj" data-mode="dj" type="button" title="DJ: Full DJ console with scratch wheels, loops, rolls, hot cues, FX & crossfader">
+            <span>🎧 DJ</span>
+          </button>
+          <button class="btn-layout-config" id="btn-layout-config" type="button" title="Customize Layout Modes (Hide / Unhide Layouts)">
+            <span>⚙️</span>
+          </button>
+        </div>
+
+        <!-- Layout Visibility Customizer Popover -->
+        <div class="layout-config-popover" id="layout-config-popover" style="display: none;">
+          <div class="layout-config-header">
+            <span class="layout-config-title">⚙️ CUSTOMIZE LAYOUTS</span>
+            <button class="btn-close-popover" id="btn-close-layout-config" type="button" title="Close">✕</button>
+          </div>
+          <div class="layout-config-desc">Toggle layout visibility in the top switcher bar:</div>
+          <div class="layout-config-list">
+            <label class="layout-config-item">
+              <input type="checkbox" id="chk-vis-radio-c" data-layout="radio-c" checked>
+              <span class="chk-custom"></span>
+              <span class="layout-item-label">🎙️ Radio A <span class="layout-item-desc">(Studio Hub &amp; Cart Wall)</span></span>
+            </label>
+            <label class="layout-config-item">
+              <input type="checkbox" id="chk-vis-radio-b" data-layout="radio-b" checked>
+              <span class="chk-custom"></span>
+              <span class="layout-item-label">📻 Radio B <span class="layout-item-desc">(Pure Mixer &amp; Cart Wall)</span></span>
+            </label>
+            <label class="layout-config-item">
+              <input type="checkbox" id="chk-vis-radio" data-layout="radio">
+              <span class="chk-custom"></span>
+              <span class="layout-item-label">📻 Radio C <span class="layout-item-desc">(Dual-Deck Studio)</span></span>
+            </label>
+            <label class="layout-config-item">
+              <input type="checkbox" id="chk-vis-dj" data-layout="dj" checked>
+              <span class="chk-custom"></span>
+              <span class="layout-item-label">🎧 DJ <span class="layout-item-desc">(Full Performance Console)</span></span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <button class="btn" id="btn-changelog">

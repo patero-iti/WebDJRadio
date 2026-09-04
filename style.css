@@ -3135,6 +3135,11 @@ input[type=range].crossfader-slider:active::-moz-range-thumb {
 /* ==========================================================================
    Layout Mode Switcher (DJ Console vs. Radio Presenter)
    ========================================================================== */
+.layout-mode-container {
+  position: relative;
+  display: inline-flex;
+}
+
 .layout-mode-selector {
   display: flex;
   background: rgba(0, 0, 0, 0.45);
@@ -3142,6 +3147,7 @@ input[type=range].crossfader-slider:active::-moz-range-thumb {
   border-radius: 6px;
   padding: 2px;
   gap: 2px;
+  align-items: center;
 }
 
 .btn-layout-mode {
@@ -3168,6 +3174,134 @@ input[type=range].crossfader-slider:active::-moz-range-thumb {
   background: var(--bg-hover);
   color: #00f0ff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.btn-layout-config {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 5px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-layout-config:hover {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.12);
+  transform: rotate(30deg);
+}
+
+.btn-layout-config.active {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.18);
+}
+
+/* Layout Visibility Config Popover */
+.layout-config-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 290px;
+  background: linear-gradient(180deg, #101626 0%, #0a0e18 100%);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.layout-config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+}
+
+.layout-config-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #00f0ff;
+}
+
+.btn-close-popover {
+  background: transparent;
+  border: none;
+  color: #8e9aa8;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.btn-close-popover:hover {
+  color: #ff1744;
+  background: rgba(255, 23, 68, 0.15);
+}
+
+.layout-config-desc {
+  font-size: 9.5px;
+  color: #8e9aa8;
+  line-height: 1.3;
+}
+
+.layout-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.layout-config-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.layout-config-item:hover {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+.layout-config-item input[type="checkbox"] {
+  accent-color: #00f0ff;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.layout-item-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.layout-item-desc {
+  font-size: 9px;
+  font-weight: 500;
+  color: #8e9aa8;
 }
 
 /* ==========================================================================
