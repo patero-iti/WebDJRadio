@@ -6,7 +6,7 @@
   <title>WebDJRadio - Dual-Deck Web Audio DJ Workstation</title>
   <meta name="description" content="Sample-accurate dual-deck web DJ application with zero-latency Web Audio engine, 3-band EQ, equal-power crossfader, and local folder scanner.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-  <link rel="stylesheet" href="style.css?v=1.9.1">
+  <link rel="stylesheet" href="style.css?v=1.9.2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -770,9 +770,14 @@
 
         <!-- Mapping Table -->
         <div class="midi-section">
-          <div class="midi-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="midi-section-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
             <span>Current Mappings</span>
-            <button class="btn" id="btn-midi-clear" style="font-size:11px;">Clear All</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn" id="btn-midi-export-json" style="font-size:11px;" title="Export current MIDI controller mappings to a JSON file on your computer">💾 Export JSON</button>
+              <button class="btn" id="btn-midi-import-json" style="font-size:11px;" title="Import MIDI controller mappings from a JSON file">📂 Import JSON</button>
+              <input type="file" id="midi-import-file-input" accept=".json,application/json" style="display:none;">
+              <button class="btn" id="btn-midi-clear" style="font-size:11px;">Clear All</button>
+            </div>
           </div>
           <div class="table-container" style="max-height:200px;">
             <table class="track-table" id="midi-mapping-table">
@@ -1386,10 +1391,10 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="audio-analysis.js?v=1.9.1"></script>
-  <script src="WebRadioDecksEngine.js?v=1.9.1"></script>
-  <script src="broadcast.js?v=1.9.1"></script>
-  <script src="midi.js?v=1.9.1"></script>
-  <script src="app.js?v=1.9.1"></script>
+  <script src="audio-analysis.js?v=1.9.2"></script>
+  <script src="WebRadioDecksEngine.js?v=1.9.2"></script>
+  <script src="broadcast.js?v=1.9.2"></script>
+  <script src="midi.js?v=1.9.2"></script>
+  <script src="app.js?v=1.9.2"></script>
 </body>
 </html>

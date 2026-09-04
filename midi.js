@@ -177,6 +177,43 @@ class MIDIMapper {
     this.save();
   }
 
+  exportMappings(deviceName = '') {
+    return {
+      version: '1.9.2',
+      generator: 'WebDJRadio Console',
+      exportedAt: new Date().toISOString(),
+      device: deviceName || 'Generic MIDI Controller',
+      mappings: [...this.mappings]
+    };
+  }
+
+  importMappings(importedData) {
+    let list = [];
+    if (Array.isArray(importedData)) {
+      list = importedData;
+    } else if (importedData && Array.isArray(importedData.mappings)) {
+      list = importedData.mappings;
+    } else {
+      throw new Error('Invalid MIDI mappings file format. Expected a mappings array.');
+    }
+
+    const valid = list.filter(m =>
+      m &&
+      typeof m.channel === 'number' &&
+      typeof m.type === 'string' &&
+      typeof m.number === 'number' &&
+      typeof m.action === 'string'
+    );
+
+    if (valid.length === 0) {
+      throw new Error('No valid MIDI mapping definitions found in file.');
+    }
+
+    this.mappings = valid;
+    this.save();
+    return valid.length;
+  }
+
   addMapping(mapping) {
     // Replace any existing entry for the same channel+type+number
     this.mappings = this.mappings.filter(m =>

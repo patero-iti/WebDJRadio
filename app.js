@@ -2406,13 +2406,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mapping table renderer
     // ------------------------------------------------------------------
     function renderMappingTable() {
-      if (!midiManager) { midiMappingTbody.innerHTML = ''; return; }
-      const mapper = midiManager.getMapper();
+      const mapper = midiManager ? midiManager.getMapper() : new MIDIMapper();
       midiMappingTbody.innerHTML = '';
 
       if (mapper.mappings.length === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = '<td colspan="6" style="text-align:center;color:var(--text-dim);padding:12px;">No mappings. Load a preset or use MIDI Learn.</td>';
+        tr.innerHTML = '<td colspan="6" style="text-align:center;color:var(--text-dim);padding:12px;">No mappings. Load a preset, import JSON, or use MIDI Learn.</td>';
         midiMappingTbody.appendChild(tr);
         return;
       }
@@ -2426,8 +2425,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><span style="text-transform:uppercase;font-size:10px;font-weight:700;color:var(--text-muted)">${m.type}</span></td>
           <td style="font-family:var(--font-mono)">${m.number}</td>
           <td>${actionMeta ? actionMeta.desc : m.action}</td>
-          <td>${m.deck || 'Global'}</td>
-          <td><button class="btn" style="padding:2px 8px;font-size:11px;" data-idx="${idx}">✕</button></td>`;
+          <td>${m.deck ? `<span class="badge ${m.deck === 'A' ? 'badge-a' : 'badge-b'}">Deck ${m.deck}</span>` : '<span class="badge" style="color:var(--text-dim);">Global</span>'}</td>
+          <td><button class="btn" style="padding:2px 8px;font-size:11px;" data-idx="${idx}" title="Delete this mapping">✕</button></td>`;
         tr.querySelector('button').addEventListener('click', () => {
           mapper.removeMapping(idx);
           renderMappingTable();
@@ -2682,10 +2681,81 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMappingTable();
     });
 
+    // Export mappings to JSON file
+    const btnMidiExportJson = document.getElementById('btn-midi-export-json');
+    const btnMidiImportJson = document.getElementById('btn-midi-import-json');
+    const midiImportFileInput = document.getElementById('midi-import-file-input');
+
+    if (btnMidiExportJson) {
+      btnMidiExportJson.addEventListener('click', () => {
+        const mapper = midiManager ? midiManager.getMapper() : new MIDIMapper();
+        if (mapper.mappings.length === 0) {
+          alert('No MIDI mappings configured to export. Load a preset or map controls first.');
+          return;
+        }
+
+        const deviceName = midiManager && midiManager.getDevices().length > 0
+          ? midiManager.getDevices().map(d => d.name).join('_')
+          : activePresetName || 'Controller';
+
+        const exportData = mapper.exportMappings(deviceName);
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const safeDevice = deviceName.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+        const filename = `webdj_midi_${safeDevice}_${new Date().toISOString().slice(0, 10)}.json`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        addActivityLine(`Exported ${mapper.mappings.length} mappings to "${filename}"`, 'trigger');
+      });
+    }
+
+    // Import mappings from JSON file
+    if (btnMidiImportJson && midiImportFileInput) {
+      btnMidiImportJson.addEventListener('click', () => {
+        midiImportFileInput.value = '';
+        midiImportFileInput.click();
+      });
+
+      midiImportFileInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            const mapper = midiManager ? midiManager.getMapper() : new MIDIMapper();
+            const count = mapper.importMappings(data);
+
+            activePresetName = data.device || 'Custom Imported';
+            renderPresets();
+            renderMappingTable();
+
+            addActivityLine(`Imported ${count} mappings from "${file.name}"`, 'trigger');
+            if (midiLearnStatus) {
+              midiLearnStatus.innerHTML = `✅ Successfully imported <strong>${count} mappings</strong> from <code>${escapeHtml(file.name)}</code>`;
+            }
+          } catch (err) {
+            alert(`Could not import MIDI mappings file: ${err.message}`);
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
     // Clear all mappings
     btnMidiClear.addEventListener('click', () => {
-      if (!midiManager) return;
-      midiManager.getMapper().clearAll();
+      const mapper = midiManager ? midiManager.getMapper() : new MIDIMapper();
+      mapper.clearAll();
       activePresetName = null;
       renderPresets();
       renderMappingTable();
@@ -2742,21 +2812,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initial table render
-    const tmpMapper = new MIDIMapper();
-    const rows = tmpMapper.mappings.map((m, i) => {
-      const meta = MIDI_ACTIONS[m.action];
-      const desc = meta ? meta.desc : m.action;
-      const deckBadge = m.deck ? `<span class="badge ${m.deck === 'A' ? 'badge-a' : 'badge-b'}">Deck ${m.deck}</span>` : '<span class="badge" style="color:var(--text-dim);">Global</span>';
-      return `<tr>
-        <td>CH${m.channel}</td>
-        <td>${m.type.toUpperCase()}</td>
-        <td>${m.number}</td>
-        <td>${desc}</td>
-        <td>${deckBadge}</td>
-        <td></td>
-      </tr>`;
-    }).join('');
-    midiMappingTbody.innerHTML = rows || '<tr><td colspan="6" style="color:var(--text-dim); text-align:center; padding:16px;">No mappings configured.</td></tr>';
+    renderPresets();
+    renderMappingTable();
   })();
 
   // -------------------------------------------------------------

@@ -1,6 +1,6 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `1.9.1`  
+> **Version:** `1.9.2`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
 > **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation & Broadcasting Console
 
@@ -195,6 +195,9 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 * **Web MIDI API Integration**: Automatic device detection, connection status badges, and message parsing.
 * **Controller Presets**: Out-of-the-box mappings for **Pioneer DDJ-200**, **Pioneer DDJ-400**, **Numark Party Mix**, and **Behringer CMD Studio/Micro**.
 * **Interactive MIDI Learn**: Click "Start Learn", move any physical control, and automatically bind to any mixer function.
+* **Portable JSON Export & Import**:
+  * **💾 Export JSON**: Downloads a structured `.json` configuration file containing all current mapping definitions, CC/Note channels, actions, and connected hardware info.
+  * **📂 Import JSON**: One-click file picker to load, validate, and restore saved MIDI mappings across any workstation or browser instance.
 * **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, volume faders, master volume, 3-band EQ, dual filter knobs, pitch faders, and performance pads.
 
 ### 3.9. Dual Layout Subsystem (DJ Workstation vs. Radio Presenter Mode)

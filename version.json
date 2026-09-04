@@ -1,8 +1,20 @@
 {
-  "version": "1.9.1",
+  "version": "1.9.2",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-04",
   "changelog": [
+    {
+      "version": "1.9.2",
+      "date": "2026-09-04",
+      "title": "USB MIDI Controller Mapping JSON Export & Import",
+      "changes": [
+        "**Portable MIDI Mappings JSON Storage**",
+        "====================:)====================",
+        "One-Click JSON File Export: Added '💾 Export JSON' button to the MIDI Controller Setup modal to save all custom device mappings, learn bindings, and presets into structured .json files directly to your computer.",
+        "Cross-Device & Instance Import: Added '📂 Import JSON' button to load and restore any saved MIDI mapping JSON file on different browser instances, workstations, or computers.",
+        "File Validation & Immediate Activation: Validates CC/Note channel configurations and instantly loads mappings into the active Web MIDI engine and local storage."
+      ]
+    },
     {
       "version": "1.9.1",
       "date": "2026-09-04",
