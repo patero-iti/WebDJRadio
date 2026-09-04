@@ -82,6 +82,27 @@ class WebRadioDecksEngine {
     this.musicBus.connect(this.broadcastBus);
     this.micGain.connect(this.broadcastBus);
 
+    // CART Subsystem Node Chain & Analyzers (Mixes to Master & Stream)
+    this.cartGain = this.ctx.createGain();
+    this.cartGain.gain.value = 1.0;
+    this.cartVolume = 1.0;
+    this.cartAnalyser = this.ctx.createAnalyser();
+    this.cartAnalyser.fftSize = 256;
+    this.cartAnalyser.smoothingTimeConstant = 0.7;
+
+    this.cartGain.connect(this.cartAnalyser);
+    this.cartGain.connect(this.masterGain);
+    this.cartGain.connect(this.broadcastBus);
+
+    // 4 Independent Cart Player Slots
+    this.carts = [
+      { id: 1, buffer: null, sourceNode: null, startTime: 0, isPlaying: false, title: '', artist: '', duration: 0 },
+      { id: 2, buffer: null, sourceNode: null, startTime: 0, isPlaying: false, title: '', artist: '', duration: 0 },
+      { id: 3, buffer: null, sourceNode: null, startTime: 0, isPlaying: false, title: '', artist: '', duration: 0 },
+      { id: 4, buffer: null, sourceNode: null, startTime: 0, isPlaying: false, title: '', artist: '', duration: 0 }
+    ];
+    this.onCartEnd = null;
+
     // Crossfader position: 0.0 (Deck A full) to 1.0 (Deck B full)
     this.crossfaderPosition = 0.5;
 
@@ -1132,4 +1153,215 @@ class WebRadioDecksEngine {
     }
     deck.priorLoopState = null;
   }
+
+  // --- BROADCAST CART MACHINE SUBSYSTEM ---
+
+  setCartVolume(val) {
+    this.cartVolume = Math.max(0, Math.min(1, parseFloat(val) || 0));
+    if (this.cartGain) {
+      this.cartGain.gain.setValueAtTime(this.cartVolume, this.ctx.currentTime);
+    }
+  }
+
+  getCartPeakLevel() {
+    if (!this.cartAnalyser) return 0;
+    const data = new Uint8Array(this.cartAnalyser.fftSize);
+    this.cartAnalyser.getByteTimeDomainData(data);
+    let max = 0;
+    for (let i = 0; i < data.length; i++) {
+      const v = Math.abs((data[i] - 128) / 128);
+      if (v > max) max = v;
+    }
+    return max;
+  }
+
+  async loadCart(slotIndex, source, metadata = {}) {
+    if (slotIndex < 0 || slotIndex > 3) return false;
+    const cart = this.carts[slotIndex];
+    if (!cart) return false;
+
+    // Stop any existing playback on this slot
+    this.stopCart(slotIndex);
+
+    let audioBuffer = null;
+    if (source instanceof AudioBuffer) {
+      audioBuffer = source;
+    } else if (source instanceof File || source instanceof Blob) {
+      const arrayBuf = await source.arrayBuffer();
+      audioBuffer = await this.ctx.decodeAudioData(arrayBuf.slice(0));
+    } else if (source instanceof ArrayBuffer) {
+      audioBuffer = await this.ctx.decodeAudioData(source.slice(0));
+    }
+
+    if (!audioBuffer) return false;
+
+    cart.buffer = audioBuffer;
+    cart.duration = audioBuffer.duration;
+    cart.title = metadata.title || (source.name ? source.name.replace(/\.[^/.]+$/, '') : `Cart ${slotIndex + 1}`);
+    cart.artist = metadata.artist || 'Station Audio';
+    cart.isPlaying = false;
+    cart.startTime = 0;
+    cart.sourceNode = null;
+    return true;
+  }
+
+  playCart(slotIndex) {
+    if (slotIndex < 0 || slotIndex > 3) return false;
+    const cart = this.carts[slotIndex];
+    if (!cart || !cart.buffer) return false;
+
+    // Re-triggering cart resets and restarts
+    if (cart.isPlaying && cart.sourceNode) {
+      try {
+        cart.sourceNode.onended = null;
+        cart.sourceNode.stop();
+        cart.sourceNode.disconnect();
+      } catch (e) {}
+    }
+
+    const source = this.ctx.createBufferSource();
+    source.buffer = cart.buffer;
+    source.connect(this.cartGain);
+
+    cart.sourceNode = source;
+    cart.startTime = this.ctx.currentTime;
+    cart.isPlaying = true;
+
+    source.onended = () => {
+      if (cart.sourceNode === source) {
+        cart.isPlaying = false;
+        cart.sourceNode = null;
+        if (typeof this.onCartEnd === 'function') {
+          this.onCartEnd(slotIndex);
+        }
+      }
+    };
+
+    source.start(0);
+    return true;
+  }
+
+  stopCart(slotIndex) {
+    if (slotIndex < 0 || slotIndex > 3) return;
+    const cart = this.carts[slotIndex];
+    if (!cart) return;
+
+    if (cart.sourceNode) {
+      try {
+        cart.sourceNode.onended = null;
+        cart.sourceNode.stop();
+        cart.sourceNode.disconnect();
+      } catch (e) {}
+      cart.sourceNode = null;
+    }
+    cart.isPlaying = false;
+  }
+
+  stopAllCarts() {
+    for (let i = 0; i < 4; i++) {
+      this.stopCart(i);
+    }
+  }
+
+  getCartState(slotIndex) {
+    if (slotIndex < 0 || slotIndex > 3) return null;
+    const cart = this.carts[slotIndex];
+    if (!cart) return null;
+
+    let currentTime = 0;
+    let timeLeft = 0;
+    if (cart.isPlaying && cart.buffer) {
+      currentTime = Math.max(0, this.ctx.currentTime - cart.startTime);
+      if (currentTime > cart.duration) currentTime = cart.duration;
+      timeLeft = Math.max(0, cart.duration - currentTime);
+    }
+
+    return {
+      id: cart.id,
+      isLoaded: !!cart.buffer,
+      isPlaying: cart.isPlaying,
+      title: cart.title || `Empty Slot ${cart.id}`,
+      artist: cart.artist || 'Unassigned',
+      duration: cart.duration || 0,
+      currentTime,
+      timeLeft
+    };
+  }
+
+  // Synthesize instant professional radio station sound FX / jingles using Web Audio oscillators
+  generateDemoJingle(type = 0) {
+    const sampleRate = this.ctx.sampleRate;
+    let duration = 2.5;
+    let name = 'Radio Jingle';
+
+    if (type === 0) {
+      duration = 2.0;
+      name = 'Station ID Stinger';
+    } else if (type === 1) {
+      duration = 1.8;
+      name = 'Sweeper Chime';
+    } else if (type === 2) {
+      duration = 2.2;
+      name = 'Laser Drop FX';
+    } else if (type === 3) {
+      duration = 3.0;
+      name = 'News Alert Fanfare';
+    }
+
+    const numSamples = Math.floor(sampleRate * duration);
+    const audioBuffer = this.ctx.createBuffer(2, numSamples, sampleRate);
+    const left = audioBuffer.getChannelData(0);
+    const right = audioBuffer.getChannelData(1);
+
+    for (let i = 0; i < numSamples; i++) {
+      const t = i / sampleRate;
+      let sample = 0;
+
+      if (type === 0) {
+        // Station ID Stinger: Chord chime + sub drop
+        const env = Math.exp(-t * 2.2);
+        const f1 = 523.25; // C5
+        const f2 = 659.25; // E5
+        const f3 = 783.99; // G5
+        const f4 = 1046.50; // C6
+        sample = (Math.sin(2 * Math.PI * f1 * t) * 0.25 +
+                  Math.sin(2 * Math.PI * f2 * t) * 0.25 +
+                  Math.sin(2 * Math.PI * f3 * t) * 0.25 +
+                  Math.sin(2 * Math.PI * f4 * t) * 0.25) * env;
+        // Sub hit
+        const subEnv = Math.exp(-t * 4);
+        sample += Math.sin(2 * Math.PI * (120 - t * 40) * t) * 0.4 * subEnv;
+      } else if (type === 1) {
+        // Sweeper Chime: Fast rising arpeggio + sparkle
+        const env = Math.exp(-t * 1.8);
+        const pitch = 300 + Math.pow(t / duration, 2) * 800;
+        sample = Math.sin(2 * Math.PI * pitch * t) * 0.4 * env;
+        sample += (Math.random() * 2 - 1) * 0.1 * Math.exp(-t * 3);
+      } else if (type === 2) {
+        // Laser Drop FX: FM sweep
+        const env = Math.exp(-t * 2.5);
+        const mod = Math.sin(2 * Math.PI * 40 * t) * 200;
+        const carrierPitch = Math.max(60, 1400 - t * 600 + mod);
+        sample = Math.sin(2 * Math.PI * carrierPitch * t) * 0.5 * env;
+      } else {
+        // News Alert Fanfare: 3 quick beeps then chord
+        let beep = 0;
+        if ((t >= 0 && t < 0.15) || (t >= 0.25 && t < 0.4) || (t >= 0.5 && t < 0.65)) {
+          beep = Math.sin(2 * Math.PI * 880 * t) * 0.4;
+        } else if (t >= 0.8) {
+          const chordEnv = Math.exp(-(t - 0.8) * 1.5);
+          beep = (Math.sin(2 * Math.PI * 440 * (t - 0.8)) * 0.3 +
+                  Math.sin(2 * Math.PI * 554.37 * (t - 0.8)) * 0.3 +
+                  Math.sin(2 * Math.PI * 659.25 * (t - 0.8)) * 0.3) * chordEnv;
+        }
+        sample = beep;
+      }
+
+      left[i] = Math.max(-1, Math.min(1, sample));
+      right[i] = Math.max(-1, Math.min(1, sample * 0.95));
+    }
+
+    return { buffer: audioBuffer, title: name, artist: 'Synthesized FX', duration };
+  }
 }
+

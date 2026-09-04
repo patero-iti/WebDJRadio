@@ -1,14 +1,14 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `1.9.5`  
+> **Version:** `1.9.9`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
-> **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation & Broadcasting Console
+> **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation, Broadcast CART Wall, Studio Hub & Radio Console
 
 ---
 
 ## 1. Executive Summary & System Overview
 
-**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a triple-layout visual subsystem (**DJ Console**, **Radio Presenter**, and **Radio Presenter B Pure Mixer**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
+**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a 4-slot broadcast CART Wall pad controller with dedicated audio routing, a triple-layout visual subsystem (**DJ Console**, **Radio Presenter**, and **Radio Presenter B Pure Mixer + Cart Wall**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
 
 ---
 
@@ -200,29 +200,22 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
   * **📂 Import JSON**: One-click file picker to load, validate, and restore saved MIDI mappings across any workstation or browser instance.
 * **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, volume faders, master volume, 3-band EQ, dual filter knobs, pitch faders, and performance pads.
 
-### 3.9. Triple Layout Subsystem (DJ Workstation vs. Radio Presenter vs. Radio Presenter B)
-* **1. DJ Console Layout (`mode-dj`)**:
-  * Clean, streamlined digital performance interface without bulky scratch discs.
-  * **Full-Width Performance Controls**: 4 Hot Cues, Beat Loops (1–8 beats), Beat Rolls, On-Deck Quick FX strips, 3-band rotary EQ, dual-filter sweeps, pitch tempo sliders, equal-power crossfader, and 4-channel broadcast mixer.
-* **2. Radio Presenter Minimal Broadcast Mode (`mode-radio`)**:
-  * Designed for radio talk hosts and station broadcasters seeking a clean, focused, distraction-free environment centered around the mixer console.
-  * **Broadcast Mixer Channel Strips (MST -> CH A -> MIC -> CH B)**:
-    * **Far-Left Master Output Monitor (MST)**: Reference stereo peak VU meter and output indicator.
-    * **Top Square Album Artwork**: Dynamically displays loaded track cover art thumbnail (or fallback icon) for Deck A (CH A) and Deck B (CH B), and a pulsing studio microphone badge for the live mic channel.
-    * **Left-Aligned Peak VU Meters**: Stereo LED peak audio meters positioned immediately to the left of each channel's vertical slider volume control for real-time visual level monitoring.
-    * **Vertical Volume Faders**: Luxury 160px vertical throw volume sliders for precision broadcast gain adjustment.
-    * **10-Second End-of-Track Broadcast Alert**: Channel A (`#mixer-strip-a`) and Channel B (`#mixer-strip-b`) cards pulse with an unmistakable flashing red alert (`#ff1744`) when 10 seconds or less remain on the playing track, warning hosts across all views.
-  * **Retains**: Dual playback decks, track title/artist metadata, scrolling and overview waveforms with 10s end alert, unified transport strip (`[ CUE ] [ PLAY/PAUSE ] [ SYNC ] [ PITCH SLIDER ]`), channel volume faders, live microphone voiceover strip with peak LED meters & ON AIR indicator, **AUTO-DECK RELAY** controller, and dual cued playlist queues.
-  * **Hides**: Loop bars, beat roll pads, on-deck quick FX knobs, 3-band EQ rack, and crossfader.
-  * **Crossfader Safety**: Automatically centers the crossfader (`0.5`) upon entering Radio mode so both deck channel volume faders operate at unattenuated 100% gain.
-* **3. Radio Presenter B Pure Mixer Layout (`mode-radio-b`)**:
-  * Dedicated pure mixer view centered directly in the spotlight without Deck A and Deck B panels on screen.
-  * **Channel Strip Track Metadata Monitors**: Compact real-time track metadata badges integrated directly within Channel A (`#mixer-track-info-a`) and Channel B (`#mixer-track-info-b`) strips below album artwork displaying current loaded/playing Title and Artist.
-  * **10-Second End-of-Track Flash Alert**: Entire CH A or CH B mixer strip card, borders, title badges, and square Play buttons pulse vividly in broadcast alert red when reaching the 10-second playback countdown.
-  * **Live Playback & Alert Animations**: Badges illuminate with active channel neon glow during playback and flash high-visibility warning red during the 10-second track completion window.
-  * **Dedicated Channel Transport & Monitoring**: Broadcasters manage playback entirely via the mixer's square Play/Pause buttons, artwork monitors, precision vertical faders, peak VU meters, live mic ON AIR toggle, and Auto-Deck Relay controller.
-  * **Maximized Studio Focus**: Perfectly tailored for compact broadcast setups, touchscreen consoles, or live hosts who let auto-relay / cued playlists run while actively riding channel gains and mic levels.
-  * **Crossfader Protection & Persistence**: Centers the crossfader (`0.5`) and persists selection across reloads via `localStorage.getItem('webdj_layout_mode')`.
+### 3.9. Quad Layout Subsystem (Radio A, Radio B, Radio C, DJ)
+* **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C ] -> [ 🎧 DJ ]`.
+* **1. Radio A Studio Hub & On-Air Trivia Layout (`mode-radio-c`)**:
+  * Flagship live radio console featuring two vertically stacked studio information panels directly to the left of the Web Radio Mixer (together matching the full height of the Mixer and CART Wall):
+    * **Top Panel ("Studio Hub")**: Real-time dual digital clocks for Local Host Time (with dynamic timezone city detection) and Perth Western Australia Time (AWST / UTC+8); live temperature and weather condition feeds for Perth Station and Local broadcast venue via Open-Meteo.
+    * **Bottom Panel ("Now Playing & Trivia")**: High-visibility album artwork, title, artist, year, label, BPM, and musical key tags; live real-world artist biographies and discography lore fetched from **TheAudioDB**, **MusicBrainz**, and **Wikipedia** combined with procedural presenter liner notes and harmonic mixing tips, complete with a live `↺ Next Fact` cycle button.
+    * **Web Radio Mixer & CART Wall Integration**: Full 5-strip broadcast mixer (`[ MST ] -> [ MIC ] -> [ CH A ] -> [ CH B ] -> [ CARTS ]`) with 160px faders, peak VU meters, and 4-slot square CART wall.
+* **2. Radio B Pure Mixer + CART Wall Layout (`mode-radio-b`)**:
+  * Dedicated pure presenter workstation centered around the Web Radio Mixer and the 4-slot square Broadcast CART Wall.
+  * Displays real-time metadata badges and precision `-MM:SS.d` playback countdowns on CH A & CH B strips.
+  * Flashes high-visibility red ending warning across the entire channel strip at 10 seconds remaining.
+* **3. Radio C Dual-Deck Broadcast Layout (`mode-radio`)**:
+  * Designed for station presenters wanting dual deck faceplates (`Deck A` and `Deck B`) alongside the mixer console, with scrolling and overview waveforms, transport strips, pitch sliders, and mic voiceover strip.
+  * Hides performance DJ controls (loops, roll bars, quick FX, 3-band EQ rack, crossfader).
+* **4. DJ Console Layout (`mode-dj`)**:
+  * Comprehensive club DJ controller interface with dual performance decks, 4 Hot Cues, Beat Loops (1–8 beats), Beat Rolls, On-Deck Quick FX strips, 3-band rotary EQ, dual-filter sweeps, pitch tempo sliders, equal-power crossfader, and 4-channel broadcast mixer.
 
 ---
 

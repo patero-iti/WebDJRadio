@@ -6,7 +6,7 @@
   <title>WebDJRadio - Dual-Deck Web Audio DJ Workstation</title>
   <meta name="description" content="Sample-accurate dual-deck web DJ application with zero-latency Web Audio engine, 3-band EQ, equal-power crossfader, and local folder scanner.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-  <link rel="stylesheet" href="style.css?v=1.9.5">
+  <link rel="stylesheet" href="style.css?v=1.9.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -38,16 +38,19 @@
     </div>
 
     <div class="header-actions">
-      <!-- Layout Mode Switcher (DJ Console vs Radio Presenter vs Radio Presenter B) -->
-      <div class="layout-mode-selector" id="layout-mode-selector" title="Switch between DJ Workstation and Radio Presenter layouts">
-        <button class="btn-layout-mode active" id="btn-layout-dj" data-mode="dj" type="button" title="DJ Console: Full controls with scratch wheels, loops, rolls, hot cues, FX & crossfader">
-          <span>🎧 DJ Console</span>
+      <!-- Layout Mode Switcher (Radio A vs Radio B vs Radio C vs DJ) -->
+      <div class="layout-mode-selector" id="layout-mode-selector" title="Switch between Radio A, Radio B, Radio C, and DJ layouts">
+        <button class="btn-layout-mode" id="btn-layout-radio-c" data-mode="radio-c" type="button" title="Radio A: Studio Hub, Live Trivia & Now Playing, Web Radio Mixer & CART Wall">
+          <span>🎙️ Radio A</span>
         </button>
-        <button class="btn-layout-mode" id="btn-layout-radio" data-mode="radio" type="button" title="Radio Presenter: Minimal broadcast studio layout with large transport, mic & auto-relay">
-          <span>🎙️ Radio Presenter</span>
+        <button class="btn-layout-mode" id="btn-layout-radio-b" data-mode="radio-b" type="button" title="Radio B: Dedicated Web Radio Mixer & Broadcast CART Wall">
+          <span>📻 Radio B</span>
         </button>
-        <button class="btn-layout-mode" id="btn-layout-radio-b" data-mode="radio-b" type="button" title="Radio Presenter B: Dedicated Web Radio Mixer view (hides Deck A & Deck B)">
-          <span>📻 Radio Presenter B</span>
+        <button class="btn-layout-mode" id="btn-layout-radio" data-mode="radio" type="button" title="Radio C: Streamlined broadcast studio layout with dual decks & auto-relay">
+          <span>📻 Radio C</span>
+        </button>
+        <button class="btn-layout-mode active" id="btn-layout-dj" data-mode="dj" type="button" title="DJ: Full DJ console with scratch wheels, loops, rolls, hot cues, FX & crossfader">
+          <span>🎧 DJ</span>
         </button>
       </div>
 
@@ -66,13 +69,6 @@
       </button>
       <button class="btn btn-primary" id="btn-unlock-audio">
         <span>⚡ Unlock Engine</span>
-      </button>
-      <button class="btn" id="btn-scan-folder">
-        <span>📁 Scan Local Folder</span>
-      </button>
-      <input type="file" id="file-input-global" accept="audio/*" multiple style="display: none;">
-      <button class="btn" onclick="document.getElementById('file-input-global').click()">
-        <span>➕ Add Files</span>
       </button>
     </div>
   </header>
@@ -233,6 +229,109 @@
         </div>
       </section>
 
+      <!-- STUDIO INFO COLUMN (Studio Hub & Now Playing) - Radio C Layout -->
+      <section class="studio-info-column" id="panel-studio-info">
+        
+        <!-- Top Panel: Studio Hub (Clocks & Weather) -->
+        <div class="studio-card studio-hub-card" id="studio-hub-card">
+          <div class="studio-card-header">
+            <div class="studio-card-title">
+              <span class="studio-card-icon">⏱️</span>
+              <span>STUDIO HUB</span>
+            </div>
+            <span class="studio-live-badge">ON AIR</span>
+          </div>
+
+          <div class="studio-clocks-grid">
+            <!-- Local Time Clock -->
+            <div class="studio-clock-box local-clock">
+              <div class="clock-label-row">
+                <span class="clock-flag">📍</span>
+                <span class="clock-zone-name" id="clock-local-name">LOCAL TIME</span>
+              </div>
+              <div class="clock-digits" id="clock-local-time">--:--:--</div>
+              <div class="clock-date" id="clock-local-date">---, -- ---</div>
+            </div>
+
+            <!-- Perth WA Time Clock -->
+            <div class="studio-clock-box perth-clock">
+              <div class="clock-label-row">
+                <span class="clock-flag">🇦🇺</span>
+                <span class="clock-zone-name">PERTH (AWST)</span>
+              </div>
+              <div class="clock-digits" id="clock-perth-time">--:--:--</div>
+              <div class="clock-date" id="clock-perth-date">---, -- ---</div>
+            </div>
+          </div>
+
+          <!-- Studio Weather Section -->
+          <div class="studio-weather-section">
+            <div class="weather-row" id="weather-row-local">
+              <div class="weather-label">
+                <span class="weather-icon" id="weather-icon-local">⛅</span>
+                <span class="weather-place" id="weather-place-local">Local Weather</span>
+              </div>
+              <div class="weather-readout">
+                <span class="weather-temp" id="weather-temp-local">--°C</span>
+                <span class="weather-cond" id="weather-cond-local">Fetching...</span>
+              </div>
+            </div>
+
+            <div class="weather-row perth-weather-row" id="weather-row-perth">
+              <div class="weather-label">
+                <span class="weather-icon" id="weather-icon-perth">☀️</span>
+                <span class="weather-place">Perth, WA</span>
+              </div>
+              <div class="weather-readout">
+                <span class="weather-temp" id="weather-temp-perth">--°C</span>
+                <span class="weather-cond" id="weather-cond-perth">Perth Station</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Panel: Now Playing (Metadata, Artist Bio, Trivia, Liner Notes) -->
+        <div class="studio-card studio-nowplaying-card" id="studio-nowplaying-card">
+          <div class="studio-card-header">
+            <div class="studio-card-title">
+              <span class="studio-card-icon">🎵</span>
+              <span>NOW PLAYING &amp; TRIVIA</span>
+            </div>
+            <span class="studio-deck-tag" id="nowplaying-active-deck-tag">DECK A</span>
+          </div>
+
+          <!-- Track Quick Summary Card -->
+          <div class="nowplaying-hero">
+            <div class="nowplaying-art" id="nowplaying-art-badge">
+              <img id="nowplaying-art-img" style="display: none;" alt="Now Playing Art">
+              <span id="nowplaying-art-placeholder">📻</span>
+            </div>
+            <div class="nowplaying-details">
+              <div class="nowplaying-title" id="nowplaying-title">Ready for Broadcast</div>
+              <div class="nowplaying-artist" id="nowplaying-artist">No Track Active</div>
+              <div class="nowplaying-tags">
+                <span class="np-tag" id="nowplaying-year">Year: --</span>
+                <span class="np-tag" id="nowplaying-label">Label: Station</span>
+                <span class="np-tag" id="nowplaying-bpm">BPM: --</span>
+                <span class="np-tag" id="nowplaying-key">Key: --</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Presenter Trivia & Artist Bio Box -->
+          <div class="nowplaying-trivia-box">
+            <div class="trivia-box-header">
+              <span>🎙️ PRESENTER LINER &amp; TRIVIA</span>
+              <button class="btn-trivia-refresh" id="btn-trivia-refresh" title="Cycle / Refresh Track Trivia">↺ Next Fact</button>
+            </div>
+            <div class="trivia-box-content" id="nowplaying-trivia-text">
+              Track information and presenter trivia will display here when a song is playing or cued on air.
+            </div>
+          </div>
+        </div>
+
+      </section>
+
       <!-- CENTRAL MIXER PANEL -->
       <section class="mixer-panel">
         <div class="mixer-header">WEB RADIO MIXER</div>
@@ -318,6 +417,10 @@
             <div class="mixer-track-info" id="mixer-track-info-master">
               <div class="mixer-track-title">MASTER OUT</div>
               <div class="mixer-track-artist">Live Mix</div>
+              <div class="mixer-track-time">
+                <span class="mixer-time-label">BUS</span>
+                <span class="mixer-time-val">STEREO</span>
+              </div>
             </div>
             <span class="strip-label">MST</span>
             <div class="fader-and-meter">
@@ -330,29 +433,6 @@
             </div>
           </div>
 
-          <!-- Deck A Channel Strip -->
-          <div class="channel-fader-strip deck-a" id="mixer-strip-a">
-            <div class="mixer-ch-art" id="mixer-art-a" title="Deck A Loaded Artwork">
-              <img class="mixer-art-img" id="mixer-art-img-a" alt="Deck A Art" style="display: none;" />
-              <div class="mixer-art-placeholder" id="mixer-art-placeholder-a">🎵</div>
-            </div>
-            <div class="mixer-track-info" id="mixer-track-info-a" title="Track Loaded on CH A">
-              <div class="mixer-track-title" id="mixer-track-title-a">No Track Loaded</div>
-              <div class="mixer-track-artist" id="mixer-track-artist-a">Deck A</div>
-            </div>
-            <span class="strip-label">CH A</span>
-            <div class="fader-and-meter">
-              <div class="vu-meter-bar">
-                <div class="vu-fill" id="vu-a"></div>
-              </div>
-              <input type="range" class="vertical-fader" id="vol-a" min="0" max="1" step="0.01" value="1" title="Deck A Volume">
-            </div>
-            <button class="btn-channel-square btn-mixer-play" id="btn-mixer-play-a" data-deck="A" title="Deck A Play / Pause (Space)">
-              <span class="btn-square-icon" id="mixer-play-icon-a">▶</span>
-              <span class="btn-square-sublabel">PLAY</span>
-            </button>
-          </div>
-
           <!-- Mic / Live Input Channel Strip -->
           <div class="channel-fader-strip mic-strip" id="mixer-strip-mic">
             <div class="mixer-ch-art mixer-mic-art" id="mixer-art-mic" title="Microphone Live Input">
@@ -361,6 +441,10 @@
             <div class="mixer-track-info" id="mixer-track-info-mic">
               <div class="mixer-track-title" id="mixer-track-title-mic">LIVE MIC</div>
               <div class="mixer-track-artist" id="mixer-track-artist-mic">Direct Voice</div>
+              <div class="mixer-track-time">
+                <span class="mixer-time-label">STATUS</span>
+                <span class="mixer-time-val" id="mixer-mic-status-text">MUTED</span>
+              </div>
             </div>
             <span class="strip-label">MIC</span>
             <div class="fader-and-meter">
@@ -381,6 +465,33 @@
             </div>
           </div>
 
+          <!-- Deck A Channel Strip -->
+          <div class="channel-fader-strip deck-a" id="mixer-strip-a">
+            <div class="mixer-ch-art" id="mixer-art-a" title="Deck A Loaded Artwork">
+              <img class="mixer-art-img" id="mixer-art-img-a" alt="Deck A Art" style="display: none;" />
+              <div class="mixer-art-placeholder" id="mixer-art-placeholder-a">🎵</div>
+            </div>
+            <div class="mixer-track-info" id="mixer-track-info-a" title="Track Loaded on CH A">
+              <div class="mixer-track-title" id="mixer-track-title-a">No Track Loaded</div>
+              <div class="mixer-track-artist" id="mixer-track-artist-a">Deck A</div>
+              <div class="mixer-track-time" id="mixer-time-box-a" title="Time Remaining on CH A">
+                <span class="mixer-time-label">LEFT</span>
+                <span class="mixer-time-val" id="mixer-time-left-a">--:--</span>
+              </div>
+            </div>
+            <span class="strip-label">CH A</span>
+            <div class="fader-and-meter">
+              <div class="vu-meter-bar">
+                <div class="vu-fill" id="vu-a"></div>
+              </div>
+              <input type="range" class="vertical-fader" id="vol-a" min="0" max="1" step="0.01" value="1" title="Deck A Volume">
+            </div>
+            <button class="btn-channel-square btn-mixer-play" id="btn-mixer-play-a" data-deck="A" title="Deck A Play / Pause (Space)">
+              <span class="btn-square-icon" id="mixer-play-icon-a">▶</span>
+              <span class="btn-square-sublabel">PLAY</span>
+            </button>
+          </div>
+
           <!-- Deck B Channel Strip -->
           <div class="channel-fader-strip deck-b" id="mixer-strip-b">
             <div class="mixer-ch-art" id="mixer-art-b" title="Deck B Loaded Artwork">
@@ -390,6 +501,10 @@
             <div class="mixer-track-info" id="mixer-track-info-b" title="Track Loaded on CH B">
               <div class="mixer-track-title" id="mixer-track-title-b">No Track Loaded</div>
               <div class="mixer-track-artist" id="mixer-track-artist-b">Deck B</div>
+              <div class="mixer-track-time" id="mixer-time-box-b" title="Time Remaining on CH B">
+                <span class="mixer-time-label">LEFT</span>
+                <span class="mixer-time-val" id="mixer-time-left-b">--:--</span>
+              </div>
             </div>
             <span class="strip-label">CH B</span>
             <div class="fader-and-meter">
@@ -401,6 +516,31 @@
             <button class="btn-channel-square btn-mixer-play" id="btn-mixer-play-b" data-deck="B" title="Deck B Play / Pause (Enter)">
               <span class="btn-square-icon" id="mixer-play-icon-b">▶</span>
               <span class="btn-square-sublabel">PLAY</span>
+            </button>
+          </div>
+          <!-- CARTS Channel Strip -->
+          <div class="channel-fader-strip carts-strip" id="mixer-strip-carts">
+            <div class="mixer-ch-art" id="mixer-art-carts" title="Broadcast CART Wall Channel">
+              <div class="mixer-art-placeholder" id="mixer-art-placeholder-carts">📻</div>
+            </div>
+            <div class="mixer-track-info" id="mixer-track-info-carts" title="Active CART Status">
+              <div class="mixer-track-title" id="mixer-track-title-carts">CART Wall</div>
+              <div class="mixer-track-artist" id="mixer-track-artist-carts">4 Slots Ready</div>
+              <div class="mixer-track-time" id="mixer-time-box-carts" title="Active Carts Playing">
+                <span class="mixer-time-label">ACTIVE</span>
+                <span class="mixer-time-val" id="mixer-carts-active-val">0 / 4</span>
+              </div>
+            </div>
+            <span class="strip-label">CARTS</span>
+            <div class="fader-and-meter">
+              <div class="vu-meter-bar">
+                <div class="vu-fill" id="vu-carts"></div>
+              </div>
+              <input type="range" class="vertical-fader" id="vol-carts" min="0" max="1" step="0.01" value="1" title="Carts Master Volume">
+            </div>
+            <button class="btn-channel-square btn-mixer-stop" id="btn-mixer-carts-stop" title="Stop All Active Carts">
+              <span class="btn-square-icon">⏹</span>
+              <span class="btn-square-sublabel">STOP ALL</span>
             </button>
           </div>
         </div>
@@ -448,6 +588,89 @@
             <span class="broadcast-stat" id="mixer-broadcast-mode">WebRTC WHIP</span>
           </div>
         </div>
+      </section>
+
+      <!-- BROADCAST CART WALL PANEL (Shown in Radio Presenter B Layout) -->
+      <section class="cart-panel" id="panel-cart">
+        <div class="cart-panel-header">
+          <div class="cart-panel-title">
+            <span class="cart-icon">📻</span>
+            <span>CART WALL</span>
+          </div>
+          <button class="btn btn-sm btn-danger" id="btn-cart-stop-all" title="Instantly kill all playing carts">⏹ STOP ALL</button>
+        </div>
+        
+        <div class="cart-pads-grid">
+          <!-- Cart Pad 1 -->
+          <div class="cart-pad" id="cart-pad-0" data-slot="0">
+            <div class="cart-pad-header">
+              <span class="cart-pad-num">1</span>
+              <span class="cart-pad-status-led" id="cart-led-0"></span>
+            </div>
+            <div class="cart-pad-body">
+              <div class="cart-pad-title" id="cart-title-0">Cart 1</div>
+              <div class="cart-pad-desc" id="cart-desc-0">Empty (Drag or Load)</div>
+            </div>
+            <div class="cart-pad-footer">
+              <span class="cart-pad-time" id="cart-time-0">--:--</span>
+              <button class="btn-cart-trigger" id="btn-cart-play-0" title="Play / Retrigger Cart 1">▶</button>
+            </div>
+            <div class="cart-pad-progress" id="cart-progress-0"></div>
+          </div>
+
+          <!-- Cart Pad 2 -->
+          <div class="cart-pad" id="cart-pad-1" data-slot="1">
+            <div class="cart-pad-header">
+              <span class="cart-pad-num">2</span>
+              <span class="cart-pad-status-led" id="cart-led-1"></span>
+            </div>
+            <div class="cart-pad-body">
+              <div class="cart-pad-title" id="cart-title-1">Cart 2</div>
+              <div class="cart-pad-desc" id="cart-desc-1">Empty (Drag or Load)</div>
+            </div>
+            <div class="cart-pad-footer">
+              <span class="cart-pad-time" id="cart-time-1">--:--</span>
+              <button class="btn-cart-trigger" id="btn-cart-play-1" title="Play / Retrigger Cart 2">▶</button>
+            </div>
+            <div class="cart-pad-progress" id="cart-progress-1"></div>
+          </div>
+
+          <!-- Cart Pad 3 -->
+          <div class="cart-pad" id="cart-pad-2" data-slot="2">
+            <div class="cart-pad-header">
+              <span class="cart-pad-num">3</span>
+              <span class="cart-pad-status-led" id="cart-led-2"></span>
+            </div>
+            <div class="cart-pad-body">
+              <div class="cart-pad-title" id="cart-title-2">Cart 3</div>
+              <div class="cart-pad-desc" id="cart-desc-2">Empty (Drag or Load)</div>
+            </div>
+            <div class="cart-pad-footer">
+              <span class="cart-pad-time" id="cart-time-2">--:--</span>
+              <button class="btn-cart-trigger" id="btn-cart-play-2" title="Play / Retrigger Cart 3">▶</button>
+            </div>
+            <div class="cart-pad-progress" id="cart-progress-2"></div>
+          </div>
+
+          <!-- Cart Pad 4 -->
+          <div class="cart-pad" id="cart-pad-3" data-slot="3">
+            <div class="cart-pad-header">
+              <span class="cart-pad-num">4</span>
+              <span class="cart-pad-status-led" id="cart-led-3"></span>
+            </div>
+            <div class="cart-pad-body">
+              <div class="cart-pad-title" id="cart-title-3">Cart 4</div>
+              <div class="cart-pad-desc" id="cart-desc-3">Empty (Drag or Load)</div>
+            </div>
+            <div class="cart-pad-footer">
+              <span class="cart-pad-time" id="cart-time-3">--:--</span>
+              <button class="btn-cart-trigger" id="btn-cart-play-3" title="Play / Retrigger Cart 4">▶</button>
+            </div>
+            <div class="cart-pad-progress" id="cart-progress-3"></div>
+          </div>
+        </div>
+
+        <input type="file" id="cart-slot-file-input" accept="audio/*" style="display: none;">
       </section>
 
       <!-- DECK B PANEL -->
@@ -615,6 +838,10 @@
             <span>📋 Cued Playlists</span>
             <span class="tab-badge" id="queues-count-badge">A: 0 | B: 0</span>
           </button>
+          <button class="panel-tab-btn" id="tab-btn-carts">
+            <span>📻 CART Library</span>
+            <span class="tab-badge" id="carts-count-badge">0</span>
+          </button>
         </div>
       </div>
 
@@ -626,6 +853,9 @@
           </div>
 
           <div class="header-actions">
+            <input type="file" id="file-input-global" accept="audio/*" multiple style="display: none;">
+            <button class="btn btn-primary" id="btn-add-files" title="Import individual audio tracks (MP3, WAV, FLAC, AAC, etc.)">➕ Import Files</button>
+            <button class="btn btn-primary" id="btn-scan-folder" title="Scan and import an entire directory/folder of music">📁 Import Folder</button>
             <button class="btn btn-accent-a" id="btn-quick-load-a">Load → Deck A</button>
             <button class="btn btn-accent-b" id="btn-quick-load-b">Load → Deck B</button>
             <button class="btn btn-accent-a" id="btn-quick-queue-a">➕ Queue A</button>
@@ -727,6 +957,43 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+      <!-- Tab 3: CART Library -->
+      <div class="tab-content" id="tab-content-carts" style="display: none;">
+        <div class="library-header">
+          <div class="library-title-group">
+            <input type="text" class="search-input" id="search-carts" placeholder="Search jingles, sweepers, sound FX, stingers...">
+          </div>
+
+          <div class="header-actions">
+            <input type="file" id="input-cart-files" accept="audio/*" multiple style="display: none;">
+            <input type="file" id="input-cart-folder" webkitdirectory directory multiple style="display: none;">
+            <button class="btn btn-primary" id="btn-import-cart-files" title="Import audio files into the CART Library">➕ Import Files</button>
+            <button class="btn btn-primary" id="btn-import-cart-folder" title="Scan and import an entire directory/folder of CART audio files">📁 Import Folder</button>
+            <button class="btn btn-accent-b" id="btn-gen-demo-carts" title="Generate 4 instant studio FX demo jingles">⚡ Demo Jingles</button>
+            <button class="btn btn-danger" id="btn-clear-cart-library" title="Clear CART Library">🗑 Clear</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="track-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ICON</th>
+                <th>CART NAME / TITLE</th>
+                <th>CATEGORY / ARTIST</th>
+                <th>DURATION</th>
+                <th>ASSIGN TO CART PAD</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="cart-library-tbody">
+              <!-- Dynamic Cart Rows -->
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -1409,10 +1676,10 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="audio-analysis.js?v=1.9.5"></script>
-  <script src="WebRadioDecksEngine.js?v=1.9.5"></script>
-  <script src="broadcast.js?v=1.9.5"></script>
-  <script src="midi.js?v=1.9.5"></script>
-  <script src="app.js?v=1.9.5"></script>
+  <script src="audio-analysis.js?v=1.9.8"></script>
+  <script src="WebRadioDecksEngine.js?v=1.9.8"></script>
+  <script src="broadcast.js?v=1.9.8"></script>
+  <script src="midi.js?v=1.9.8"></script>
+  <script src="app.js?v=1.9.8"></script>
 </body>
 </html>

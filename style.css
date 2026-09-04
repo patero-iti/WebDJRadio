@@ -3187,21 +3187,40 @@ body.mode-radio-b .loops-bar,
 body.mode-radio-b .roll-bar,
 body.mode-radio-b .deck-fx-strip,
 body.mode-radio-b .eq-rack,
-body.mode-radio-b .crossfader-container {
+body.mode-radio-b .crossfader-container,
+body.mode-radio-c .jog-container,
+body.mode-radio-c .hotcues-bar,
+body.mode-radio-c .loops-bar,
+body.mode-radio-c .roll-bar,
+body.mode-radio-c .deck-fx-strip,
+body.mode-radio-c .eq-rack,
+body.mode-radio-c .crossfader-container {
   display: none !important;
 }
 
-body.mode-radio-b .deck-panel {
+body.mode-radio-b .deck-panel,
+body.mode-radio-c .deck-panel {
   display: none !important;
 }
 
 body.mode-radio-b .dj-console {
   display: flex !important;
   justify-content: center;
-  align-items: flex-start;
-  max-width: 680px;
+  align-items: stretch;
+  max-width: 1060px;
   width: 100%;
   margin: 0 auto;
+  gap: 20px;
+}
+
+body.mode-radio-c .dj-console {
+  display: flex !important;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 1380px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 16px;
 }
 
 body.mode-radio .dj-console {
@@ -3279,7 +3298,8 @@ body.mode-radio .pitch-slider {
 
 /* Radio Presenter Focused Mixer Console */
 body.mode-radio .mixer-panel,
-body.mode-radio-b .mixer-panel {
+body.mode-radio-b .mixer-panel,
+body.mode-radio-c .mixer-panel {
   padding: 20px 18px;
   gap: 16px;
   background: linear-gradient(180deg, #101626 0%, #0a0e18 100%);
@@ -3287,7 +3307,8 @@ body.mode-radio-b .mixer-panel {
   box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-body.mode-radio-b .mixer-panel {
+body.mode-radio-b .mixer-panel,
+body.mode-radio-c .mixer-panel {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
@@ -3296,7 +3317,8 @@ body.mode-radio-b .mixer-panel {
 }
 
 body.mode-radio .mixer-header,
-body.mode-radio-b .mixer-header {
+body.mode-radio-b .mixer-header,
+body.mode-radio-c .mixer-header {
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 2.5px;
@@ -3311,7 +3333,8 @@ body.mode-radio .faders-section {
 }
 
 body.mode-radio .channel-fader-strip,
-body.mode-radio-b .channel-fader-strip {
+body.mode-radio-b .channel-fader-strip,
+body.mode-radio-c .channel-fader-strip {
   flex: 1;
   padding: 12px 8px;
   background: rgba(0, 0, 0, 0.38);
@@ -3323,31 +3346,36 @@ body.mode-radio-b .channel-fader-strip {
 }
 
 body.mode-radio .channel-fader-strip.deck-a,
-body.mode-radio-b .channel-fader-strip.deck-a {
+body.mode-radio-b .channel-fader-strip.deck-a,
+body.mode-radio-c .channel-fader-strip.deck-a {
   border-color: rgba(0, 240, 255, 0.35);
   box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.05);
 }
 
 body.mode-radio .channel-fader-strip.deck-b,
-body.mode-radio-b .channel-fader-strip.deck-b {
+body.mode-radio-b .channel-fader-strip.deck-b,
+body.mode-radio-c .channel-fader-strip.deck-b {
   border-color: rgba(255, 0, 127, 0.35);
   box-shadow: inset 0 0 12px rgba(255, 0, 127, 0.05);
 }
 
 body.mode-radio .channel-fader-strip.mic-strip,
-body.mode-radio-b .channel-fader-strip.mic-strip {
+body.mode-radio-b .channel-fader-strip.mic-strip,
+body.mode-radio-c .channel-fader-strip.mic-strip {
   border-color: rgba(255, 23, 68, 0.35);
   box-shadow: inset 0 0 12px rgba(255, 23, 68, 0.05);
 }
 
 body.mode-radio .channel-fader-strip.master-strip,
-body.mode-radio-b .channel-fader-strip.master-strip {
+body.mode-radio-b .channel-fader-strip.master-strip,
+body.mode-radio-c .channel-fader-strip.master-strip {
   border-color: rgba(255, 255, 255, 0.15);
   flex: 0 0 52px;
 }
 
 body.mode-radio .mixer-ch-art,
-body.mode-radio-b .mixer-ch-art {
+body.mode-radio-b .mixer-ch-art,
+body.mode-radio-c .mixer-ch-art {
   width: 48px;
   height: 48px;
   border-radius: 8px;
@@ -3356,32 +3384,38 @@ body.mode-radio-b .mixer-ch-art {
 body.mode-radio .mixer-art-placeholder,
 body.mode-radio .mixer-art-icon,
 body.mode-radio-b .mixer-art-placeholder,
-body.mode-radio-b .mixer-art-icon {
+body.mode-radio-b .mixer-art-icon,
+body.mode-radio-c .mixer-art-placeholder,
+body.mode-radio-c .mixer-art-icon {
   font-size: 22px;
 }
 
 body.mode-radio .fader-and-meter,
-body.mode-radio-b .fader-and-meter {
+body.mode-radio-b .fader-and-meter,
+body.mode-radio-c .fader-and-meter {
   height: 160px;
   gap: 10px;
   flex-shrink: 0;
 }
 
 body.mode-radio .vu-meter-bar,
-body.mode-radio-b .vu-meter-bar {
+body.mode-radio-b .vu-meter-bar,
+body.mode-radio-c .vu-meter-bar {
   height: 160px;
   width: 10px;
   border-radius: 4px;
 }
 
 body.mode-radio .master-vu-bar,
-body.mode-radio-b .master-vu-bar {
+body.mode-radio-b .master-vu-bar,
+body.mode-radio-c .master-vu-bar {
   height: 160px;
   width: 14px;
 }
 
 body.mode-radio input[type=range].vertical-fader,
-body.mode-radio-b input[type=range].vertical-fader {
+body.mode-radio-b input[type=range].vertical-fader,
+body.mode-radio-c input[type=range].vertical-fader {
   height: 160px;
   width: 18px;
   border-radius: 9px;
@@ -3390,65 +3424,75 @@ body.mode-radio-b input[type=range].vertical-fader {
 }
 
 body.mode-radio input[type=range].vertical-fader::-webkit-slider-thumb,
-body.mode-radio-b input[type=range].vertical-fader::-webkit-slider-thumb {
+body.mode-radio-b input[type=range].vertical-fader::-webkit-slider-thumb,
+body.mode-radio-c input[type=range].vertical-fader::-webkit-slider-thumb {
   width: 30px;
   height: 30px;
 }
 
 body.mode-radio input[type=range].vertical-fader::-moz-range-thumb,
-body.mode-radio-b input[type=range].vertical-fader::-moz-range-thumb {
+body.mode-radio-b input[type=range].vertical-fader::-moz-range-thumb,
+body.mode-radio-c input[type=range].vertical-fader::-moz-range-thumb {
   width: 30px;
   height: 30px;
 }
 
 body.mode-radio .master-bottom-placeholder,
-body.mode-radio-b .master-bottom-placeholder {
+body.mode-radio-b .master-bottom-placeholder,
+body.mode-radio-c .master-bottom-placeholder {
   width: 100%;
   height: 48px;
   border-radius: 8px;
 }
 
 body.mode-radio .btn-channel-square,
-body.mode-radio-b .btn-channel-square {
+body.mode-radio-b .btn-channel-square,
+body.mode-radio-c .btn-channel-square {
   width: 100%;
   height: 48px;
   border-radius: 8px;
 }
 
 body.mode-radio .btn-square-icon,
-body.mode-radio-b .btn-square-icon {
+body.mode-radio-b .btn-square-icon,
+body.mode-radio-c .btn-square-icon {
   font-size: 18px;
 }
 
 body.mode-radio .btn-square-sublabel,
-body.mode-radio-b .btn-square-sublabel {
+body.mode-radio-b .btn-square-sublabel,
+body.mode-radio-c .btn-square-sublabel {
   font-size: 9px;
   font-weight: 800;
 }
 
 body.mode-radio .btn-mic-toggle,
-body.mode-radio-b .btn-mic-toggle {
+body.mode-radio-b .btn-mic-toggle,
+body.mode-radio-c .btn-mic-toggle {
   width: 100%;
   height: 48px;
   border-radius: 8px;
 }
 
 body.mode-radio .btn-talkover-toggle,
-body.mode-radio-b .btn-talkover-toggle {
+body.mode-radio-b .btn-talkover-toggle,
+body.mode-radio-c .btn-talkover-toggle {
   padding: 4px 6px;
   font-size: 9px;
   border-radius: 4px;
 }
 
 body.mode-radio .relay-container,
-body.mode-radio-b .relay-container {
+body.mode-radio-b .relay-container,
+body.mode-radio-c .relay-container {
   width: 100%;
   padding-top: 12px;
   border-top: 1px solid var(--border-color);
 }
 
 body.mode-radio .btn-relay,
-body.mode-radio-b .btn-relay {
+body.mode-radio-b .btn-relay,
+body.mode-radio-c .btn-relay {
   padding: 12px 16px;
   font-size: 12px;
   font-weight: 800;
@@ -3460,15 +3504,17 @@ body.mode-radio-b .btn-relay {
   display: none !important;
 }
 
-/* Radio Presenter B Focused Track Metadata Monitors */
-body.mode-radio-b .faders-section {
+/* Radio Presenter B & C Focused Track Metadata Monitors */
+body.mode-radio-b .faders-section,
+body.mode-radio-c .faders-section {
   gap: 14px;
-  min-height: 380px;
+  min-height: 410px;
   height: auto;
   align-items: stretch;
 }
 
-body.mode-radio-b .mixer-track-info {
+body.mode-radio-b .mixer-track-info,
+body.mode-radio-c .mixer-track-info {
   display: flex !important;
   flex-direction: column;
   align-items: center;
@@ -3486,23 +3532,28 @@ body.mode-radio-b .mixer-track-info {
   transition: all 0.25s ease;
 }
 
-body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-info {
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-info,
+body.mode-radio-c .channel-fader-strip.deck-a .mixer-track-info {
   border-color: rgba(0, 240, 255, 0.25);
   background: rgba(0, 240, 255, 0.06);
 }
 
-body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-info {
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-info,
+body.mode-radio-c .channel-fader-strip.deck-b .mixer-track-info {
   border-color: rgba(255, 0, 127, 0.25);
   background: rgba(255, 0, 127, 0.06);
 }
 
 body.mode-radio-b .channel-fader-strip.master-strip .mixer-track-info,
-body.mode-radio-b .channel-fader-strip.mic-strip .mixer-track-info {
+body.mode-radio-b .channel-fader-strip.mic-strip .mixer-track-info,
+body.mode-radio-c .channel-fader-strip.master-strip .mixer-track-info,
+body.mode-radio-c .channel-fader-strip.mic-strip .mixer-track-info {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.03);
 }
 
-body.mode-radio-b .mixer-track-title {
+body.mode-radio-b .mixer-track-title,
+body.mode-radio-c .mixer-track-title {
   font-size: 11px;
   font-weight: 800;
   color: #fff;
@@ -3514,17 +3565,20 @@ body.mode-radio-b .mixer-track-title {
   line-height: 1.2;
 }
 
-body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-title {
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-title,
+body.mode-radio-c .channel-fader-strip.deck-a .mixer-track-title {
   color: #00f0ff;
   text-shadow: 0 0 6px rgba(0, 240, 255, 0.3);
 }
 
-body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-title {
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-title,
+body.mode-radio-c .channel-fader-strip.deck-b .mixer-track-title {
   color: #ff007f;
   text-shadow: 0 0 6px rgba(255, 0, 127, 0.3);
 }
 
-body.mode-radio-b .mixer-track-artist {
+body.mode-radio-b .mixer-track-artist,
+body.mode-radio-c .mixer-track-artist {
   font-size: 9.5px;
   font-weight: 600;
   color: #8e9aa8;
@@ -3536,23 +3590,110 @@ body.mode-radio-b .mixer-track-artist {
   margin-top: 1px;
 }
 
-body.mode-radio-b .mixer-track-info.playing {
+/* Time Left Countdown Badge (Radio Presenter B & C) */
+body.mode-radio-b .mixer-track-time,
+body.mode-radio-c .mixer-track-time {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-track-time,
+body.mode-radio-c .channel-fader-strip.deck-a .mixer-track-time {
+  border-color: rgba(0, 240, 255, 0.25);
+  background: rgba(0, 240, 255, 0.08);
+}
+
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-time,
+body.mode-radio-c .channel-fader-strip.deck-b .mixer-track-time {
+  border-color: rgba(255, 0, 127, 0.25);
+  background: rgba(255, 0, 127, 0.08);
+}
+
+body.mode-radio-b .mixer-time-label,
+body.mode-radio-c .mixer-time-label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #8e9aa8;
+}
+
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-time-label,
+body.mode-radio-c .channel-fader-strip.deck-a .mixer-time-label {
+  color: rgba(0, 240, 255, 0.85);
+}
+
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-time-label,
+body.mode-radio-c .channel-fader-strip.deck-b .mixer-time-label {
+  color: rgba(255, 0, 127, 0.85);
+}
+
+body.mode-radio-b .mixer-time-val,
+body.mode-radio-c .mixer-time-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+body.mode-radio-b .channel-fader-strip.deck-a .mixer-time-val,
+body.mode-radio-c .channel-fader-strip.deck-a .mixer-time-val {
+  color: #00f0ff;
+  text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+}
+
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-time-val,
+body.mode-radio-c .channel-fader-strip.deck-b .mixer-time-val {
+  color: #ff007f;
+  text-shadow: 0 0 6px rgba(255, 0, 127, 0.4);
+}
+
+body.mode-radio-b .channel-fader-strip.track-ending-warning .mixer-track-time,
+body.mode-radio-c .channel-fader-strip.track-ending-warning .mixer-track-time {
+  border-color: #ff1744 !important;
+  background: rgba(255, 23, 68, 0.25) !important;
+  box-shadow: 0 0 10px rgba(255, 23, 68, 0.5) !important;
+}
+
+body.mode-radio-b .channel-fader-strip.track-ending-warning .mixer-time-val,
+body.mode-radio-b .channel-fader-strip.track-ending-warning .mixer-time-label,
+body.mode-radio-c .channel-fader-strip.track-ending-warning .mixer-time-val,
+body.mode-radio-c .channel-fader-strip.track-ending-warning .mixer-time-label {
+  color: #ff1744 !important;
+  font-weight: 900 !important;
+  text-shadow: 0 0 8px #ff1744 !important;
+}
+
+body.mode-radio-b .mixer-track-info.playing,
+body.mode-radio-c .mixer-track-info.playing {
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
   border-color: rgba(0, 240, 255, 0.6);
 }
 
-body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-info.playing {
+body.mode-radio-b .channel-fader-strip.deck-b .mixer-track-info.playing,
+body.mode-radio-c .channel-fader-strip.deck-b .mixer-track-info.playing {
   box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
   border-color: rgba(255, 0, 127, 0.6);
 }
 
-body.mode-radio-b .mixer-track-info.track-ending-warning {
+body.mode-radio-b .mixer-track-info.track-ending-warning,
+body.mode-radio-c .mixer-track-info.track-ending-warning {
   animation: pulse-ending-alert 1s infinite alternate;
   border-color: #ff1744 !important;
   background: rgba(255, 23, 68, 0.15) !important;
 }
 
-body.mode-radio-b .mixer-track-info.track-ending-warning .mixer-track-title {
+body.mode-radio-b .mixer-track-info.track-ending-warning .mixer-track-title,
+body.mode-radio-c .mixer-track-info.track-ending-warning .mixer-track-title {
   color: #ff1744 !important;
   text-shadow: 0 0 8px rgba(255, 23, 68, 0.8) !important;
 }
@@ -3602,4 +3743,688 @@ body.mode-radio-b .channel-fader-strip.track-ending-warning .btn-mixer-play {
   color: #ff1744 !important;
 }
 
+/* ==========================================================================
+   CARTS Channel Strip (Web Radio Mixer)
+   ========================================================================== */
+body.mode-dj .channel-fader-strip.carts-strip,
+body.mode-dj #mixer-strip-carts {
+  display: none !important;
+}
 
+.channel-fader-strip.carts-strip,
+body.mode-radio .channel-fader-strip.carts-strip,
+body.mode-radio-b .channel-fader-strip.carts-strip {
+  border-color: rgba(255, 179, 0, 0.35);
+  background: rgba(255, 179, 0, 0.03);
+  box-shadow: inset 0 0 12px rgba(255, 179, 0, 0.05);
+}
+
+.channel-fader-strip.carts-strip .strip-label,
+body.mode-radio .channel-fader-strip.carts-strip .strip-label,
+body.mode-radio-b .channel-fader-strip.carts-strip .strip-label {
+  color: #ffb300;
+  text-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
+}
+
+.channel-fader-strip.carts-strip .vu-meter-bar,
+body.mode-radio .channel-fader-strip.carts-strip .vu-meter-bar,
+body.mode-radio-b .channel-fader-strip.carts-strip .vu-meter-bar,
+body.mode-radio-c .channel-fader-strip.carts-strip .vu-meter-bar {
+  border-color: rgba(255, 179, 0, 0.3);
+}
+
+.channel-fader-strip.carts-strip #vu-carts {
+  background: linear-gradient(0deg, #ffb300 0%, #ff9100 70%, #ff1744 100%);
+}
+
+.channel-fader-strip.carts-strip input[type=range].vertical-fader::-webkit-slider-thumb,
+body.mode-radio .channel-fader-strip.carts-strip input[type=range].vertical-fader::-webkit-slider-thumb,
+body.mode-radio-b .channel-fader-strip.carts-strip input[type=range].vertical-fader::-webkit-slider-thumb,
+body.mode-radio-c .channel-fader-strip.carts-strip input[type=range].vertical-fader::-webkit-slider-thumb {
+  border-color: #ffb300;
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.channel-fader-strip.carts-strip input[type=range].vertical-fader::-moz-range-thumb,
+body.mode-radio .channel-fader-strip.carts-strip input[type=range].vertical-fader::-moz-range-thumb,
+body.mode-radio-b .channel-fader-strip.carts-strip input[type=range].vertical-fader::-moz-range-thumb,
+body.mode-radio-c .channel-fader-strip.carts-strip input[type=range].vertical-fader::-moz-range-thumb {
+  border-color: #ffb300;
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+body.mode-radio-b .channel-fader-strip.carts-strip .mixer-track-info,
+body.mode-radio-c .channel-fader-strip.carts-strip .mixer-track-info {
+  border-color: rgba(255, 179, 0, 0.25);
+  background: rgba(255, 179, 0, 0.06);
+}
+
+body.mode-radio-b .channel-fader-strip.carts-strip .mixer-track-title,
+body.mode-radio-c .channel-fader-strip.carts-strip .mixer-track-title {
+  color: #ffb300;
+  text-shadow: 0 0 6px rgba(255, 179, 0, 0.3);
+}
+
+body.mode-radio-b .channel-fader-strip.carts-strip .mixer-track-time,
+body.mode-radio-c .channel-fader-strip.carts-strip .mixer-track-time {
+  border-color: rgba(255, 179, 0, 0.25);
+  background: rgba(255, 179, 0, 0.08);
+}
+
+body.mode-radio-b .channel-fader-strip.carts-strip .mixer-time-label,
+body.mode-radio-c .channel-fader-strip.carts-strip .mixer-time-label {
+  color: #ffb300;
+}
+
+body.mode-radio-b .channel-fader-strip.carts-strip .mixer-time-val,
+body.mode-radio-c .channel-fader-strip.carts-strip .mixer-time-val {
+  color: #ffb300;
+}
+
+.channel-fader-strip.carts-strip .btn-mixer-stop {
+  width: 44px;
+  height: 44px;
+  background: #141a29;
+  border: 1px solid rgba(255, 179, 0, 0.3);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.channel-fader-strip.carts-strip .btn-mixer-stop:hover {
+  background: rgba(255, 23, 68, 0.15);
+  border-color: #ff1744;
+  color: #ff1744;
+  box-shadow: 0 0 10px rgba(255, 23, 68, 0.4);
+}
+
+/* ==========================================================================
+   Broadcast CART Wall Panel (Radio Presenter B & Radio C Layouts)
+   ========================================================================== */
+body.mode-dj .cart-panel,
+body.mode-radio .cart-panel {
+  display: none !important;
+}
+
+body.mode-radio-b .cart-panel,
+body.mode-radio-c .cart-panel {
+  display: flex !important;
+  flex-direction: column;
+  width: 320px;
+  min-width: 300px;
+  max-width: 360px;
+  background: linear-gradient(180deg, #101626 0%, #0a0e18 100%);
+  border: 1px solid rgba(255, 179, 0, 0.3);
+  border-radius: 12px;
+  padding: 18px 16px;
+  gap: 14px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.cart-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 179, 0, 0.2);
+}
+
+.cart-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #ffb300;
+  text-shadow: 0 0 10px rgba(255, 179, 0, 0.4);
+}
+
+.cart-pads-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.cart-pad {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(145deg, #141c2c, #0b101c);
+  border: 1px solid rgba(255, 179, 0, 0.25);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.cart-pad:hover {
+  border-color: rgba(255, 179, 0, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 179, 0, 0.2);
+}
+
+.cart-pad.drag-over {
+  border-color: #00f0ff !important;
+  background: rgba(0, 240, 255, 0.1) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5) !important;
+}
+
+.cart-pad.playing {
+  border-color: #ffb300 !important;
+  background: linear-gradient(145deg, #2a220b, #151004) !important;
+  box-shadow: 0 0 18px rgba(255, 179, 0, 0.55), inset 0 0 14px rgba(255, 179, 0, 0.25) !important;
+}
+
+.cart-pad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-pad-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffb300;
+  background: rgba(255, 179, 0, 0.12);
+  border: 1px solid rgba(255, 179, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.cart-pad-status-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #334155;
+  border: 1px solid #475569;
+  transition: all 0.15s ease;
+}
+
+.cart-pad.loaded .cart-pad-status-led {
+  background: #00e676;
+  border-color: #00e676;
+  box-shadow: 0 0 6px rgba(0, 230, 118, 0.6);
+}
+
+.cart-pad.playing .cart-pad-status-led {
+  background: #ffb300 !important;
+  border-color: #ffb300 !important;
+  box-shadow: 0 0 10px #ffb300 !important;
+}
+
+.cart-pad-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+  overflow: hidden;
+}
+
+.cart-pad-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.cart-pad.playing .cart-pad-title {
+  color: #ffb300;
+  text-shadow: 0 0 8px rgba(255, 179, 0, 0.6);
+}
+
+.cart-pad-desc {
+  font-size: 9px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-pad-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-pad-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffb300;
+  letter-spacing: 0.5px;
+}
+
+.btn-cart-trigger {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 179, 0, 0.4);
+  background: rgba(255, 179, 0, 0.15);
+  color: #ffb300;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cart-trigger:hover {
+  background: #ffb300;
+  color: #000;
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.7);
+}
+
+.cart-pad.playing .btn-cart-trigger {
+  background: #ff1744;
+  border-color: #ff1744;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 23, 68, 0.7);
+}
+
+.cart-pad-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: 0%;
+  background: linear-gradient(90deg, #ffb300, #ff9100);
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.8);
+  transition: width 0.08s linear;
+}
+
+/* ==========================================================================
+   CART Library Table & Action Controls
+   ========================================================================== */
+.cart-lib-icon-badge {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-slot-assign-group {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-cart-slot {
+  background: #141a29;
+  border: 1px solid rgba(255, 179, 0, 0.3);
+  color: #ffb300;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cart-slot:hover {
+  background: #ffb300;
+  color: #000;
+  border-color: #ffb300;
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.5);
+}
+
+.cart-action-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+body.mode-dj .studio-info-column,
+body.mode-radio .studio-info-column,
+body.mode-radio-b .studio-info-column {
+  display: none !important;
+}
+
+body.mode-radio-c .studio-info-column {
+  display: flex !important;
+  flex-direction: column;
+  width: 330px;
+  min-width: 310px;
+  max-width: 360px;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.studio-card {
+  background: linear-gradient(180deg, #101626 0%, #0a0e18 100%);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 12px;
+  padding: 16px 14px;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.studio-hub-card {
+  flex: 1;
+}
+
+.studio-nowplaying-card {
+  flex: 1.15;
+}
+
+.studio-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.18);
+  padding-bottom: 8px;
+}
+
+.studio-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+.studio-card-icon {
+  font-size: 14px;
+}
+
+.studio-live-badge {
+  background: #ff1744;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  animation: pulse-ending-alert 1.5s infinite alternate;
+}
+
+.studio-deck-tag {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+}
+
+/* Clocks Grid */
+.studio-clocks-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.studio-clock-box {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2px;
+}
+
+.studio-clock-box.local-clock {
+  border-color: rgba(0, 240, 255, 0.25);
+  background: rgba(0, 240, 255, 0.04);
+}
+
+.studio-clock-box.perth-clock {
+  border-color: rgba(255, 179, 0, 0.25);
+  background: rgba(255, 179, 0, 0.04);
+}
+
+.clock-label-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #8e9aa8;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.clock-flag {
+  font-size: 11px;
+}
+
+.clock-digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.local-clock .clock-digits {
+  color: #00f0ff;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+.perth-clock .clock-digits {
+  color: #ffb300;
+  text-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
+}
+
+.clock-date {
+  font-size: 8.5px;
+  color: #8e9aa8;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Studio Weather Section */
+.studio-weather-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.weather-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.weather-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.weather-icon {
+  font-size: 13px;
+}
+
+.weather-readout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.weather-temp {
+  color: #00f0ff;
+  font-weight: 800;
+}
+
+.perth-weather-row .weather-temp {
+  color: #ffb300;
+}
+
+.weather-cond {
+  color: #8e9aa8;
+  font-size: 9px;
+}
+
+/* Now Playing Hero */
+.nowplaying-hero {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.nowplaying-art {
+  width: 46px;
+  height: 46px;
+  border-radius: 6px;
+  background: #141c2c;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.nowplaying-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nowplaying-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.nowplaying-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px;
+}
+
+.nowplaying-artist {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #00f0ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nowplaying-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.np-tag {
+  font-size: 8px;
+  font-weight: 700;
+  color: #8e9aa8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+/* Presenter Trivia & Bio Box */
+.nowplaying-trivia-box {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.trivia-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #00f0ff;
+  letter-spacing: 0.8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+}
+
+.btn-trivia-refresh {
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: #00f0ff;
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-trivia-refresh:hover {
+  background: #00f0ff;
+  color: #000;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+.trivia-box-content {
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: #cbd5e1;
+  font-style: italic;
+  flex: 1;
+  min-height: 48px;
+  max-height: 90px;
+  overflow-y: auto;
+  padding-top: 2px;
+}

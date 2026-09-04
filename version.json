@@ -1,8 +1,68 @@
 {
-  "version": "1.9.5",
+  "version": "1.9.9",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-04",
+  "releaseDate": "2026-09-05",
   "changelog": [
+    {
+      "version": "1.9.9",
+      "date": "2026-09-05",
+      "title": "Layout Realignment & 'Radio A' Studio Hub, Clocks, Weather & Now Playing Trivia",
+      "changes": [
+        "**Radio Layout Hierarchy (Radio A, Radio B, Radio C, DJ)**",
+        "====================:)====================",
+        "Layout Mode Hierarchy: Renamed and organized the top banner layout mode switcher to `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C ] -> [ 🎧 DJ ]`.",
+        "Radio A (Flagship Studio Hub): The complete live broadcast console featuring vertically stacked Studio Hub clocks & live weather, Now Playing metadata & TheAudioDB/MusicBrainz trivia engine, 5-channel Web Radio Mixer, and the 4-slot square CART Wall.",
+        "Radio B (Pure Mixer & Cart Wall): The streamlined pure mixer console with 160px vertical faders, precision '-MM:SS.d' countdown badges, 10s flashing ending alert, and the 4-slot CART Wall.",
+        "Radio C (Dual-Deck Studio Workstation): Clean broadcast layout featuring dual playback decks with scrolling and overview waveforms, transport strips, pitch sliders, and central broadcast mixer.",
+        "Dual Studio Digital Clocks: Features real-time precision digital clocks for Local Host Time (with automatic timezone city detection) and Perth Western Australia Time (AWST / UTC+8) for the main station broadcast headquarters.",
+        "Live Broadcast Weather Monitors: Fetches real-time temperature and weather conditions via Open-Meteo API for both the Perth WA broadcast station and the host's local broadcast location.",
+        "Now Playing Metadata & Artwork: Displays high-visibility album artwork, title, artist, release year, record label, BPM, and musical key for the active track.",
+        "Presenter Liner & Music Trivia Engine: Generates intelligent on-air talkover liners, harmonic mixing notes (Camelot wheel compatible), record release trivia, and artist biographies, complete with a '↺ Next Fact' presenter cycle button.",
+        "Live TheAudioDB & MusicBrainz Integration: Asynchronously enriches on-air trivia with real-world artist biographies, birth/formation history, country of origin, official record labels, and release discography notes via live public API queries with smart memory caching."
+      ]
+    },
+    {
+      "version": "1.9.8",
+      "date": "2026-09-05",
+      "title": "Broadcast CART Wall, CART Library & Dedicated Mixer Channel Strip (Radio Presenter B)",
+      "changes": [
+        "**Broadcast CART Wall Subsystem & Studio Pad Controller**",
+        "====================:)====================",
+        "Dedicated CART Wall Pad Grid: Introduced a 4-slot square-shaped CART pad wall positioned directly to the right of the Web Radio Mixer in the 'Radio Presenter B' studio layout.",
+        "Single 'CARTS' Mixer Channel Strip: Created a dedicated gold/amber channel strip placed to the right of CH B (`[ MST ] -> [ MIC ] -> [ CH A ] -> [ CH B ] -> [ CARTS ]`) with full 160px vertical volume fader, real-time VU meter, active slot status counter, and instant master kill switch (⏹ STOP ALL).",
+        "Dedicated CART Library Tab: Added a 3rd top-level library tab alongside '📁 Track Library' and '📋 Cued Playlists' for managing sound effects, jingles, station sweepers, and station ID drops.",
+        "Quick Pad Assignment & Auditioning: Load any cart to pads via quick action buttons (`+C1`, `+C2`, `+C3`, `+C4`), audition previews (▶), and manage entries with search filtering.",
+        "Track Library Import Relocation & Renaming: Moved and unified import actions in the '📁 Track Library' tab toolbar as '➕ Import Files' and '📁 Import Folder', establishing clean visual and functional symmetry with the 'CART Library'.",
+        "Multi-Format Import, Folder Scanning & Drag-and-Drop: Import individual audio files or entire directories (`📁 Import Folder`) directly into the CART library, drag-and-drop files onto Cart Wall pads, or synthesize 4 instant broadcast demo jingles (`⚡ Demo Jingles`).",
+        "Top Banner Layout Switcher Reorganization: Reordered and renamed the layout switcher buttons to [ 📻 Radio A ] (Pure Mixer + CART Wall), [ 🎙️ Radio B ] (Dual Deck Studio Layout), and [ 🎧 DJ ] (Full DJ Controller Console).",
+        "Real-Time Countdown & Progress Glow: Pads feature animated progress bars, live time remaining readouts, active status LEDs, and retriggering capabilities."
+      ]
+    },
+    {
+      "version": "1.9.7",
+      "date": "2026-09-05",
+      "title": "Playback 'Time Left' Live Countdown on Mixer Channel Strips (Radio Presenter B)",
+      "changes": [
+        "**Precision Playback Countdown Monitors (Radio Presenter B)**",
+        "====================:)====================",
+        "Live 'Time Left' Digital Badges: Integrated dedicated high-visibility time remaining countdown gauges (`-MM:SS.d`) directly on Channel A (CH A) and Channel B (CH B) mixer strips below the track metadata.",
+        "Presenter Precision Down to Fractions: Powered by 60fps Web Audio playback timers, giving broadcasters exact sample-accurate countdown visibility without needing deck faceplates on screen.",
+        "Color-Coded & Alert Synchronized: Formatted in JetBrains Mono with channel neon accents (Cyan for CH A, Magenta for CH B) and flashes high-visibility alert red when entering the 10-second end window.",
+        "Unified Strip Symmetry: Master strip displays active audio bus mode (`BUS: STEREO`), and the live microphone strip displays real-time on-air status (`STATUS: ON AIR / MUTED`)."
+      ]
+    },
+    {
+      "version": "1.9.6",
+      "date": "2026-09-05",
+      "title": "Microphone (MIC) Channel Strip Relocation to the Left of CH A",
+      "changes": [
+        "**Broadcast Console Channel Strip Reordering**",
+        "====================:)====================",
+        "Standard Broadcast Strip Sequence: Relocated the Live Microphone strip (MIC) to the left side of Channel A across all layouts (DJ Console, Radio Presenter, and Radio Presenter B).",
+        "New Symmetrical Mixer Layout: Channel sequence is now organized as [ MST ] -> [ MIC ] -> [ CH A ] -> [ CH B ], grouping master and presenter input controls together on the left followed by the dual deck playback channels on the right.",
+        "Full Feature Continuity: Preserves 160px luxury fader throw, real-time LED peak VU meter, ON AIR / TALK ducking triggers, track info displays, and 10-second track end flashing alerts."
+      ]
+    },
     {
       "version": "1.9.5",
       "date": "2026-09-04",

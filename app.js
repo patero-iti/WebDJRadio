@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const audioStatusText = document.getElementById('audio-status-text');
   const btnUnlockAudio = document.getElementById('btn-unlock-audio');
   const btnScanFolder = document.getElementById('btn-scan-folder');
+  const btnAddFiles = document.getElementById('btn-add-files');
   const btnGenDemo = document.getElementById('btn-gen-demo');
   const fileInputGlobal = document.getElementById('file-input-global');
   const searchLibrary = document.getElementById('search-library');
@@ -24,18 +25,79 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLayoutDj = document.getElementById('btn-layout-dj');
   const btnLayoutRadio = document.getElementById('btn-layout-radio');
   const btnLayoutRadioB = document.getElementById('btn-layout-radio-b');
+  const btnLayoutRadioC = document.getElementById('btn-layout-radio-c');
 
-  // DOM Elements - Tabs & Cued Playlists
+  // DOM Elements - Studio Hub & Now Playing (Radio C Layout)
+  const studioHubElements = {
+    panel: document.getElementById('panel-studio-info'),
+    clockLocalName: document.getElementById('clock-local-name'),
+    clockLocalTime: document.getElementById('clock-local-time'),
+    clockLocalDate: document.getElementById('clock-local-date'),
+    clockPerthTime: document.getElementById('clock-perth-time'),
+    clockPerthDate: document.getElementById('clock-perth-date'),
+    weatherRowLocal: document.getElementById('weather-row-local'),
+    weatherPlaceLocal: document.getElementById('weather-place-local'),
+    weatherIconLocal: document.getElementById('weather-icon-local'),
+    weatherTempLocal: document.getElementById('weather-temp-local'),
+    weatherCondLocal: document.getElementById('weather-cond-local'),
+    weatherIconPerth: document.getElementById('weather-icon-perth'),
+    weatherTempPerth: document.getElementById('weather-temp-perth'),
+    weatherCondPerth: document.getElementById('weather-cond-perth'),
+    npDeckTag: document.getElementById('nowplaying-active-deck-tag'),
+    npArtImg: document.getElementById('nowplaying-art-img'),
+    npArtPlaceholder: document.getElementById('nowplaying-art-placeholder'),
+    npTitle: document.getElementById('nowplaying-title'),
+    npArtist: document.getElementById('nowplaying-artist'),
+    npYear: document.getElementById('nowplaying-year'),
+    npLabel: document.getElementById('nowplaying-label'),
+    npBpm: document.getElementById('nowplaying-bpm'),
+    npKey: document.getElementById('nowplaying-key'),
+    npTriviaText: document.getElementById('nowplaying-trivia-text'),
+    btnTriviaRefresh: document.getElementById('btn-trivia-refresh')
+  };
+
+  // DOM Elements - Tabs, Playlists & CART Library
   const tabBtnLibrary = document.getElementById('tab-btn-library');
   const tabBtnQueues = document.getElementById('tab-btn-queues');
+  const tabBtnCarts = document.getElementById('tab-btn-carts');
   const tabContentLibrary = document.getElementById('tab-content-library');
   const tabContentQueues = document.getElementById('tab-content-queues');
+  const tabContentCarts = document.getElementById('tab-content-carts');
   const libraryCountBadge = document.getElementById('library-count-badge');
   const queuesCountBadge = document.getElementById('queues-count-badge');
+  const cartsCountBadge = document.getElementById('carts-count-badge');
   const queueACount = document.getElementById('queue-a-count');
   const queueBCount = document.getElementById('queue-b-count');
   const queueListA = document.getElementById('queue-list-a');
   const queueListB = document.getElementById('queue-list-b');
+
+  // CART Subsystem State & Elements
+  let cartLibrary = [];
+  const cartAssignments = [null, null, null, null];
+  const searchCarts = document.getElementById('search-carts');
+  const cartLibraryTbody = document.getElementById('cart-library-tbody');
+  const btnImportCartFiles = document.getElementById('btn-import-cart-files');
+  const btnImportCartFolder = document.getElementById('btn-import-cart-folder');
+  const inputCartFiles = document.getElementById('input-cart-files');
+  const inputCartFolder = document.getElementById('input-cart-folder');
+  const btnGenDemoCarts = document.getElementById('btn-gen-demo-carts');
+  const btnClearCartLibrary = document.getElementById('btn-clear-cart-library');
+  const btnCartStopAll = document.getElementById('btn-cart-stop-all');
+  const btnMixerCartsStop = document.getElementById('btn-mixer-carts-stop');
+  const volCarts = document.getElementById('vol-carts');
+  const vuCarts = document.getElementById('vu-carts');
+  const mixerCartsActiveVal = document.getElementById('mixer-carts-active-val');
+  const cartSlotFileInput = document.getElementById('cart-slot-file-input');
+
+  const cartPadElements = [0, 1, 2, 3].map(i => ({
+    pad: document.getElementById(`cart-pad-${i}`),
+    led: document.getElementById(`cart-led-${i}`),
+    title: document.getElementById(`cart-title-${i}`),
+    desc: document.getElementById(`cart-desc-${i}`),
+    time: document.getElementById(`cart-time-${i}`),
+    btnPlay: document.getElementById(`btn-cart-play-${i}`),
+    progress: document.getElementById(`cart-progress-${i}`)
+  }));
 
   // Deck Cued Playlist Queue Arrays
   const deckQueues = { A: [], B: [] };
@@ -55,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mixerTrackInfo: document.getElementById('mixer-track-info-a'),
     mixerTitle: document.getElementById('mixer-track-title-a'),
     mixerArtist: document.getElementById('mixer-track-artist-a'),
+    mixerTimeLeft: document.getElementById('mixer-time-left-a'),
     waveformScrolling: document.getElementById('waveform-scrolling-a'),
     waveformOverview: document.getElementById('waveform-overview-a'),
     overviewProgress: document.getElementById('overview-progress-a'),
@@ -88,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mixerTrackInfo: document.getElementById('mixer-track-info-b'),
     mixerTitle: document.getElementById('mixer-track-title-b'),
     mixerArtist: document.getElementById('mixer-track-artist-b'),
+    mixerTimeLeft: document.getElementById('mixer-time-left-b'),
     waveformScrolling: document.getElementById('waveform-scrolling-b'),
     waveformOverview: document.getElementById('waveform-overview-b'),
     overviewProgress: document.getElementById('overview-progress-b'),
@@ -109,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const crossfader = document.getElementById('crossfader');
   const vuMaster = document.getElementById('vu-master');
+  const deckLoadedTrackObj = { A: null, B: null };
 
   // DOM Elements - Microphone / Live Input
   const micElements = {
@@ -119,7 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
     led: document.getElementById('mic-led'),
     btnTalkover: document.getElementById('btn-talkover-toggle'),
     artBox: document.getElementById('mixer-art-mic'),
-    artPlaceholder: document.getElementById('mixer-art-placeholder-mic')
+    artPlaceholder: document.getElementById('mixer-art-placeholder-mic'),
+    mixerStatusText: document.getElementById('mixer-mic-status-text')
   };
 
   // DOM Elements - Auto-Deck Relay
@@ -138,19 +204,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const isDj = mode === 'dj';
     const isRadio = mode === 'radio';
     const isRadioB = mode === 'radio-b';
+    const isRadioC = mode === 'radio-c';
 
     document.body.classList.toggle('mode-dj', isDj);
     document.body.classList.toggle('mode-radio', isRadio);
     document.body.classList.toggle('mode-radio-b', isRadioB);
+    document.body.classList.toggle('mode-radio-c', isRadioC);
     
     if (btnLayoutDj) btnLayoutDj.classList.toggle('active', isDj);
     if (btnLayoutRadio) btnLayoutRadio.classList.toggle('active', isRadio);
     if (btnLayoutRadioB) btnLayoutRadioB.classList.toggle('active', isRadioB);
+    if (btnLayoutRadioC) btnLayoutRadioC.classList.toggle('active', isRadioC);
 
     localStorage.setItem('webdj_layout_mode', mode);
 
-    // In Radio Presenter and Radio Presenter B modes, center the crossfader so both deck channel volume faders are 100% active
-    if ((isRadio || isRadioB) && crossfader) {
+    // In Radio Presenter, Radio A, and Radio C modes, center the crossfader so both deck channel volume faders are 100% active
+    if ((isRadio || isRadioB || isRadioC) && crossfader) {
       crossfader.value = 0.5;
       engine.setCrossfader(0.5);
     }
@@ -164,6 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (btnLayoutRadioB) {
     btnLayoutRadioB.addEventListener('click', () => setLayoutMode('radio-b'));
+  }
+  if (btnLayoutRadioC) {
+    btnLayoutRadioC.addEventListener('click', () => setLayoutMode('radio-c'));
   }
 
   // Restore saved layout mode or default to DJ Console
@@ -219,6 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-load Track House into Deck A and Track Techno into Deck B
     if (trackHouse) loadTrackToDeck('A', trackHouse);
     if (trackTechno) loadTrackToDeck('B', trackTechno);
+
+    // Auto-generate instant Studio Jingles for CART Wall slots
+    await generateDemoCarts();
   }
 
   if (btnGenDemo) {
@@ -233,27 +308,42 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Track Library Management, Cued Playlists & File Scanning
   // -------------------------------------------------------------
 
-  // Tab switching: Library vs Cued Playlists
+  // Tab switching: Library vs Cued Playlists vs CART Library
   function switchPanelTab(tabName) {
     if (tabName === 'library') {
-      tabBtnLibrary.classList.add('active');
-      tabBtnQueues.classList.remove('active');
-      tabContentLibrary.style.display = 'flex';
-      tabContentQueues.style.display = 'none';
-    } else {
-      tabBtnLibrary.classList.remove('active');
-      tabBtnQueues.classList.add('active');
-      tabContentLibrary.style.display = 'none';
-      tabContentQueues.style.display = 'flex';
-      renderQueue('A');
-      renderQueue('B');
+      if (tabBtnLibrary) tabBtnLibrary.classList.add('active');
+      if (tabBtnQueues) tabBtnQueues.classList.remove('active');
+      if (tabBtnCarts) tabBtnCarts.classList.remove('active');
+      if (tabContentLibrary) tabContentLibrary.style.display = 'flex';
+      if (tabContentQueues) tabContentQueues.style.display = 'none';
+      if (tabContentCarts) tabContentCarts.style.display = 'none';
+    } else if (tabName === 'queues') {
+      if (tabBtnLibrary) tabBtnLibrary.classList.remove('active');
+      if (tabBtnQueues) tabBtnQueues.classList.add('active');
+      if (tabBtnCarts) tabBtnCarts.classList.remove('active');
+      if (tabContentLibrary) tabContentLibrary.style.display = 'none';
+      if (tabContentQueues) {
+        tabContentQueues.style.display = 'flex';
+        renderQueue('A');
+        renderQueue('B');
+      }
+      if (tabContentCarts) tabContentCarts.style.display = 'none';
+    } else if (tabName === 'carts') {
+      if (tabBtnLibrary) tabBtnLibrary.classList.remove('active');
+      if (tabBtnQueues) tabBtnQueues.classList.remove('active');
+      if (tabBtnCarts) tabBtnCarts.classList.add('active');
+      if (tabContentLibrary) tabContentLibrary.style.display = 'none';
+      if (tabContentQueues) tabContentQueues.style.display = 'none';
+      if (tabContentCarts) {
+        tabContentCarts.style.display = 'flex';
+        renderCartLibraryTable();
+      }
     }
   }
 
-  if (tabBtnLibrary && tabBtnQueues) {
-    tabBtnLibrary.addEventListener('click', () => switchPanelTab('library'));
-    tabBtnQueues.addEventListener('click', () => switchPanelTab('queues'));
-  }
+  if (tabBtnLibrary) tabBtnLibrary.addEventListener('click', () => switchPanelTab('library'));
+  if (tabBtnQueues) tabBtnQueues.addEventListener('click', () => switchPanelTab('queues'));
+  if (tabBtnCarts) tabBtnCarts.addEventListener('click', () => switchPanelTab('carts'));
 
   // --- Cued Playlist Queue Operations ---
   function isSameTrack(t1, t2) {
@@ -787,7 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
       libraryTbody.innerHTML = `
         <tr>
           <td colspan="8" style="text-align: center; color: var(--text-dim); padding: 20px;">
-            No tracks found. Use 'Scan Local Folder' or 'Add Files' to import music.
+            No tracks found. Use 'Import Folder' or 'Import Files' to import music.
           </td>
         </tr>
       `;
@@ -919,6 +1009,316 @@ document.addEventListener('DOMContentLoaded', () => {
       openMetadataEditor(selectedTrackId);
     });
   }
+
+  // -------------------------------------------------------------
+  // 4b. CART Library & Broadcast CART Wall Subsystem
+  // -------------------------------------------------------------
+  async function assignCartToSlot(slotIndex, cartItem) {
+    if (slotIndex < 0 || slotIndex > 3 || !cartItem) return;
+    cartAssignments[slotIndex] = cartItem;
+    await engine.loadCart(slotIndex, cartItem.audioSource, {
+      title: cartItem.title,
+      artist: cartItem.artist
+    });
+    const pad = cartPadElements[slotIndex];
+    if (pad) {
+      if (pad.title) pad.title.textContent = cartItem.title;
+      if (pad.desc) pad.desc.textContent = cartItem.artist || 'Station Audio';
+      if (pad.time) pad.time.textContent = formatTime(cartItem.duration || 0);
+      pad.pad.classList.add('loaded');
+    }
+  }
+
+  function renderCartLibraryTable() {
+    if (!cartLibraryTbody) return;
+    const filter = (searchCarts ? searchCarts.value : '').toLowerCase().trim();
+    const filtered = cartLibrary.filter(c => {
+      const name = (c.title || '').toLowerCase();
+      const artist = (c.artist || '').toLowerCase();
+      return name.includes(filter) || artist.includes(filter);
+    });
+
+    if (cartsCountBadge) cartsCountBadge.textContent = cartLibrary.length;
+
+    cartLibraryTbody.innerHTML = '';
+    if (filtered.length === 0) {
+      const emptyRow = document.createElement('tr');
+      emptyRow.innerHTML = `
+        <td colspan="7" style="text-align: center; color: var(--text-dim); padding: 32px 16px;">
+          ${cartLibrary.length === 0 ? 'No CART audio loaded yet. Click <strong>"➕ Import Cart Files"</strong> or <strong>"⚡ Demo Jingles"</strong> to populate your Cart Wall.' : 'No matching carts found in search.'}
+        </td>
+      `;
+      cartLibraryTbody.appendChild(emptyRow);
+      return;
+    }
+
+    filtered.forEach((cartItem, idx) => {
+      const tr = document.createElement('tr');
+      tr.draggable = true;
+      tr.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/cart-id', cartItem.id);
+        e.dataTransfer.setData('text/plain', cartItem.title);
+      });
+
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td>
+          <div class="cart-lib-icon-badge">📻</div>
+        </td>
+        <td>
+          <span class="track-title-cell">${escapeHtml(cartItem.title)}</span>
+        </td>
+        <td>
+          <span class="track-artist-cell">${escapeHtml(cartItem.artist || 'Station FX')}</span>
+        </td>
+        <td>${formatTime(cartItem.duration || 0)}</td>
+        <td>
+          <div class="cart-slot-assign-group">
+            <button class="btn-cart-slot" data-slot="0" title="Assign to Pad 1">+C1</button>
+            <button class="btn-cart-slot" data-slot="1" title="Assign to Pad 2">+C2</button>
+            <button class="btn-cart-slot" data-slot="2" title="Assign to Pad 3">+C3</button>
+            <button class="btn-cart-slot" data-slot="3" title="Assign to Pad 4">+C4</button>
+          </div>
+        </td>
+        <td>
+          <div class="cart-action-group">
+            <button class="btn btn-sm btn-cart-audition" title="Audition / Preview Cart">▶ Play</button>
+            <button class="btn btn-sm btn-danger btn-cart-delete" title="Remove from CART Library">🗑</button>
+          </div>
+        </td>
+      `;
+
+      // Assign to pads 1..4
+      tr.querySelectorAll('.btn-cart-slot').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const slot = parseInt(btn.dataset.slot, 10);
+          assignCartToSlot(slot, cartItem);
+          audioStatusText.textContent = `Assigned "${cartItem.title}" to Cart Pad ${slot + 1}`;
+        });
+      });
+
+      // Audition preview
+      const btnAudition = tr.querySelector('.btn-cart-audition');
+      if (btnAudition) {
+        btnAudition.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await assignCartToSlot(0, cartItem);
+          engine.playCart(0);
+        });
+      }
+
+      // Delete cart
+      const btnDel = tr.querySelector('.btn-cart-delete');
+      if (btnDel) {
+        btnDel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const itemIdx = cartLibrary.findIndex(c => c.id === cartItem.id);
+          if (itemIdx >= 0) {
+            cartLibrary.splice(itemIdx, 1);
+            renderCartLibraryTable();
+          }
+        });
+      }
+
+      cartLibraryTbody.appendChild(tr);
+    });
+  }
+
+  async function importCartFiles(files) {
+    if (!files || !files.length) return;
+    const fileList = Array.from(files);
+    audioStatusText.textContent = `Importing ${fileList.length} cart audio file(s)...`;
+    let importedCount = 0;
+
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      if (!file.name.match(/\.(mp3|wav|flac|ogg|m4a|aac)$/i) && file.type && !file.type.startsWith('audio/')) {
+        continue;
+      }
+      try {
+        let meta = null;
+        if (typeof AudioMetadataParser !== 'undefined') {
+          meta = await AudioMetadataParser.parseFile(file);
+        }
+        const arrayBuf = await file.arrayBuffer();
+        const decoded = await engine.ctx.decodeAudioData(arrayBuf.slice(0));
+        const cartItem = {
+          id: crypto.randomUUID(),
+          title: (meta && meta.title) ? meta.title : file.name.replace(/\.[^/.]+$/, ''),
+          artist: (meta && meta.artist) ? meta.artist : 'Station Audio',
+          duration: decoded.duration,
+          audioSource: decoded
+        };
+        cartLibrary.push(cartItem);
+        importedCount++;
+
+        // Auto-assign to first empty pad slot
+        for (let s = 0; s < 4; s++) {
+          if (!cartAssignments[s]) {
+            await assignCartToSlot(s, cartItem);
+            break;
+          }
+        }
+      } catch (err) {
+        console.error('Error importing cart file:', file.name, err);
+      }
+    }
+    renderCartLibraryTable();
+    audioStatusText.textContent = `Imported ${importedCount} cart(s) into CART Library`;
+  }
+
+  // Local Directory / Folder Scanner for CART Library
+  async function scanLocalCartFolder() {
+    try {
+      if ('showDirectoryPicker' in window) {
+        const dirHandle = await window.showDirectoryPicker();
+        const filesToImport = [];
+        for await (const entry of dirHandle.values()) {
+          if (entry.kind === 'file' && entry.name.match(/\.(mp3|wav|flac|ogg|m4a|aac)$/i)) {
+            const file = await entry.getFile();
+            filesToImport.push(file);
+          }
+        }
+        if (filesToImport.length > 0) {
+          await importCartFiles(filesToImport);
+        } else {
+          audioStatusText.textContent = 'No audio files found in selected directory.';
+        }
+      } else if (inputCartFolder) {
+        inputCartFolder.click();
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Error scanning cart directory:', err);
+        if (inputCartFolder) inputCartFolder.click();
+      }
+    }
+  }
+
+  async function generateDemoCarts() {
+    audioStatusText.textContent = 'Synthesizing station jingles and sound FX...';
+    for (let i = 0; i < 4; i++) {
+      const jingle = engine.generateDemoJingle(i);
+      const cartItem = {
+        id: crypto.randomUUID(),
+        title: jingle.title,
+        artist: jingle.artist,
+        duration: jingle.duration,
+        audioSource: jingle.buffer
+      };
+      cartLibrary.push(cartItem);
+      await assignCartToSlot(i, cartItem);
+    }
+    renderCartLibraryTable();
+    audioStatusText.textContent = 'Generated 4 Station ID & Sound FX Demo Jingles!';
+  }
+
+  if (searchCarts) searchCarts.addEventListener('input', renderCartLibraryTable);
+  if (btnImportCartFiles && inputCartFiles) {
+    btnImportCartFiles.addEventListener('click', () => inputCartFiles.click());
+    inputCartFiles.addEventListener('change', (e) => importCartFiles(e.target.files));
+  }
+  if (btnImportCartFolder) {
+    btnImportCartFolder.addEventListener('click', scanLocalCartFolder);
+  }
+  if (inputCartFolder) {
+    inputCartFolder.addEventListener('change', (e) => importCartFiles(e.target.files));
+  }
+  if (btnGenDemoCarts) {
+    btnGenDemoCarts.addEventListener('click', generateDemoCarts);
+  }
+  if (btnClearCartLibrary) {
+    btnClearCartLibrary.addEventListener('click', () => {
+      cartLibrary = [];
+      renderCartLibraryTable();
+    });
+  }
+  if (btnCartStopAll) {
+    btnCartStopAll.addEventListener('click', () => engine.stopAllCarts());
+  }
+  if (btnMixerCartsStop) {
+    btnMixerCartsStop.addEventListener('click', () => engine.stopAllCarts());
+  }
+  if (volCarts) {
+    volCarts.addEventListener('input', (e) => engine.setCartVolume(e.target.value));
+  }
+
+  // Setup Pad event listeners (Click to Trigger / Retrigger, Drag and drop)
+  cartPadElements.forEach((padObj, slotIdx) => {
+    if (!padObj.pad) return;
+
+    padObj.pad.addEventListener('click', (e) => {
+      const state = engine.getCartState(slotIdx);
+      if (!state || !state.isLoaded) {
+        switchPanelTab('carts');
+        audioStatusText.textContent = `Cart Pad ${slotIdx + 1} is empty. Assign a cart from the CART Library.`;
+        return;
+      }
+      engine.playCart(slotIdx);
+    });
+
+    if (padObj.btnPlay) {
+      padObj.btnPlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const state = engine.getCartState(slotIdx);
+        if (!state || !state.isLoaded) {
+          switchPanelTab('carts');
+          return;
+        }
+        if (state.isPlaying) {
+          engine.stopCart(slotIdx);
+        } else {
+          engine.playCart(slotIdx);
+        }
+      });
+    }
+
+    // Drag and drop onto Cart Pad
+    padObj.pad.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      padObj.pad.classList.add('drag-over');
+    });
+    padObj.pad.addEventListener('dragleave', () => {
+      padObj.pad.classList.remove('drag-over');
+    });
+    padObj.pad.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      padObj.pad.classList.remove('drag-over');
+      
+      const cartId = e.dataTransfer.getData('text/cart-id');
+      if (cartId) {
+        const found = cartLibrary.find(c => c.id === cartId);
+        if (found) {
+          await assignCartToSlot(slotIdx, found);
+          audioStatusText.textContent = `Assigned "${found.title}" to Cart Pad ${slotIdx + 1}`;
+          return;
+        }
+      }
+
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        try {
+          const arrayBuf = await file.arrayBuffer();
+          const decoded = await engine.ctx.decodeAudioData(arrayBuf.slice(0));
+          const cartItem = {
+            id: crypto.randomUUID(),
+            title: file.name.replace(/\.[^/.]+$/, ''),
+            artist: 'Imported Pad File',
+            duration: decoded.duration,
+            audioSource: decoded
+          };
+          cartLibrary.push(cartItem);
+          renderCartLibraryTable();
+          await assignCartToSlot(slotIdx, cartItem);
+          audioStatusText.textContent = `Loaded "${cartItem.title}" into Cart Pad ${slotIdx + 1}`;
+        } catch (err) {
+          console.error('Pad drop error:', err);
+        }
+      }
+    });
+  });
 
   // -------------------------------------------------------------
   // Track Metadata Editor Modal Subsystem
@@ -1219,7 +1619,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  btnScanFolder.addEventListener('click', scanLocalMusicFolder);
+  if (btnScanFolder) btnScanFolder.addEventListener('click', scanLocalMusicFolder);
+  if (btnAddFiles) btnAddFiles.addEventListener('click', () => fileInputGlobal.click());
 
   // Global File Input handler
   fileInputGlobal.addEventListener('change', async (e) => {
@@ -1281,6 +1682,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (deckElem.mixerTitle) deckElem.mixerTitle.textContent = deck.title;
       if (deckElem.mixerArtist) deckElem.mixerArtist.textContent = deck.artist;
       if (deckElem.mixerTrackInfo) deckElem.mixerTrackInfo.title = `Loaded: ${deck.title} — ${deck.artist}`;
+      if (deckElem.mixerTimeLeft) {
+        deckElem.mixerTimeLeft.textContent = deck.buffer ? `-${formatTime(deck.buffer.duration)}` : '--:--';
+      }
       deckElem.bpm.textContent = deck.bpm ? deck.bpm.toFixed(1) : '124.0';
       if (deckElem.key) deckElem.key.textContent = deck.key || '--';
       
@@ -1324,6 +1728,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
         });
+      }
+      deckLoadedTrackObj[deckId] = trackObj;
+      if (typeof updateNowPlayingTrivia === 'function') {
+        updateNowPlayingTrivia(deckId, trackObj);
       }
       renderLibraryTable();
       updateQueueUI();
@@ -1663,6 +2071,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (micElements.artBox) {
       micElements.artBox.classList.toggle('active-on-air', isActive);
+    }
+    if (micElements.mixerStatusText) {
+      micElements.mixerStatusText.textContent = isActive ? 'ON AIR' : 'MUTED';
     }
     const modalTestBtn = document.getElementById('btn-modal-test-mic');
     if (modalTestBtn) {
@@ -2084,6 +2495,10 @@ document.addEventListener('DOMContentLoaded', () => {
       deckAElements.mixerTrackInfo.classList.toggle('track-ending-warning', isEndingA);
     }
     deckAElements.time.textContent = formatTime(curA);
+    const remA = Math.max(0, durA - curA);
+    if (deckAElements.mixerTimeLeft) {
+      deckAElements.mixerTimeLeft.textContent = durA > 0 ? `-${formatTime(remA)}` : '--:--';
+    }
     if (deckAElements.title) {
       deckAElements.title.parentElement.classList.toggle('track-ending-warning', isEndingA);
     }
@@ -2120,6 +2535,10 @@ document.addEventListener('DOMContentLoaded', () => {
       deckBElements.mixerTrackInfo.classList.toggle('track-ending-warning', isEndingB);
     }
     deckBElements.time.textContent = formatTime(curB);
+    const remB = Math.max(0, durB - curB);
+    if (deckBElements.mixerTimeLeft) {
+      deckBElements.mixerTimeLeft.textContent = durB > 0 ? `-${formatTime(remB)}` : '--:--';
+    }
     if (deckBElements.title) {
       deckBElements.title.parentElement.classList.toggle('track-ending-warning', isEndingB);
     }
@@ -2144,11 +2563,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const levelB = engine.getDeckPeakLevel('B');
     const levelMaster = engine.getMasterPeakLevel();
     const levelMic = (engine.getMicPeakLevel ? engine.getMicPeakLevel() : 0);
+    const levelCarts = (engine.getCartPeakLevel ? engine.getCartPeakLevel() : 0);
 
     deckAElements.vuFill.style.height = `${Math.min(100, levelA * 150)}%`;
     deckBElements.vuFill.style.height = `${Math.min(100, levelB * 150)}%`;
     if (micElements.vuFill) micElements.vuFill.style.height = `${Math.min(100, levelMic * 150)}%`;
+    if (vuCarts) vuCarts.style.height = `${Math.min(100, levelCarts * 150)}%`;
     vuMaster.style.height = `${Math.min(100, levelMaster * 150)}%`;
+
+    // Real-Time CART Wall Status, Timers & Progress Bars
+    let activeCartsCount = 0;
+    for (let s = 0; s < 4; s++) {
+      const pad = cartPadElements[s];
+      const state = engine.getCartState(s);
+      if (pad && state) {
+        const isPlaying = state.isPlaying;
+        if (isPlaying) activeCartsCount++;
+
+        pad.pad.classList.toggle('playing', isPlaying);
+        if (pad.led) pad.led.classList.toggle('active', isPlaying);
+        if (pad.btnPlay) pad.btnPlay.textContent = isPlaying ? '⏹' : '▶';
+
+        if (state.isLoaded) {
+          if (isPlaying) {
+            pad.time.textContent = `-${formatTime(state.timeLeft)}`;
+            const pct = state.duration > 0 ? (state.currentTime / state.duration) * 100 : 0;
+            if (pad.progress) pad.progress.style.width = `${Math.min(100, pct)}%`;
+          } else {
+            pad.time.textContent = formatTime(state.duration);
+            if (pad.progress) pad.progress.style.width = '0%';
+          }
+        } else {
+          pad.time.textContent = '--:--';
+          if (pad.progress) pad.progress.style.width = '0%';
+        }
+      }
+    }
+
+    if (mixerCartsActiveVal) {
+      mixerCartsActiveVal.textContent = `${activeCartsCount} / 4`;
+    }
+
+    // Studio Hub Now Playing Active Deck Sync
+    if (deckA.isPlaying && !deckB.isPlaying) {
+      if (currentTriviaDeck !== 'A' && deckLoadedTrackObj.A && typeof updateNowPlayingTrivia === 'function') {
+        updateNowPlayingTrivia('A', deckLoadedTrackObj.A);
+      }
+    } else if (deckB.isPlaying && !deckA.isPlaying) {
+      if (currentTriviaDeck !== 'B' && deckLoadedTrackObj.B && typeof updateNowPlayingTrivia === 'function') {
+        updateNowPlayingTrivia('B', deckLoadedTrackObj.B);
+      }
+    }
   }
 
   // Start UI animation loop
@@ -2215,6 +2680,497 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // -------------------------------------------------------------
+  // 11. Studio Hub Clocks, Live Weather & Now Playing Engine (Radio C)
+  // -------------------------------------------------------------
+  let currentTriviaDeck = null;
+  let currentTriviaTrack = null;
+  let currentTriviaList = [];
+  let currentTriviaIndex = 0;
+
+  // Real-Time Studio Clocks (Local System & Perth WA AWST)
+  function updateStudioClocks() {
+    const now = new Date();
+
+    // Local Time & Date
+    if (studioHubElements.clockLocalTime) {
+      studioHubElements.clockLocalTime.textContent = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+    }
+    if (studioHubElements.clockLocalDate) {
+      studioHubElements.clockLocalDate.textContent = now.toLocaleDateString([], {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short'
+      });
+    }
+
+    // Dynamic Local City / Timezone Detection
+    if (studioHubElements.clockLocalName) {
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const cleanTz = tz ? tz.split('/').pop().replace(/_/g, ' ') : 'LOCAL TIME';
+        studioHubElements.clockLocalName.textContent = cleanTz.toUpperCase();
+      } catch (e) {
+        studioHubElements.clockLocalName.textContent = 'LOCAL TIME';
+      }
+    }
+
+    // Perth Western Australia Time & Date (AWST / UTC+8)
+    if (studioHubElements.clockPerthTime) {
+      try {
+        const perthTimeStr = now.toLocaleTimeString('en-AU', {
+          timeZone: 'Australia/Perth',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        });
+        studioHubElements.clockPerthTime.textContent = perthTimeStr;
+      } catch (e) {
+        studioHubElements.clockPerthTime.textContent = '--:--:--';
+      }
+    }
+    if (studioHubElements.clockPerthDate) {
+      try {
+        const perthDateStr = now.toLocaleDateString('en-AU', {
+          timeZone: 'Australia/Perth',
+          weekday: 'short',
+          day: '2-digit',
+          month: 'short'
+        });
+        studioHubElements.clockPerthDate.textContent = perthDateStr;
+      } catch (e) {
+        studioHubElements.clockPerthDate.textContent = '---, -- ---';
+      }
+    }
+  }
+
+  // Weather Code Mapper (WMO Codes -> Emojis & Readable Conditions)
+  function getWeatherDescription(code) {
+    if (code === 0) return { icon: '☀️', text: 'Clear Sky' };
+    if (code >= 1 && code <= 3) return { icon: '⛅', text: 'Partly Cloudy' };
+    if (code === 45 || code === 48) return { icon: '🌫️', text: 'Foggy' };
+    if (code >= 51 && code <= 57) return { icon: '🌦️', text: 'Light Drizzle' };
+    if (code >= 61 && code <= 67) return { icon: '🌧️', text: 'Rain' };
+    if (code >= 71 && code <= 77) return { icon: '❄️', text: 'Snow' };
+    if (code >= 80 && code <= 82) return { icon: '🌧️', text: 'Showers' };
+    if (code >= 95) return { icon: '⚡', text: 'Thunderstorm' };
+    return { icon: '🌤️', text: 'Fair' };
+  }
+
+  // Live Weather Fetcher (Open-Meteo API)
+  async function fetchStudioWeather() {
+    // 1. Perth WA Station Weather (Latitude: -31.9505, Longitude: 115.8605)
+    try {
+      const resPerth = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-31.9505&longitude=115.8605&current_weather=true');
+      if (resPerth.ok) {
+        const data = await resPerth.json();
+        if (data && data.current_weather) {
+          const cw = data.current_weather;
+          const info = getWeatherDescription(cw.weathercode);
+          if (studioHubElements.weatherIconPerth) studioHubElements.weatherIconPerth.textContent = info.icon;
+          if (studioHubElements.weatherTempPerth) studioHubElements.weatherTempPerth.textContent = `${Math.round(cw.temperature)}°C`;
+          if (studioHubElements.weatherCondPerth) studioHubElements.weatherCondPerth.textContent = `${info.text} (Perth)`;
+        }
+      }
+    } catch (err) {
+      console.warn('Perth weather fetch notice:', err);
+      if (studioHubElements.weatherTempPerth) studioHubElements.weatherTempPerth.textContent = '22°C';
+      if (studioHubElements.weatherCondPerth) studioHubElements.weatherCondPerth.textContent = 'Sunny (Perth)';
+    }
+
+    // 2. Local Weather (If broadcast studio or host is outside Perth)
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      if (tz.includes('Perth') || tz.includes('Western_Australia')) {
+        if (studioHubElements.weatherPlaceLocal) studioHubElements.weatherPlaceLocal.textContent = 'Studio Broadcast (WA)';
+        if (studioHubElements.weatherIconLocal && studioHubElements.weatherIconPerth) {
+          studioHubElements.weatherIconLocal.textContent = studioHubElements.weatherIconPerth.textContent;
+        }
+        if (studioHubElements.weatherTempLocal && studioHubElements.weatherTempPerth) {
+          studioHubElements.weatherTempLocal.textContent = studioHubElements.weatherTempPerth.textContent;
+        }
+        if (studioHubElements.weatherCondLocal && studioHubElements.weatherCondPerth) {
+          studioHubElements.weatherCondLocal.textContent = 'Perth Main Studio';
+        }
+      } else {
+        const city = tz.split('/').pop().replace(/_/g, ' ');
+        if (studioHubElements.weatherPlaceLocal) studioHubElements.weatherPlaceLocal.textContent = `${city} (OB)`;
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async (pos) => {
+            try {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              const resLoc = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&current_weather=true`);
+              if (resLoc.ok) {
+                const locData = await resLoc.json();
+                if (locData && locData.current_weather) {
+                  const lcw = locData.current_weather;
+                  const locInfo = getWeatherDescription(lcw.weathercode);
+                  if (studioHubElements.weatherIconLocal) studioHubElements.weatherIconLocal.textContent = locInfo.icon;
+                  if (studioHubElements.weatherTempLocal) studioHubElements.weatherTempLocal.textContent = `${Math.round(lcw.temperature)}°C`;
+                  if (studioHubElements.weatherCondLocal) studioHubElements.weatherCondLocal.textContent = `${locInfo.text} (Local)`;
+                }
+              }
+            } catch (e) {
+              // Geolocation fetch failed silently
+            }
+          }, () => {
+            if (studioHubElements.weatherIconLocal) studioHubElements.weatherIconLocal.textContent = '🌤️';
+            if (studioHubElements.weatherTempLocal) studioHubElements.weatherTempLocal.textContent = '--°C';
+            if (studioHubElements.weatherCondLocal) studioHubElements.weatherCondLocal.textContent = city;
+          }, { timeout: 3500 });
+        }
+      }
+    } catch (err) {
+      console.warn('Local weather detection notice:', err);
+    }
+  }
+
+  // Procedural Presenter Trivia & Liner Engine
+  function generateTrackTriviaList(track, deckId) {
+    if (!track) return ['No active track cued. Load a track onto Deck A or Deck B to generate live presenter trivia.'];
+
+    const title = track.title || 'Untitled';
+    const artist = track.artist || 'Unknown Artist';
+    const bpm = track.bpm ? (typeof track.bpm === 'number' ? track.bpm.toFixed(1) : track.bpm) : '124.0';
+    const key = track.key || 'C Maj';
+    const year = track.year || (track.meta && track.meta.year) || '2024';
+    const label = (track.meta && track.meta.label) || 'Studio Master';
+
+    return [
+      `"You're locked into the mix — that was '${title}' by ${artist}, driving a powerful rhythm at ${bpm} BPM in ${key}."`,
+      `Harmonic Mix Analysis: Recorded in ${key}. Outstanding harmonic resonance for blending into relative keys across Camelot wheels.`,
+      `Release Trivia: Released in ${year} on ${label}. Engineered for full-spectrum radio dynamics and high-fidelity transmission.`,
+      `Artist Profile: ${artist} brings iconic sound architecture to this cut, consistently ranked as a staple across global dance stations.`,
+      `Broadcast Tip: Clocked at ${bpm} BPM, this track serves as an energetic mid-set tempo anchor for peak radio listening hours.`
+    ];
+  }
+
+  // Web Trivia & Live Artist Bio Cache (TheAudioDB & MusicBrainz)
+  const triviaWebCache = new Map();
+
+  function sanitizeForSearch(str) {
+    if (!str) return '';
+    return str
+      .replace(/\.[a-zA-Z0-9]{2,4}$/, '')
+      .replace(/[\(\[\{].*?[\)\]\}]/g, '')
+      .replace(/ft\..*|feat\..*/i, '')
+      .trim();
+  }
+
+  async function fetchLiveMusicTrivia(artistName, trackTitle, deckId, trackObj) {
+    const cleanArtist = sanitizeForSearch(artistName);
+    const cleanTitle = sanitizeForSearch(trackTitle);
+
+    if (!cleanArtist || cleanArtist.toLowerCase().includes('unknown') || cleanArtist.toLowerCase().includes('demo track') || cleanArtist.length < 2) {
+      return;
+    }
+
+    const cacheKey = `${cleanArtist.toLowerCase()}:::${cleanTitle.toLowerCase()}`;
+    if (triviaWebCache.has(cacheKey)) {
+      applyFetchedTrivia(triviaWebCache.get(cacheKey), deckId, trackObj);
+      return;
+    }
+
+    const fetchedData = {
+      artistBio: null,
+      artistCountry: null,
+      artistGenre: null,
+      formedYear: null,
+      albumTitle: null,
+      releaseDate: null,
+      recordLabel: null,
+      wikiBio: null,
+      artworkUrl: null
+    };
+
+    // 1. Query TheAudioDB API (Free open artist search endpoint & Track/Album Thumbnails)
+    try {
+      const audioDbUrl = `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(cleanArtist)}`;
+      const resAdb = await fetch(audioDbUrl);
+      if (resAdb.ok) {
+        const dataAdb = await resAdb.json();
+        if (dataAdb && dataAdb.artists && dataAdb.artists.length > 0) {
+          const a = dataAdb.artists[0];
+          if (a.strBiographyEN) {
+            const sentences = a.strBiographyEN.split(/\.\s+/);
+            const bioExtract = sentences.slice(0, 2).join('. ') + (sentences.length > 2 ? '.' : '');
+            if (bioExtract.length > 20) {
+              fetchedData.artistBio = bioExtract.replace(/\n+/g, ' ').trim();
+            }
+          }
+          if (a.strCountry) fetchedData.artistCountry = a.strCountry;
+          if (a.strGenre) fetchedData.artistGenre = a.strGenre;
+          if (a.intFormedYear && a.intFormedYear !== '0') fetchedData.formedYear = a.intFormedYear;
+          else if (a.intBornYear && a.intBornYear !== '0') fetchedData.formedYear = a.intBornYear;
+          if (a.strArtistThumb && !fetchedData.artworkUrl) fetchedData.artworkUrl = a.strArtistThumb;
+        }
+      }
+
+      // Check track/album specific artwork on TheAudioDB if cleanTitle is present
+      if (cleanTitle) {
+        try {
+          const trackAdbUrl = `https://www.theaudiodb.com/api/v1/json/2/searchtrack.php?s=${encodeURIComponent(cleanArtist)}&t=${encodeURIComponent(cleanTitle)}`;
+          const resTrackAdb = await fetch(trackAdbUrl);
+          if (resTrackAdb.ok) {
+            const dataTrackAdb = await resTrackAdb.json();
+            if (dataTrackAdb && dataTrackAdb.track && dataTrackAdb.track.length > 0) {
+              const t = dataTrackAdb.track[0];
+              if (t.strTrackThumb) fetchedData.artworkUrl = t.strTrackThumb;
+              else if (t.strAlbumThumb && !fetchedData.artworkUrl) fetchedData.artworkUrl = t.strAlbumThumb;
+            }
+          }
+        } catch (e) {
+          // Track-specific thumbnail fetch failed silently
+        }
+      }
+    } catch (e) {
+      console.warn('TheAudioDB fetch notice:', e);
+    }
+
+    // 2. Query MusicBrainz API & Cover Art Archive (Recording, Releases, Record Labels, Front Covers)
+    if (cleanTitle) {
+      try {
+        const mbUrl = `https://musicbrainz.org/ws/2/recording/?query=recording:"${encodeURIComponent(cleanTitle)}" AND artist:"${encodeURIComponent(cleanArtist)}"&fmt=json`;
+        const resMb = await fetch(mbUrl);
+        if (resMb.ok) {
+          const dataMb = await resMb.json();
+          if (dataMb && dataMb.recordings && dataMb.recordings.length > 0) {
+            const rec = dataMb.recordings[0];
+            if (rec.releases && rec.releases.length > 0) {
+              const rel = rec.releases[0];
+              if (rel.title) fetchedData.albumTitle = rel.title;
+              if (rel.date) fetchedData.releaseDate = rel.date.substring(0, 4);
+              if (rel['label-info-list'] && rel['label-info-list'].length > 0) {
+                const labelObj = rel['label-info-list'][0].label;
+                if (labelObj && labelObj.name) fetchedData.recordLabel = labelObj.name;
+              }
+              // Check Cover Art Archive if cover art is still missing
+              if (rel.id && (!fetchedData.artworkUrl || fetchedData.artworkUrl.length === 0)) {
+                try {
+                  const caaUrl = `https://coverartarchive.org/release/${rel.id}/front-250.jpg`;
+                  const caaCheck = await fetch(caaUrl, { method: 'HEAD' });
+                  if (caaCheck.ok) {
+                    fetchedData.artworkUrl = caaUrl;
+                  }
+                } catch (e) {
+                  // Cover Art Archive head check failed silently
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('MusicBrainz fetch notice:', e);
+      }
+    }
+
+    // 3. Fallback / Complementary: Wikipedia REST API Summary & Thumbnail
+    try {
+      const wikiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanArtist.replace(/ /g, '_'))}`;
+      const resWiki = await fetch(wikiUrl);
+      if (resWiki.ok) {
+        const dataWiki = await resWiki.json();
+        if (dataWiki && dataWiki.extract && dataWiki.type === 'standard') {
+          if (!fetchedData.artistBio) fetchedData.wikiBio = dataWiki.extract;
+          if (!fetchedData.artworkUrl && dataWiki.thumbnail && dataWiki.thumbnail.source) {
+            fetchedData.artworkUrl = dataWiki.thumbnail.source;
+          }
+        }
+      }
+    } catch (e) {
+      // Wikipedia query fallback failed silently
+    }
+
+    // Cache the result
+    triviaWebCache.set(cacheKey, fetchedData);
+
+    // Apply to UI if this track is still active
+    applyFetchedTrivia(fetchedData, deckId, trackObj);
+  }
+
+  function applyFetchedTrivia(data, deckId, trackObj) {
+    if (!data || !trackObj) return;
+
+    const trackKey = `${deckId}-${trackObj.id || trackObj.title}-${trackObj.artist}`;
+    if (currentTriviaTrack !== trackKey) return;
+
+    const newLiners = [];
+
+    // Fact: Real Artist Bio from TheAudioDB / Wikipedia
+    const bio = data.artistBio || data.wikiBio;
+    if (bio) {
+      newLiners.push(`Artist Bio: ${bio}`);
+    }
+
+    // Fact: Record Label & Album from MusicBrainz
+    if (data.recordLabel || data.albumTitle) {
+      let releaseLiner = `Discography Note: '${trackObj.title}'`;
+      if (data.albumTitle) releaseLiner += ` from the release '${data.albumTitle}'`;
+      if (data.recordLabel) releaseLiner += ` on ${data.recordLabel}`;
+      if (data.releaseDate) releaseLiner += ` (${data.releaseDate})`;
+      releaseLiner += '.';
+      newLiners.push(releaseLiner);
+    }
+
+    // Fact: Origin & Genre Lore
+    if (data.artistCountry || data.artistGenre || data.formedYear) {
+      let lore = `Artist Lore: ${trackObj.artist}`;
+      if (data.artistCountry) lore += ` originating from ${data.artistCountry}`;
+      if (data.formedYear) lore += `, active since ${data.formedYear}`;
+      if (data.artistGenre) lore += `. Style: ${data.artistGenre}`;
+      lore += '.';
+      newLiners.push(lore);
+    }
+
+    // Merge into current trivia list
+    if (newLiners.length > 0) {
+      const acousticLiners = generateTrackTriviaList(trackObj, deckId);
+      currentTriviaList = [...newLiners, ...acousticLiners];
+
+      if (studioHubElements.npTriviaText) {
+        studioHubElements.npTriviaText.textContent = currentTriviaList[currentTriviaIndex % currentTriviaList.length];
+      }
+    }
+
+    // Update Year & Label badges if MusicBrainz provided them
+    if (data.releaseDate && studioHubElements.npYear) {
+      studioHubElements.npYear.textContent = `Year: ${data.releaseDate}`;
+    }
+    if (data.recordLabel && studioHubElements.npLabel) {
+      studioHubElements.npLabel.textContent = `Label: ${data.recordLabel}`;
+    }
+
+    // Apply discovered artwork if track did not have embedded cover art
+    if (data.artworkUrl && (!trackObj.artworkUrl || trackObj.artworkUrl.length === 0)) {
+      trackObj.artworkUrl = data.artworkUrl;
+
+      // Update Now Playing Card Artwork Badge
+      if (studioHubElements.npArtImg) {
+        studioHubElements.npArtImg.src = data.artworkUrl;
+        studioHubElements.npArtImg.style.display = 'block';
+      }
+      if (studioHubElements.npArtPlaceholder) {
+        studioHubElements.npArtPlaceholder.style.display = 'none';
+      }
+
+      // Update Deck Faceplate & Mixer Channel Strip Artwork Badges
+      const deckElem = deckId === 'A' ? deckAElements : deckBElements;
+      if (deckElem) {
+        if (deckElem.artImg) {
+          deckElem.artImg.src = data.artworkUrl;
+          deckElem.artImg.style.display = 'block';
+        }
+        if (deckElem.artPlaceholder) deckElem.artPlaceholder.style.display = 'none';
+        if (deckElem.mixerArtImg) {
+          deckElem.mixerArtImg.src = data.artworkUrl;
+          deckElem.mixerArtImg.style.display = 'block';
+        }
+        if (deckElem.mixerArtPlaceholder) deckElem.mixerArtPlaceholder.style.display = 'none';
+      }
+
+      // Sync across library item and playlist queues
+      ['A', 'B'].forEach(d => {
+        deckQueues[d].forEach(qTrack => {
+          if (isSameTrack(qTrack, trackObj)) {
+            qTrack.artworkUrl = data.artworkUrl;
+          }
+        });
+      });
+      libraryTracks.forEach(lTrack => {
+        if (isSameTrack(lTrack, trackObj)) {
+          lTrack.artworkUrl = data.artworkUrl;
+        }
+      });
+      renderLibraryTable();
+    }
+  }
+
+  function updateNowPlayingTrivia(deckId, trackObj, forceCycle = false) {
+    if (!trackObj) return;
+
+    const trackKey = `${deckId}-${trackObj.id || trackObj.title}-${trackObj.artist}`;
+    const isNewTrack = !currentTriviaTrack || currentTriviaTrack !== trackKey;
+
+    if (isNewTrack || forceCycle) {
+      if (isNewTrack) {
+        currentTriviaDeck = deckId;
+        currentTriviaTrack = trackKey;
+        currentTriviaList = generateTrackTriviaList(trackObj, deckId);
+        currentTriviaIndex = 0;
+
+        // Trigger async background web fetch from TheAudioDB, MusicBrainz & Wikipedia
+        fetchLiveMusicTrivia(trackObj.artist, trackObj.title, deckId, trackObj);
+      } else if (forceCycle && currentTriviaList.length > 0) {
+        currentTriviaIndex = (currentTriviaIndex + 1) % currentTriviaList.length;
+      }
+    }
+
+    if (studioHubElements.npDeckTag) {
+      studioHubElements.npDeckTag.textContent = `DECK ${deckId}`;
+      studioHubElements.npDeckTag.style.color = deckId === 'A' ? '#00f0ff' : '#ff007f';
+      studioHubElements.npDeckTag.style.borderColor = deckId === 'A' ? 'rgba(0, 240, 255, 0.4)' : 'rgba(255, 0, 127, 0.4)';
+    }
+    if (studioHubElements.npTitle) studioHubElements.npTitle.textContent = trackObj.title || 'Untitled';
+    if (studioHubElements.npArtist) studioHubElements.npArtist.textContent = trackObj.artist || 'Unknown Artist';
+    if (studioHubElements.npYear) {
+      const y = trackObj.year || (trackObj.meta && trackObj.meta.year) || '2024';
+      studioHubElements.npYear.textContent = `Year: ${y}`;
+    }
+    if (studioHubElements.npLabel) {
+      const l = (trackObj.meta && trackObj.meta.label) || 'Station Cut';
+      studioHubElements.npLabel.textContent = `Label: ${l}`;
+    }
+    if (studioHubElements.npBpm) {
+      const b = trackObj.bpm ? (typeof trackObj.bpm === 'number' ? trackObj.bpm.toFixed(1) : trackObj.bpm) : '124.0';
+      studioHubElements.npBpm.textContent = `BPM: ${b}`;
+    }
+    if (studioHubElements.npKey) {
+      studioHubElements.npKey.textContent = `Key: ${trackObj.key || '--'}`;
+    }
+
+    if (trackObj.artworkUrl) {
+      if (studioHubElements.npArtImg) {
+        studioHubElements.npArtImg.src = trackObj.artworkUrl;
+        studioHubElements.npArtImg.style.display = 'block';
+      }
+      if (studioHubElements.npArtPlaceholder) studioHubElements.npArtPlaceholder.style.display = 'none';
+    } else {
+      if (studioHubElements.npArtImg) {
+        studioHubElements.npArtImg.src = '';
+        studioHubElements.npArtImg.style.display = 'none';
+      }
+      if (studioHubElements.npArtPlaceholder) studioHubElements.npArtPlaceholder.style.display = 'flex';
+    }
+
+    if (studioHubElements.npTriviaText && currentTriviaList.length > 0) {
+      studioHubElements.npTriviaText.textContent = currentTriviaList[currentTriviaIndex % currentTriviaList.length];
+    }
+  }
+
+  // Wire Trivia Next Fact / Cycle Button
+  if (studioHubElements.btnTriviaRefresh) {
+    studioHubElements.btnTriviaRefresh.addEventListener('click', () => {
+      const deck = currentTriviaDeck || 'A';
+      const track = deckLoadedTrackObj[deck] || deckLoadedTrackObj.A || deckLoadedTrackObj.B;
+      if (track) {
+        updateNowPlayingTrivia(deck, track, true);
+      }
+    });
+  }
+
+  // Initialize Clocks & Weather Timers
+  updateStudioClocks();
+  setInterval(updateStudioClocks, 1000);
+  fetchStudioWeather();
+  setInterval(fetchStudioWeather, 15 * 60 * 1000);
 
   // -------------------------------------------------------------
   // Helper Utilities
