@@ -1,8 +1,84 @@
 {
-  "version": "1.8.5",
+  "version": "1.9.1",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-04",
   "changelog": [
+    {
+      "version": "1.9.1",
+      "date": "2026-09-04",
+      "title": "Recessed Slider Slot Channels for Mixer Faders (CH A, MIC, Master, CH B)",
+      "changes": [
+        "**Tactile Slider Slot Channel Styling**",
+        "====================:)====================",
+        "Recessed Hardware Slot Tracks: Restored visible dark recessed slot channels (similar to the crossfader) across all mixer volume faders (CH A, MIC, Master, CH B).",
+        "Ergonomic Groove Alignment: The enlarged circular slider knobs glide seamlessly centered along the dark recessed slot tracks with bevelled borders and inset depth shadows."
+      ]
+    },
+    {
+      "version": "1.9.0",
+      "date": "2026-09-04",
+      "title": "Universal Design Ergonomics (Larger Movable Slider Thumbs, High-Contrast Dials & Knobs)",
+      "changes": [
+        "**Universal Design & Accessibility Enhancements**",
+        "====================:)====================",
+        "Enlarged Tactile Slider Thumbs: Standardized larger circular movable thumbs (26px to 30px) across all vertical channel faders (CH A, MIC, Master, CH B) with high-contrast metallic radial shading and channel-specific glowing neon accent rings.",
+        "Precision Pitch Slider Thumbs: Added large 22px circular slider thumbs with glowing LED indicator rings and 1.18x hover magnification for effortless tempo adjustment.",
+        "Tactile Crossfader Knob: Enhanced the horizontal crossfader with an enlarged 36px x 26px pill fader knob featuring bright contrast borders and hover illumination.",
+        "High-Visibility Rotary Dials: Expanded 3-band EQ, Dual-Filter, Master, and On-Deck FX knobs (46px diameter) with thicker (3.5px) illuminated pointers and calibrated pivot origins for crystal-clear viewing from any angle or distance."
+      ]
+    },
+    {
+      "version": "1.8.9",
+      "date": "2026-09-04",
+      "title": "Microphone Channel Routing & Mono Centering (Behringer UMC202HD & 2-Ch Interfaces)",
+      "changes": [
+        "**Microphone Channel Routing & Mono Centering Matrix**",
+        "====================:)====================",
+        "Multi-Channel Interface Support: Solved the single-ear panning issue on 2-channel USB audio interfaces (Behringer U-Phoria UMC202HD, Focusrite Scarlett 2i2, etc.) where Input 1 routes exclusively to Left and Input 2 routes to Right.",
+        "Precision Channel Routing Selector: Added '🎚️ Mic Channel / Mono Mode' dropdown to B.U.T.T. / Audio Routing with 4 routing modes:",
+        "  • Mono — Input 1 / Left (Centered): Routes Channel 1 to both Left & Right headphone/broadcast channels equally.",
+        "  • Mono — Sum L+R (Centered Mix): Blends both inputs to center with -3dB headroom summing.",
+        "  • Mono — Input 2 / Right (Centered): Centers Channel 2 for mics plugged into input 2.",
+        "  • Stereo — Separate Left & Right: True unmixed stereo passthrough.",
+        "Real-Time Glitch-Free Switching: Web Audio ChannelSplitter / ChannelMerger gain matrix updates on the fly without audio drops or reconnects.",
+        "Persistent Preference: Automatically saves the chosen channel routing mode to localStorage."
+      ]
+    },
+    {
+      "version": "1.8.8",
+      "date": "2026-09-04",
+      "title": "Pitch Slider Relocation to the Right of SYNC (Deck A & Deck B)",
+      "changes": [
+        "**Standardized Pitch Slider Positioning**",
+        "====================:)====================",
+        "Right-of-SYNC Deck Placement: Repositioned the pitch tempo sliders to the right side of the SYNC button on both Deck A and Deck B.",
+        "Transport Sequence: Standardized deck bottom bar layout: [ CUE ] -> [ PLAY / PAUSE ] -> [ SYNC ] -> [ PITCH SLIDER ].",
+        "Dual-Layout Consistency: Aligned across both Radio Presenter and DJ Console layouts with live tempo readout and double-click reset."
+      ]
+    },
+    {
+      "version": "1.8.7",
+      "date": "2026-09-04",
+      "title": "Pitch Slider Integration to the Left of SYNC (Radio Presenter & DJ Modes)",
+      "changes": [
+        "**Integrated Pitch Slider Transport Control**",
+        "====================:)====================",
+        "Radio Presenter Pitch Control: Restored the precision tempo pitch slider to the Radio Presenter layout, positioned directly to the left of the SYNC button on both Deck A and Deck B.",
+        "Unified Transport Bar: Transport strip sequence standardized across all modes: [ CUE ] -> [ PLAY / PAUSE ] -> [ PITCH SLIDER ] -> [ SYNC ].",
+        "Compact Visual Gauge: Sleek dark fader box with real-time percentage readout (e.g. +0.0%), smooth slider thumb, and double-click to instant 0.0% reset."
+      ]
+    },
+    {
+      "version": "1.8.6",
+      "date": "2026-09-04",
+      "title": "Streamlined DJ Console Layout (Scratch Jog Discs Removed)",
+      "changes": [
+        "**Clean DJ Workstation Interface**",
+        "====================:)====================",
+        "Streamlined Digital Deck Faceplate: Removed the physical turntable/jog scratch discs from the visual layout across the console.",
+        "Full-Width Performance Controls: Expanded Hot Cues (1-4), Beat Loops, Beat Roll slip pads, On-Deck Quick FX strips, and pitch transport bars across the entire width of each deck for maximum usability."
+      ]
+    },
     {
       "version": "1.8.5",
       "date": "2026-09-04",

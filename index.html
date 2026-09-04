@@ -6,7 +6,7 @@
   <title>WebDJRadio - Dual-Deck Web Audio DJ Workstation</title>
   <meta name="description" content="Sample-accurate dual-deck web DJ application with zero-latency Web Audio engine, 3-band EQ, equal-power crossfader, and local folder scanner.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-  <link rel="stylesheet" href="style.css?v=1.8.5">
+  <link rel="stylesheet" href="style.css?v=1.9.1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -219,12 +219,11 @@
                 <button class="btn-transport btn-sync" id="btn-sync-a">
                   <span>SYNC</span>
                 </button>
-              </div>
-
-              <!-- Pitch Slider -->
-              <div class="pitch-slider-box">
-                <div class="pitch-val-display" id="deck-a-pitch-val">0.0%</div>
-                <input type="range" class="crossfader-slider" id="pitch-a" min="-0.08" max="0.08" step="0.001" value="0">
+                <!-- Pitch Slider to the right of SYNC -->
+                <div class="pitch-slider-box" id="pitch-box-a">
+                  <div class="pitch-val-display" id="deck-a-pitch-val">0.0%</div>
+                  <input type="range" class="crossfader-slider pitch-slider" id="pitch-a" min="-0.08" max="0.08" step="0.001" value="0" title="Pitch / Tempo (Double-click to reset)">
+                </div>
               </div>
             </div>
           </div>
@@ -572,12 +571,11 @@
                 <button class="btn-transport btn-sync" id="btn-sync-b">
                   <span>SYNC</span>
                 </button>
-              </div>
-
-              <!-- Pitch Slider -->
-              <div class="pitch-slider-box">
-                <div class="pitch-val-display" id="deck-b-pitch-val">0.0%</div>
-                <input type="range" class="crossfader-slider" id="pitch-b" min="-0.08" max="0.08" step="0.001" value="0">
+                <!-- Pitch Slider to the right of SYNC -->
+                <div class="pitch-slider-box" id="pitch-box-b">
+                  <div class="pitch-val-display" id="deck-b-pitch-val">0.0%</div>
+                  <input type="range" class="crossfader-slider pitch-slider" id="pitch-b" min="-0.08" max="0.08" step="0.001" value="0" title="Pitch / Tempo (Double-click to reset)">
+                </div>
               </div>
             </div>
           </div>
@@ -980,6 +978,18 @@
                   <small class="field-hint" id="audio-input-status">Active Input: Not Connected (Click 'Connect Mic' or the MIC button on mixer)</small>
                   <button class="btn btn-sm" id="btn-modal-test-mic" type="button" style="font-size: 11px; padding: 2px 8px;">🎙️ Connect / Test Mic</button>
                 </div>
+                <!-- Mic Input Channel Routing / Mono Mode (Behringer UMC202HD, Focusrite, etc.) -->
+                <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px; background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.15); border-radius: 6px; padding: 6px 10px;">
+                  <label for="bcast-mic-channel-mode" style="font-size: 11px; font-weight: 700; color: #00f0ff; margin-bottom: 0; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
+                    <span>🎚️ Mic Channel / Mono Mode:</span>
+                  </label>
+                  <select id="bcast-mic-channel-mode" style="flex: 1; font-size: 11px; padding: 3px 6px; height: 28px; background: #0c101c; border: 1px solid var(--border-color); color: #fff; border-radius: 4px;" title="Select Mono routing to center Input 1 (Left) or Input 2 (Right) for Behringer UMC202HD & 2-channel audio interfaces">
+                    <option value="mono-left">Mono — Input 1 / Left (Centered — Behringer UMC / Scarlett / 2-Ch Interfaces)</option>
+                    <option value="mono-sum">Mono — Sum L+R (Centered Mix)</option>
+                    <option value="mono-right">Mono — Input 2 / Right (Centered)</option>
+                    <option value="stereo">Stereo — Separate Left &amp; Right</option>
+                  </select>
+                </div>
                 <div style="display: flex; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 4px;">
                   <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Studio Clean disables browser echo/noise gating so your voice never cuts off">
                     <input type="checkbox" id="chk-mic-raw-mode" checked>
@@ -1376,10 +1386,10 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="audio-analysis.js?v=1.8.5"></script>
-  <script src="WebRadioDecksEngine.js?v=1.8.5"></script>
-  <script src="broadcast.js?v=1.8.5"></script>
-  <script src="midi.js?v=1.8.5"></script>
-  <script src="app.js?v=1.8.5"></script>
+  <script src="audio-analysis.js?v=1.9.1"></script>
+  <script src="WebRadioDecksEngine.js?v=1.9.1"></script>
+  <script src="broadcast.js?v=1.9.1"></script>
+  <script src="midi.js?v=1.9.1"></script>
+  <script src="app.js?v=1.9.1"></script>
 </body>
 </html>

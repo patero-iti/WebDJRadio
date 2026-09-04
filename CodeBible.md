@@ -1,6 +1,6 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `1.8.5`  
+> **Version:** `1.9.1`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
 > **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation & Broadcasting Console
 
@@ -58,11 +58,6 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
                                                                         │
                                                                         ▼
                         ┌───────────────────────────────────────────────────────────────────────────────┐
-                        │                   Master Gain Stage & Master Peak Analyser                    │
-                        └───────────────┬───────────────────────────────────────────────┬───────────────┘
-                                        │                                               │
-                                        ▼                                               ▼
-                        ┌───────────────────────────────────────┐       ┌───────────────────────────────────┐
                         │           Local Audio Output          │       │        Radio Broadcast Stream     │
                         │  - AudioContext.destination           │       │  - WebRTC WHIP / P2P Mesh         │
                         │  - AudioContext.setSinkId (B.U.T.T.)  │       │  - Icecast 2 & Shoutcast Streams  │
@@ -164,7 +159,14 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 * **Auto-Queue**: Automatically pulls upcoming tracks from each deck's dedicated cued playlist (or library) to ensure 24/7 continuous broadcast play.
 
 ### 3.6. Live Microphone, Host & Audio Input Subsystem (`WebRadioDecksEngine.js`)
-* **Hardware Input Enumeration**: Dynamically queries and populates `navigator.mediaDevices.enumerateDevices()` (`kind === 'audioinput'`) for USB audio interfaces (Focusrite, PreSonus, Rode), Bluetooth headsets/AirPods, and internal mics.
+* **Hardware Input Enumeration**: Dynamically queries and populates `navigator.mediaDevices.enumerateDevices()` (`kind === 'audioinput'`) for USB audio interfaces (Behringer UMC, Focusrite, PreSonus, Rode), Bluetooth headsets/AirPods, and internal mics.
+* **Input Channel Routing & Mono Centering Matrix**:
+  * Solves single-ear panning issues on 2-channel audio interfaces (such as Behringer UMC202HD, Focusrite Scarlett 2i2) where microphone input 1 is hardwired to Left and input 2 to Right.
+  * Real-time `ChannelSplitterNode(2)` $\rightarrow$ Gain Matrix $\rightarrow$ `ChannelMergerNode(2)` routing with 4 selectable modes:
+    * **Mono — Input 1 / Left (Centered)**: Directs Channel 1 to both Left & Right headphone/broadcast channels equally.
+    * **Mono — Sum L+R (Centered Mix)**: Sums both inputs with $-3\text{ dB}$ headroom protection.
+    * **Mono — Input 2 / Right (Centered)**: Directs Channel 2 to both Left & Right channels equally.
+    * **Stereo**: True unmixed separate Left and Right channel passthrough.
 * **Dedicated Mixer Channel Strip (`.mic-strip`)**:
   * Precision vertical gain fader ($0\% \dots 150\%$) with persistent volume memory.
   * Real-time 60 FPS LED peak VU meter bar isolated to incoming voice amplitude.
@@ -197,16 +199,18 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 
 ### 3.9. Dual Layout Subsystem (DJ Workstation vs. Radio Presenter Mode)
 * **1. DJ Console Layout (`mode-dj`)**:
-  * Comprehensive performance interface equipped with dual vinyl/jog scratch wheels, 3-band rotary EQ, dual-filter sweeps, pitch tempo sliders, 4 Hot Cues, Beat Loops (1–8 beats), Beat Rolls, On-Deck Quick FX strips, and equal-power crossfader.
+  * Clean, streamlined digital performance interface without bulky scratch discs.
+  * **Full-Width Performance Controls**: 4 Hot Cues, Beat Loops (1–8 beats), Beat Rolls, On-Deck Quick FX strips, 3-band rotary EQ, dual-filter sweeps, pitch tempo sliders, equal-power crossfader, and 4-channel broadcast mixer.
 * **2. Radio Presenter Minimal Broadcast Mode (`mode-radio`)**:
   * Designed for radio talk hosts and station broadcasters seeking a clean, focused, distraction-free environment centered around the mixer console.
-  * **Broadcast Mixer Channel Strips**:
+  * **Broadcast Mixer Channel Strips (MST -> CH A -> MIC -> CH B)**:
+    * **Far-Left Master Output Monitor (MST)**: Reference stereo peak VU meter and output indicator.
     * **Top Square Album Artwork**: Dynamically displays loaded track cover art thumbnail (or fallback icon) for Deck A (CH A) and Deck B (CH B), and a pulsing studio microphone badge for the live mic channel.
     * **Left-Aligned Peak VU Meters**: Stereo LED peak audio meters positioned immediately to the left of each channel's vertical slider volume control for real-time visual level monitoring.
-    * **Vertical Volume Faders**: Luxury 155px vertical throw volume sliders for precision broadcast gain adjustment.
+    * **Vertical Volume Faders**: Luxury 160px vertical throw volume sliders for precision broadcast gain adjustment.
     * **Bottom Square Transport / Mic Buttons**: Oversized square Play/Pause buttons for Deck A & B with glowing active status indicators, and an ON AIR toggle button for the mic channel.
-  * **Retains**: Dual playback decks, track title/artist metadata, scrolling and overview waveforms with 10s end alert, channel volume faders, live microphone voiceover strip with peak LED meters & ON AIR indicator, **AUTO-DECK RELAY** controller, and dual cued playlist queues.
-  * **Hides**: Scratch jog wheels, loop bars, beat roll pads, on-deck quick FX knobs, 3-band EQ rack, pitch tempo faders, and crossfader.
+  * **Retains**: Dual playback decks, track title/artist metadata, scrolling and overview waveforms with 10s end alert, unified transport strip (`[ CUE ] [ PLAY/PAUSE ] [ SYNC ] [ PITCH SLIDER ]`), channel volume faders, live microphone voiceover strip with peak LED meters & ON AIR indicator, **AUTO-DECK RELAY** controller, and dual cued playlist queues.
+  * **Hides**: Loop bars, beat roll pads, on-deck quick FX knobs, 3-band EQ rack, and crossfader.
   * **Crossfader Safety**: Automatically centers the crossfader (`0.5`) upon entering Radio mode so both deck channel volume faders operate at unattenuated 100% gain.
   * **State Persistence**: Remembers active layout preference in `localStorage.getItem('webdj_layout_mode')`.
 

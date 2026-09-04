@@ -20,11 +20,35 @@ class WebRadioDecksEngine {
     this.masterAnalyser.fftSize = 256;
     this.masterAnalyser.smoothingTimeConstant = 0.8;
     
-    // Live Microphone / Audio Input Node Chain
+    // Live Microphone / Audio Input Node Chain & Matrix Router
     this.micStream = null;
     this.micSourceNode = null;
+    this.micChannelMode = 'mono-left'; // 'mono-left' (Input 1 -> Center), 'mono-right' (Input 2 -> Center), 'mono-sum' (L+R sum -> Center), 'stereo'
+
+    // Channel Routing Matrix for Stereo & Multi-Channel Audio Interfaces (e.g. Behringer UMC202HD, Focusrite Scarlett)
+    this.micSplitter = this.ctx.createChannelSplitter(2);
+    this.micLeftGainL = this.ctx.createGain();
+    this.micLeftGainR = this.ctx.createGain();
+    this.micRightGainL = this.ctx.createGain();
+    this.micRightGainR = this.ctx.createGain();
+    this.micMerger = this.ctx.createChannelMerger(2);
+
+    this.micSplitter.connect(this.micLeftGainL, 0);
+    this.micSplitter.connect(this.micLeftGainR, 0);
+    this.micSplitter.connect(this.micRightGainL, 1);
+    this.micSplitter.connect(this.micRightGainR, 1);
+
+    this.micLeftGainL.connect(this.micMerger, 0, 0);
+    this.micLeftGainR.connect(this.micMerger, 0, 1);
+    this.micRightGainL.connect(this.micMerger, 0, 0);
+    this.micRightGainR.connect(this.micMerger, 0, 1);
+
     this.micGain = this.ctx.createGain();
     this.micGain.gain.value = 0.0; // starts muted/inactive
+    this.micMerger.connect(this.micGain);
+
+    this.setMicChannelMode(this.micChannelMode);
+
     this.micVolume = 1.0;
     this.isMicActive = false;
     this.micDeviceId = '';
@@ -542,7 +566,8 @@ class WebRadioDecksEngine {
 
       this.micStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
       this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
-      this.micSourceNode.connect(this.micGain);
+      this.micSourceNode.connect(this.micSplitter);
+      this.setMicChannelMode(this.micChannelMode);
 
       // If mic is active, apply gain
       if (this.isMicActive) {
@@ -559,7 +584,8 @@ class WebRadioDecksEngine {
         };
         this.micStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
         this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
-        this.micSourceNode.connect(this.micGain);
+        this.micSourceNode.connect(this.micSplitter);
+        this.setMicChannelMode(this.micChannelMode);
         if (this.isMicActive) {
           this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
         }
@@ -568,6 +594,50 @@ class WebRadioDecksEngine {
         console.warn('Could not connect audio input device:', fallbackErr);
         return false;
       }
+    }
+  }
+
+  // Set Microphone Channel Mode / Mono Routing (e.g. Behringer UMC202HD, Focusrite Scarlett, Sum L+R, Stereo)
+  setMicChannelMode(mode) {
+    this.micChannelMode = mode || 'mono-left';
+    const now = this.ctx.currentTime;
+    const ramp = 0.02;
+
+    switch (this.micChannelMode) {
+      case 'mono-left':
+      case 'input-1':
+        // Channel 0 (Input 1 / Left) sent to both Left & Right equally (Centered)
+        this.micLeftGainL.gain.setTargetAtTime(1.0, now, ramp);
+        this.micLeftGainR.gain.setTargetAtTime(1.0, now, ramp);
+        this.micRightGainL.gain.setTargetAtTime(0.0, now, ramp);
+        this.micRightGainR.gain.setTargetAtTime(0.0, now, ramp);
+        break;
+
+      case 'mono-right':
+      case 'input-2':
+        // Channel 1 (Input 2 / Right) sent to both Left & Right equally (Centered)
+        this.micLeftGainL.gain.setTargetAtTime(0.0, now, ramp);
+        this.micLeftGainR.gain.setTargetAtTime(0.0, now, ramp);
+        this.micRightGainL.gain.setTargetAtTime(1.0, now, ramp);
+        this.micRightGainR.gain.setTargetAtTime(1.0, now, ramp);
+        break;
+
+      case 'mono-sum':
+        // Sum both Left & Right inputs and center them
+        this.micLeftGainL.gain.setTargetAtTime(0.707, now, ramp);
+        this.micLeftGainR.gain.setTargetAtTime(0.707, now, ramp);
+        this.micRightGainL.gain.setTargetAtTime(0.707, now, ramp);
+        this.micRightGainR.gain.setTargetAtTime(0.707, now, ramp);
+        break;
+
+      case 'stereo':
+      default:
+        // Standard stereo passthrough (L -> L, R -> R)
+        this.micLeftGainL.gain.setTargetAtTime(1.0, now, ramp);
+        this.micLeftGainR.gain.setTargetAtTime(0.0, now, ramp);
+        this.micRightGainL.gain.setTargetAtTime(0.0, now, ramp);
+        this.micRightGainR.gain.setTargetAtTime(1.0, now, ramp);
+        break;
     }
   }
 

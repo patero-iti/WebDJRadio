@@ -378,19 +378,17 @@ body {
   transition: width 0.05s linear;
 }
 
-/* Deck Deck Body: Turntable + Controls */
+/* Deck Body: Controls */
 .deck-body {
   display: flex;
-  gap: 16px;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
-/* Jog Wheel / Turntable */
+/* Jog Wheel / Scratch Discs (Removed from visual layout) */
 .jog-container {
-  width: 180px;
-  height: 180px;
-  position: relative;
-  flex-shrink: 0;
+  display: none !important;
 }
 
 .jog-wheel {
@@ -462,7 +460,7 @@ body {
 
 /* Deck Control Rack */
 .deck-controls-rack {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -586,14 +584,82 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  width: 90px;
+  justify-content: center;
+  gap: 2px;
+  width: 95px;
+  height: 44px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 3px 6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .pitch-val-display {
   font-family: var(--font-mono);
   font-size: 10px;
+  font-weight: 700;
   color: var(--text-muted);
+  line-height: 1;
+}
+
+input[type=range].pitch-slider {
+  width: 100%;
+  height: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+input[type=range].pitch-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d8e2ec 45%, #64748b 100%);
+  border: 2px solid #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+input[type=range].pitch-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d8e2ec 45%, #64748b 100%);
+  border: 2px solid #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+#pitch-b::-webkit-slider-thumb,
+#pitch-b::-moz-range-thumb {
+  border-color: #ff007f;
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.6), 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+input[type=range].pitch-slider:hover::-webkit-slider-thumb,
+input[type=range].pitch-slider:active::-webkit-slider-thumb,
+input[type=range].pitch-slider:hover::-moz-range-thumb,
+input[type=range].pitch-slider:active::-moz-range-thumb {
+  transform: scale(1.18);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.9), 0 3px 8px rgba(0, 0, 0, 0.85);
+}
+
+#pitch-b:hover::-webkit-slider-thumb,
+#pitch-b:active::-webkit-slider-thumb,
+#pitch-b:hover::-moz-range-thumb,
+#pitch-b:active::-moz-range-thumb {
+  box-shadow: 0 0 12px rgba(255, 0, 127, 0.9), 0 3px 8px rgba(0, 0, 0, 0.85);
 }
 
 /* Central DJ Mixer Panel */
@@ -653,33 +719,40 @@ body {
   font-weight: 700;
 }
 
-/* Custom Rotary Knob UI */
+/* Custom Rotary Knob UI (Universal Design: High-contrast, larger diameter) */
 .rotary-knob {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: radial-gradient(circle, #2a3144 0%, #151924 100%);
+  background: radial-gradient(circle at 35% 35%, #2e374d 0%, #151924 100%);
   border: 2px solid var(--border-color);
   position: relative;
   cursor: ns-resize;
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.05), 0 3px 6px rgba(0,0,0,0.4);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.08), 0 3px 8px rgba(0,0,0,0.5);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rotary-knob:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.12), 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
 .rotary-pointer {
   position: absolute;
   top: 4px;
   left: 50%;
-  /* translateX(-50%) centres the 2px wide line horizontally.
-     The knob is 42px tall; its centre is at 21px from the top.
+  /* translateX(-50%) centres the 3.5px wide line horizontally.
+     The knob is 46px tall; its centre is at 23px from the top.
      The pointer starts at top:4px, so the knob centre is
-     (21 - 4) = 17px below the pointer's top edge.
-     Setting transform-origin to (50%, 17px) pivots the line
-     around the knob centre rather than around the line's midpoint. */
-  transform-origin: 50% 17px;
-  width: 2px;
-  height: 12px;
+     (23 - 4) = 19px below the pointer's top edge.
+     Setting transform-origin to (50%, 19px) pivots the line
+     around the knob centre. */
+  transform-origin: 50% 19px;
+  width: 3.5px;
+  height: 13px;
   background-color: var(--text-main);
-  border-radius: 1px;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
 }
 
 /* Level Faders & VU Meters */
@@ -818,13 +891,93 @@ body {
 input[type=range].vertical-fader {
   writing-mode: vertical-lr;
   direction: rtl;
-  width: 20px;
+  width: 14px;
   height: 110px;
-  accent-color: var(--text-main);
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7), inset 0 0 4px rgba(0, 0, 0, 0.8);
   cursor: pointer;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  outline: none;
+  overflow: visible;
+}
+
+input[type=range].vertical-fader::-webkit-slider-runnable-track {
+  background: transparent;
+  border: none;
+}
+
+input[type=range].vertical-fader::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+input[type=range].vertical-fader::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d8e2ec 45%, #64748b 100%);
+  border: 2.5px solid #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 2px 8px rgba(0, 0, 0, 0.75);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+input[type=range].vertical-fader::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #d8e2ec 45%, #64748b 100%);
+  border: 2.5px solid #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 2px 8px rgba(0, 0, 0, 0.75);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+
+input[type=range].vertical-fader:hover::-webkit-slider-thumb,
+input[type=range].vertical-fader:active::-webkit-slider-thumb,
+input[type=range].vertical-fader:hover::-moz-range-thumb,
+input[type=range].vertical-fader:active::-moz-range-thumb {
+  transform: scale(1.18);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.9), 0 3px 10px rgba(0, 0, 0, 0.9);
+  border-color: #ffffff;
+}
+
+#vol-b::-webkit-slider-thumb,
+#vol-b::-moz-range-thumb {
+  border-color: #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.6), 0 2px 8px rgba(0, 0, 0, 0.75);
+}
+#vol-b:hover::-webkit-slider-thumb, #vol-b:active::-webkit-slider-thumb,
+#vol-b:hover::-moz-range-thumb, #vol-b:active::-moz-range-thumb {
+  box-shadow: 0 0 14px rgba(255, 0, 127, 0.9), 0 3px 10px rgba(0, 0, 0, 0.9);
+}
+
+#vol-mic::-webkit-slider-thumb,
+#vol-mic::-moz-range-thumb {
+  border-color: #ff1744;
+  box-shadow: 0 0 10px rgba(255, 23, 68, 0.6), 0 2px 8px rgba(0, 0, 0, 0.75);
+}
+#vol-mic:hover::-webkit-slider-thumb, #vol-mic:active::-webkit-slider-thumb,
+#vol-mic:hover::-moz-range-thumb, #vol-mic:active::-moz-range-thumb {
+  box-shadow: 0 0 14px rgba(255, 23, 68, 0.9), 0 3px 10px rgba(0, 0, 0, 0.9);
+}
+
+#vol-master::-webkit-slider-thumb,
+#vol-master::-moz-range-thumb {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.75);
+}
+#vol-master:hover::-webkit-slider-thumb, #vol-master:active::-webkit-slider-thumb,
+#vol-master:hover::-moz-range-thumb, #vol-master:active::-moz-range-thumb {
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.9), 0 3px 10px rgba(0, 0, 0, 0.9);
 }
 
 .master-bottom-placeholder {
@@ -1037,23 +1190,46 @@ input[type=range].vertical-fader {
 
 input[type=range].crossfader-slider {
   width: 100%;
-  height: 14px;
+  height: 16px;
   -webkit-appearance: none;
+  appearance: none;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: 7px;
+  border-radius: 8px;
   outline: none;
 }
 
 input[type=range].crossfader-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 32px;
-  height: 24px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #424e6a 0%, #202738 100%);
-  border: 1px solid #5a6b90;
+  appearance: none;
+  width: 36px;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #4f5d7e 0%, #202738 100%);
+  border: 1.5px solid #6b7fa9;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type=range].crossfader-slider::-moz-range-thumb {
+  width: 36px;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #4f5d7e 0%, #202738 100%);
+  border: 1.5px solid #6b7fa9;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type=range].crossfader-slider:hover::-webkit-slider-thumb,
+input[type=range].crossfader-slider:active::-webkit-slider-thumb,
+input[type=range].crossfader-slider:hover::-moz-range-thumb,
+input[type=range].crossfader-slider:active::-moz-range-thumb {
+  transform: scale(1.08);
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 3px 10px rgba(0, 0, 0, 0.8);
 }
 
 /* Auto-Deck Relay Section */
@@ -2653,23 +2829,24 @@ input[type=range].crossfader-slider::-webkit-slider-thumb {
   box-shadow: 0 0 6px #ff007f;
 }
 
-/* Compact rotary dial for on-deck FX */
+/* Compact rotary dial for on-deck FX (Universal Design: enhanced visibility) */
 .knob-deck-fx {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
 }
 
 .knob-deck-fx .rotary-pointer {
   top: 3px;
-  height: 8px;
-  transform-origin: 50% 13px;
+  height: 10px;
+  width: 3px;
+  transform-origin: 50% 15px;
   background-color: #00f0ff;
-  box-shadow: 0 0 4px #00f0ff;
+  box-shadow: 0 0 5px #00f0ff;
 }
 
 .deck-b .knob-deck-fx .rotary-pointer {
   background-color: #ff007f;
-  box-shadow: 0 0 4px #ff007f;
+  box-shadow: 0 0 5px #ff007f;
 }
 
 .fx-knob-sublabel {
@@ -3003,8 +3180,7 @@ body.mode-radio .loops-bar,
 body.mode-radio .roll-bar,
 body.mode-radio .deck-fx-strip,
 body.mode-radio .eq-rack,
-body.mode-radio .crossfader-container,
-body.mode-radio .pitch-slider-box {
+body.mode-radio .crossfader-container {
   display: none !important;
 }
 
@@ -3041,7 +3217,8 @@ body.mode-radio .deck-bottom-bar {
 body.mode-radio .transport-btns {
   width: 100%;
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  align-items: stretch;
 }
 
 body.mode-radio .transport-btns .btn-transport {
@@ -3054,7 +3231,30 @@ body.mode-radio .transport-btns .btn-transport {
 }
 
 body.mode-radio .transport-btns .btn-sync {
-  flex: 0 0 85px;
+  flex: 0 0 80px;
+}
+
+body.mode-radio .pitch-slider-box {
+  display: flex !important;
+  flex: 0 0 100px;
+  height: 52px;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}
+
+body.mode-radio .pitch-val-display {
+  font-size: 10px;
+  font-weight: 700;
+  color: #00f0ff;
+}
+
+body.mode-radio .pitch-slider {
+  width: 100%;
 }
 
 /* Radio Presenter Focused Mixer Console */
@@ -3141,9 +3341,20 @@ body.mode-radio .master-vu-bar {
 
 body.mode-radio input[type=range].vertical-fader {
   height: 160px;
-  width: 26px;
+  width: 18px;
+  border-radius: 9px;
   margin: 0;
   padding: 0;
+}
+
+body.mode-radio input[type=range].vertical-fader::-webkit-slider-thumb {
+  width: 30px;
+  height: 30px;
+}
+
+body.mode-radio input[type=range].vertical-fader::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
 }
 
 body.mode-radio .master-bottom-placeholder {

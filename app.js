@@ -3588,6 +3588,20 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.micDeviceId = initialSavedMicDevice;
     }
 
+    // Mic Input Channel Mode / Mono Routing (e.g. Behringer UMC202HD, Focusrite Scarlett)
+    const micChannelModeSelect = document.getElementById('bcast-mic-channel-mode');
+    if (micChannelModeSelect) {
+      const savedMode = localStorage.getItem('webdj_mic_channel_mode') || 'mono-left';
+      micChannelModeSelect.value = savedMode;
+      engine.setMicChannelMode(savedMode);
+
+      micChannelModeSelect.addEventListener('change', () => {
+        const mode = micChannelModeSelect.value;
+        engine.setMicChannelMode(mode);
+        localStorage.setItem('webdj_mic_channel_mode', mode);
+      });
+    }
+
     if (navigator.mediaDevices && typeof navigator.mediaDevices.addEventListener === 'function') {
       navigator.mediaDevices.addEventListener('devicechange', () => {
         refreshAudioOutputDevices(false);
