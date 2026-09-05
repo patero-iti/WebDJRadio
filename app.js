@@ -3765,6 +3765,20 @@ document.addEventListener('DOMContentLoaded', () => {
       midiLearnAction.appendChild(opt);
     });
 
+    midiLearnAction.addEventListener('change', () => {
+      const selected = midiLearnAction.value;
+      const meta = ACTIONS[selected];
+      if (meta && !meta.deck) {
+        midiLearnDeck.value = 'null';
+        midiLearnDeck.disabled = true;
+      } else {
+        midiLearnDeck.disabled = false;
+        if (midiLearnDeck.value === 'null') {
+          midiLearnDeck.value = 'A';
+        }
+      }
+    });
+
     // ------------------------------------------------------------------
     // Status helpers
     // ------------------------------------------------------------------
@@ -3984,6 +3998,45 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.toggle('active', isActive);
           }
         }
+
+        // CART Wall Trigger updates
+        if (action && action.startsWith('cart_play_')) {
+          const slot = parseInt(action.replace('cart_play_', '')) - 1;
+          const pad = document.getElementById(`cart-pad-${slot}`);
+          const btnPlay = document.getElementById(`btn-cart-play-${slot}`);
+          [pad, btnPlay].forEach(el => {
+            if (el) {
+              el.classList.add('midi-indicator-flash');
+              setTimeout(() => el.classList.remove('midi-indicator-flash'), 300);
+            }
+          });
+        }
+        if (action === 'cart_stop_all') {
+          const stopBtn = document.getElementById('btn-cart-stop-all');
+          const mixerStopBtn = document.getElementById('btn-mixer-carts-stop');
+          [stopBtn, mixerStopBtn].forEach(el => {
+            if (el) {
+              el.classList.add('midi-indicator-flash');
+              setTimeout(() => el.classList.remove('midi-indicator-flash'), 300);
+            }
+          });
+        }
+
+        // Live Mic Trigger updates
+        if (action === 'mic_toggle') {
+          const micBtn = document.getElementById('btn-mic-toggle');
+          if (micBtn) {
+            micBtn.classList.add('midi-indicator-flash');
+            setTimeout(() => micBtn.classList.remove('midi-indicator-flash'), 300);
+          }
+        }
+        if (action === 'mic_talkover') {
+          const talkBtn = document.getElementById('btn-talkover-toggle');
+          if (talkBtn) {
+            talkBtn.classList.add('midi-indicator-flash');
+            setTimeout(() => talkBtn.classList.remove('midi-indicator-flash'), 300);
+          }
+        }
       },
 
       onRollChange(action, deck, isPressed) {
@@ -4067,6 +4120,16 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (action === 'fx_bitcrush_mix' && deck) {
           const knob = document.getElementById(`knob-fx-bitcrush-${deckKey}`);
           if (knob) updateRotaryKnobUI(knob, normValue);
+        }
+        // 8. CART Wall Master Volume Slider
+        else if (action === 'cart_volume') {
+          const slider = document.getElementById('vol-carts');
+          if (slider) slider.value = normValue;
+        }
+        // 9. Live Mic Volume / Gain Slider (scaled 0.0 to 1.5)
+        else if (action === 'mic_volume') {
+          const slider = document.getElementById('vol-mic');
+          if (slider) slider.value = (normValue * 1.5).toFixed(2);
         }
       }
     };

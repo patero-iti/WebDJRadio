@@ -1,8 +1,24 @@
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-05",
   "changelog": [
+    {
+      "version": "2.1.1",
+      "date": "2026-09-05",
+      "title": "USB MIDI Controller Integration for Broadcast CART Wall & Live Microphone",
+      "changes": [
+        "**Broadcast CART Wall & Live Mic MIDI Controller Integration**",
+        "====================:)====================",
+        "CART Wall MIDI Pad Triggers: Added full USB MIDI Note/Trigger actions for playing and re-triggering Cart Pad 1, Pad 2, Pad 3, and Pad 4 (`cart_play_1` - `cart_play_4`) directly from controller performance pads.",
+        "CART Wall Master Stop Trigger: Added dedicated MIDI trigger action (`cart_stop_all`) to instantly kill all playing carts from a single controller button.",
+        "CART Master Volume CC Fader: Added continuous MIDI CC mapping (`cart_volume`) for hardware fader control over the CARTS mixer channel strip.",
+        "Live Mic ON AIR / Mute Trigger: Added MIDI Note/Trigger action (`mic_toggle`) for hands-free toggling of the live microphone broadcast state.",
+        "Live Mic Talkover Ducking Trigger: Added MIDI Note/Trigger action (`mic_talkover`) for toggling -9dB music talkover ducking.",
+        "Live Mic Gain CC Fader: Added continuous MIDI CC mapping (`mic_volume`) with automatic 0.0 to 1.5 gain scaling for hardware mic fader control.",
+        "Seamless MIDI Learn & Visual Feedback: Integrated all new CART and MIC actions into the MIDI Learn selector, JSON import/export, and live visual activity indicator flashing across on-screen buttons, pads, and faders."
+      ]
+    },
     {
       "version": "2.1.0",
       "date": "2026-09-05",

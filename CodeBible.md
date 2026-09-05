@@ -194,11 +194,18 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 ### 3.8. USB MIDI Controller Hardware Support (`midi.js`)
 * **Web MIDI API Integration**: Automatic device detection, connection status badges, and message parsing.
 * **Controller Presets**: Out-of-the-box mappings for **Pioneer DDJ-200**, **Pioneer DDJ-400**, **Numark Party Mix**, and **Behringer CMD Studio/Micro**.
+* **Broadcast CART Wall & Live Mic MIDI Actions**:
+  * **CART Pad Triggers**: Note/Trigger actions for Cart Pads 1–4 (`cart_play_1` - `cart_play_4`) to fire and retrigger drops/jingles.
+  * **CART Master Stop**: Instant trigger action (`cart_stop_all`) to kill all active carts.
+  * **CART Master Volume CC**: Continuous fader mapping (`cart_volume`) for the CARTS mixer channel strip.
+  * **Live Mic ON AIR Toggle**: Note/Trigger action (`mic_toggle`) for hands-free live presenter muting/unmuting.
+  * **Live Mic Talkover Ducking**: Note/Trigger action (`mic_talkover`) for toggling -9dB music talkover ducking.
+  * **Live Mic Volume CC**: Continuous fader mapping (`mic_volume`) with automatic 0.0 to 1.5 gain scaling.
 * **Interactive MIDI Learn**: Click "Start Learn", move any physical control, and automatically bind to any mixer function.
 * **Portable JSON Export & Import**:
   * **💾 Export JSON**: Downloads a structured `.json` configuration file containing all current mapping definitions, CC/Note channels, actions, and connected hardware info.
   * **📂 Import JSON**: One-click file picker to load, validate, and restore saved MIDI mappings across any workstation or browser instance.
-* **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, volume faders, master volume, 3-band EQ, dual filter knobs, pitch faders, and performance pads.
+* **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, channel volume faders, master volume, CART fader, Live Mic fader, 3-band EQ, dual filter knobs, pitch faders, CART pads, and performance buttons.
 
 ### 3.9. Quad Layout Subsystem & Visibility Customizer (Radio A, Radio B, Radio C, DJ)
 * **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C (Hidden by Default) ] -> [ 🎧 DJ ] -> [ ⚙️ ]`.
