@@ -16,7 +16,9 @@
         "Touch-First Ergonomics & 48px Hitboxes: Expanded buttons (48px height), tactile vertical fader thumbs (38px with glowing neon borders), pitch thumbs (28px), and generous hit targets preventing on-air misses on touchscreen glass.",
         "Accidental Gesture & Bounce Protection: Integrated `touch-action: manipulation` and `overscroll-behavior: none` to eliminate browser elastic pull-to-refresh, double-tap zoom, and accidental text selection.",
         "MediaSession API Integration: Synchronizes active track metadata, album cover art, and transport action handlers (Play/Pause/Next) directly with iOS / iPadOS Control Center and Android lock-screen controls.",
-        "Progressive Web App (PWA) Standalone Mode: Added `manifest.json` and Apple mobile web app meta tags allowing broadcasters to install WebDJRadio directly to iPad and Android home screens as a full-screen, chromeless app."
+        "Progressive Web App (PWA) Standalone Mode: Added `manifest.json` and Apple mobile web app meta tags allowing broadcasters to install WebDJRadio directly to iPad and Android home screens as a full-screen, chromeless app.",
+        "Streamlined Header Button Labels: Tidied top banner button labels for maximum clarity and compact symmetry (`📜 Updates`, `🎛 MIDI`, and `✨ FX`).",
+        "Radio DADAA Official Brand Theme & Tagline: Integrated the official style guide palette (Hot Pink `#e83bb2`, Black `#231218`) and angled 'LISTEN DIFFERENTLY' lockup badge, toggleable on and off instantly by clicking or touching the Radio DADAA logo in the top-left corner."
       ]
     },
     {

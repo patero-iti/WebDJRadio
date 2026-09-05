@@ -22,13 +22,16 @@
   <!-- Header -->
   <header class="header">
     <div class="brand">
-      <div class="brand-icon">DJ</div>
+      <div class="brand-logo-container" id="brand-logo-container" title="Click or Touch Logo to Toggle Radio DADAA Brand Theme">
+        <img src="RadioDADAA-Logo.png" alt="Radio DADAA Logo" class="brand-logo-img" id="btn-toggle-dadaa-theme">
+        <span class="brand-tagline-badge" id="brand-tagline-badge">LISTEN DIFFERENTLY</span>
+      </div>
       <div>
         <div style="display: flex; align-items: center; gap: 8px;">
           <h1 class="brand-title">WebDJRadio</h1>
           <span class="version-tag" id="app-version-tag">v1.0.0</span>
         </div>
-        <div class="brand-subtitle">Web Audio DJ Console</div>
+        <div class="brand-subtitle">Radio DADAA Studio Console</div>
       </div>
     </div>
 
@@ -125,14 +128,14 @@
         </button>
       </div>
 
-      <button class="btn" id="btn-changelog">
-        <span>📜 Version Notes</span>
+      <button class="btn" id="btn-changelog" title="Version & Update History">
+        <span>📜 Updates</span>
       </button>
-      <button class="btn" id="btn-midi-panel">
-        <span>🎛 MIDI Controller</span>
+      <button class="btn" id="btn-midi-panel" title="USB MIDI Controller Setup">
+        <span>🎛 MIDI</span>
       </button>
       <button class="btn" id="btn-fx-panel" title="Open Studio Software FX Rack (Filter, Delay, Reverb, Flanger, Bitcrusher, Beat Roll)">
-        <span>✨ Software FX</span>
+        <span>✨ FX</span>
       </button>
       <button class="btn btn-broadcast" id="btn-broadcast-panel" title="Configure live streaming to WebRTC (WHIP), Icecast, or Shoutcast">
         <span class="broadcast-dot" id="header-broadcast-dot"></span>

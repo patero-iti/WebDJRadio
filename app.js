@@ -528,6 +528,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedDeviceProfile = localStorage.getItem('webdj_device_profile') || 'auto';
   applyDeviceProfile(savedDeviceProfile);
 
+  // -------------------------------------------------------------
+  // 2d. Radio DADAA Brand Theme Controller & Logo Interactive Toggle
+  // -------------------------------------------------------------
+  const brandLogoContainer = document.getElementById('brand-logo-container');
+
+  function setDadaaTheme(isEnabled) {
+    document.body.classList.toggle('theme-dadaa', isEnabled);
+    localStorage.setItem('webdj_theme_dadaa', isEnabled ? 'true' : 'false');
+    if (brandLogoContainer) {
+      brandLogoContainer.setAttribute('title', isEnabled ? 
+        'Radio DADAA Theme Active • Click / Touch to switch to Cyber theme' : 
+        'Cyber Theme Active • Click / Touch to activate Radio DADAA theme');
+    }
+  }
+
+  function toggleDadaaTheme() {
+    const isCurrentlyActive = document.body.classList.contains('theme-dadaa');
+    setDadaaTheme(!isCurrentlyActive);
+  }
+
+  if (brandLogoContainer) {
+    brandLogoContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDadaaTheme();
+    });
+  }
+
+  // Restore saved DADAA theme state (default to true)
+  const savedDadaaTheme = localStorage.getItem('webdj_theme_dadaa');
+  setDadaaTheme(savedDadaaTheme === null || savedDadaaTheme === 'true');
+
   // Mobile / Tablet Lock Screen & MediaSession API Integration
   function updateMediaSessionMetadata(deckId, trackObj) {
     if ('mediaSession' in navigator && trackObj) {

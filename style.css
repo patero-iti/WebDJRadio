@@ -68,6 +68,131 @@ body {
   gap: 12px;
 }
 
+.brand-logo-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.brand-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 68px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 3px 5px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(232, 59, 178, 0.4);
+  box-shadow: 0 0 14px rgba(232, 59, 178, 0.35), 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.brand-logo-container:hover .brand-logo-img {
+  transform: scale(1.06);
+  border-color: #e83bb2;
+  box-shadow: 0 0 20px rgba(232, 59, 178, 0.75);
+}
+
+.brand-logo-container:active .brand-logo-img {
+  transform: scale(0.96);
+}
+
+/* Radio DADAA Official Tagline Badge (LISTEN DIFFERENTLY) */
+.brand-tagline-badge {
+  display: inline-block;
+  background: #231218;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 1.5px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(232, 59, 178, 0.5);
+  transform: rotate(-3deg) translateY(-5px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), 0 0 8px rgba(232, 59, 178, 0.35);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.brand-logo-container:hover .brand-tagline-badge {
+  transform: rotate(0deg) translateY(-5px) scale(1.05);
+  background: #000000;
+  border-color: #e83bb2;
+  color: #e83bb2;
+  box-shadow: 0 0 12px rgba(232, 59, 178, 0.7);
+}
+
+/* ==========================================================================
+   Radio DADAA Official Style Guide Theme (Hot Pink #e83bb2)
+   ========================================================================== */
+body.theme-dadaa .brand-logo-img {
+  border-color: #e83bb2;
+  box-shadow: 0 0 22px rgba(232, 59, 178, 0.8), 0 0 6px #ffffff;
+}
+
+body.theme-dadaa .brand-tagline-badge {
+  background: #e83bb2;
+  color: #231218;
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(232, 59, 178, 0.8);
+}
+
+body.theme-dadaa .brand-title {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(232, 59, 178, 0.6);
+}
+
+body.theme-dadaa .brand-subtitle {
+  color: #e83bb2;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+}
+
+body.theme-dadaa .btn-primary-view.active {
+  background: linear-gradient(180deg, #e83bb2 0%, #b81b88 100%);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(232, 59, 178, 0.6);
+}
+
+body.theme-dadaa .btn-primary-view.active .view-badge {
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+}
+
+body.theme-dadaa .btn-layout-mode.active {
+  background: rgba(232, 59, 178, 0.2);
+  border-color: #e83bb2;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(232, 59, 178, 0.45);
+}
+
+body.theme-dadaa .btn-primary {
+  background: linear-gradient(180deg, #e83bb2 0%, #b81b88 100%);
+  box-shadow: 0 0 12px rgba(232, 59, 178, 0.5);
+}
+
+body.theme-dadaa .btn-device-profile.active {
+  background: rgba(232, 59, 178, 0.2);
+  color: #e83bb2;
+  border-color: rgba(232, 59, 178, 0.5);
+  box-shadow: 0 0 10px rgba(232, 59, 178, 0.3);
+}
+
+body.theme-dadaa .panel-tab-btn.active {
+  color: #e83bb2;
+  border-bottom-color: #e83bb2;
+}
+
+body.theme-dadaa .nowplaying-artist {
+  color: #e83bb2;
+}
+
 .brand-icon {
   width: 36px;
   height: 36px;
