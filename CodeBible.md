@@ -1,14 +1,14 @@
 # WebDJRadio — System Architecture & CodeBible Specification
 
-> **Version:** `2.0.0`  
+> **Version:** `2.1.0`  
 > **Classification:** Comprehensive Technical Manual, Architecture Reference & Operating Specification  
-> **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation, Broadcast CART Wall, Studio Hub, Zero-Scroll Tabbed Workspace & Radio Console
+> **Engine:** Zero-Latency Web Audio API Dual-Deck DJ Workstation, Broadcast CART Wall, Studio Hub, Zero-Scroll Tabbed Workspace, Adaptive Touch Architecture & Radio Console
 
 ---
 
 ## 1. Executive Summary & System Overview
 
-**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a 4-slot broadcast CART Wall pad controller with dedicated audio routing, a Universal Design **Zero-Scroll Tabbed Workspace** with primary views (**🎙️ On-Air Studio** and **🗃️ Music Management**), layout customization (**Radio A**, **Radio B**, **Radio C**, and **DJ Console**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
+**WebDJRadio** is a browser-native, studio-grade dual-deck DJ mixing console and live radio broadcast workstation. Engineered strictly with vanilla JavaScript and the standard **Web Audio API**, the application delivers sample-accurate scheduling, zero-perceived latency, real-time 3-band EQ, dual-filter sweeping, a studio software FX rack, automated continuous relay playback, a 4-slot broadcast CART Wall pad controller with dedicated audio routing, a Universal Design **Zero-Scroll Tabbed Workspace** with primary views (**🎙️ On-Air Studio** and **🗃️ Music**), **Unified Adaptive Touch Architecture** supporting iPad, Android tablet, and desktop environments, layout customization (**Radio A**, **Radio B**, **Radio C**, and **DJ Console**), USB MIDI controller hardware integration, live microphone & external audio input mixing with talkover ducking, MediaSession API lock-screen control, and multi-protocol live radio streaming (WebRTC WHIP, Icecast 2, Shoutcast, and B.U.T.T. virtual soundcard routing).
 
 ---
 
@@ -254,6 +254,14 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
    - Real-time `-MM:SS.d` countdown time remaining gauges and 10s flashing ending alerts.
    - 1-click Deck A / Deck B play/pause controls and active CART counters with master stop.
    - Immediate **↩ Return to Studio** button (<kbd>Esc</kbd>).
+
+### 4.5. Universal Design: Unified Adaptive Touch Architecture & Tablet Mode
+1. **Single-Codebase Adaptive System (Approach A)**: Runs natively on the same URL and audio graph across desktop laptops, iPads, and Android tablets.
+2. **Automatic Device Detection**: Checks pointer capabilities (`@media (pointer: coarse)`) and screen widths ($\le 1200\text{px}$) to activate touch-optimized ergonomics automatically.
+3. **Interactive Device Profile Switcher**: Toggle between `⚡ Auto`, `📱 Touch`, and `🖥️ Desktop` directly from the header switcher.
+4. **Touch-First Hit Targets**: Automatically scales buttons to $48\text{px}$ minimum height, expands vertical fader thumbs to $38\text{px}$ with high-contrast glowing rims, and activates touch-safe scrolling.
+5. **MediaSession API Support**: Live lock-screen and Control Center metadata, album art, and transport controls on iOS and Android.
+6. **Progressive Web App (PWA) Mode**: Add WebDJRadio to your iPad or Android home screen for a chromeless, full-screen studio experience.
 
 ---
 

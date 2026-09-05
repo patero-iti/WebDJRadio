@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>WebDJRadio - Dual-Deck Web Audio DJ Workstation</title>
   <meta name="description" content="Sample-accurate dual-deck web DJ application with zero-latency Web Audio engine, 3-band EQ, equal-power crossfader, and local folder scanner.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WebDJRadio">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0a0e17">
+  <link rel="manifest" href="manifest.json">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-  <link rel="stylesheet" href="style.css?v=1.9.7">
+  <link rel="stylesheet" href="style.css?v=2.1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -101,6 +107,22 @@
             </label>
           </div>
         </div>
+      </div>
+
+      <!-- Device Touch & Ergonomics Profile Switcher -->
+      <div class="device-profile-nav" id="device-profile-nav" title="Device Touch & Ergonomics Profile">
+        <button class="btn-device-profile active" id="btn-profile-auto" data-profile="auto" type="button" title="Auto-Detect: Automatically adapts layout and touch targets for iPads, Android tablets, or desktop">
+          <span class="profile-icon">⚡</span>
+          <span class="profile-label">Auto</span>
+        </button>
+        <button class="btn-device-profile" id="btn-profile-tablet" data-profile="tablet" type="button" title="Touch Profile: Force enlarged 48px tactile buttons, fader thumbs and touch layout">
+          <span class="profile-icon">📱</span>
+          <span class="profile-label">Touch</span>
+        </button>
+        <button class="btn-device-profile" id="btn-profile-desktop" data-profile="desktop" type="button" title="Desktop Profile: Force precision mouse/trackpad pointer ergonomics">
+          <span class="profile-icon">🖥️</span>
+          <span class="profile-label">Desktop</span>
+        </button>
       </div>
 
       <button class="btn" id="btn-changelog">

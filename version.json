@@ -1,8 +1,24 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-05",
   "changelog": [
+    {
+      "version": "2.1.0",
+      "date": "2026-09-05",
+      "title": "Unified Adaptive Touch Architecture, Device Profile Engine & PWA Support",
+      "changes": [
+        "**Universal Design: Unified Adaptive Touch Architecture (Approach A)**",
+        "====================:)====================",
+        "Unified Adaptive Single-Codebase Architecture: Runs on a single URL with zero engine duplication, keeping all local playlists, scanned tracks, volume presets, and CART wall pad assignments 100% synchronized across desktop, laptop, iPad, and Android tablets.",
+        "Automatic Device Detection: Detects touchscreens and coarse pointer inputs via Pointer API and CSS interaction media queries (`@media (pointer: coarse)` and screen widths <= 1200px), automatically activating touch-first ergonomics.",
+        "Interactive Device Profile Switcher: Added top-level header switcher (`⚡ Auto`, `📱 Touch`, `🖥️ Desktop`) with user manual override and localStorage persistence.",
+        "Touch-First Ergonomics & 48px Hitboxes: Expanded buttons (48px height), tactile vertical fader thumbs (38px with glowing neon borders), pitch thumbs (28px), and generous hit targets preventing on-air misses on touchscreen glass.",
+        "Accidental Gesture & Bounce Protection: Integrated `touch-action: manipulation` and `overscroll-behavior: none` to eliminate browser elastic pull-to-refresh, double-tap zoom, and accidental text selection.",
+        "MediaSession API Integration: Synchronizes active track metadata, album cover art, and transport action handlers (Play/Pause/Next) directly with iOS / iPadOS Control Center and Android lock-screen controls.",
+        "Progressive Web App (PWA) Standalone Mode: Added `manifest.json` and Apple mobile web app meta tags allowing broadcasters to install WebDJRadio directly to iPad and Android home screens as a full-screen, chromeless app."
+      ]
+    },
     {
       "version": "2.0.0",
       "date": "2026-09-05",

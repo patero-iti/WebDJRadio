@@ -1387,6 +1387,47 @@ input[type=range].crossfader-slider:active::-moz-range-thumb {
   color: #00f0ff;
 }
 
+/* Device Touch & Ergonomics Profile Selector */
+.device-profile-nav {
+  display: flex;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.btn-device-profile {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-device-profile .profile-icon {
+  font-size: 11px;
+}
+
+.btn-device-profile:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-device-profile.active {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+
 /* Main View Containers */
 .main-view-container {
   width: 100%;
@@ -4898,4 +4939,184 @@ body.mode-radio-c .studio-info-column {
   max-height: 90px;
   overflow-y: auto;
   padding-top: 2px;
+}
+
+/* ==========================================================================
+   Universal Design: Touch & Tablet Adaptive Profile
+   (iPads, Android Tablets, Touchscreens & Touch Surfaces)
+   ========================================================================== */
+
+/* Touch Protection & Elasticity Control */
+body.profile-touch-active,
+body.profile-tablet {
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Enlarged Touch Targets for Buttons & Action Triggers */
+body.profile-touch-active .btn,
+body.profile-tablet .btn {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+body.profile-touch-active .btn-play,
+body.profile-touch-active .btn-cue,
+body.profile-touch-active .btn-sync,
+body.profile-tablet .btn-play,
+body.profile-tablet .btn-cue,
+body.profile-tablet .btn-sync {
+  min-height: 48px;
+  min-width: 52px;
+  font-size: 13.5px;
+}
+
+/* Enlarged Hot Cues and Quick FX in Touch Mode */
+body.profile-touch-active .cue-pad,
+body.profile-tablet .cue-pad {
+  min-height: 38px;
+  font-size: 12px;
+}
+
+body.profile-touch-active .cart-pad,
+body.profile-tablet .cart-pad {
+  min-height: 88px;
+}
+
+body.profile-touch-active .cart-pad-header,
+body.profile-tablet .cart-pad-header {
+  padding: 4px 6px;
+}
+
+/* Tactile Vertical Faders in Touch Mode */
+body.profile-touch-active input[type=range].vertical-fader::-webkit-slider-thumb,
+body.profile-tablet input[type=range].vertical-fader::-webkit-slider-thumb {
+  width: 38px;
+  height: 38px;
+  border-width: 3px;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.7), 0 3px 8px rgba(0, 0, 0, 0.85);
+}
+
+body.profile-touch-active input[type=range].vertical-fader::-moz-range-thumb,
+body.profile-tablet input[type=range].vertical-fader::-moz-range-thumb {
+  width: 38px;
+  height: 38px;
+  border-width: 3px;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.7), 0 3px 8px rgba(0, 0, 0, 0.85);
+}
+
+/* Tactile Crossfader Knob */
+body.profile-touch-active input[type=range].crossfader::-webkit-slider-thumb,
+body.profile-tablet input[type=range].crossfader::-webkit-slider-thumb {
+  width: 44px;
+  height: 32px;
+}
+
+body.profile-touch-active input[type=range].crossfader::-moz-range-thumb,
+body.profile-tablet input[type=range].crossfader::-moz-range-thumb {
+  width: 44px;
+  height: 32px;
+}
+
+/* Tactile Pitch Sliders */
+body.profile-touch-active input[type=range].pitch-slider::-webkit-slider-thumb,
+body.profile-tablet input[type=range].pitch-slider::-webkit-slider-thumb {
+  width: 28px;
+  height: 28px;
+}
+
+body.profile-touch-active input[type=range].pitch-slider::-moz-range-thumb,
+body.profile-tablet input[type=range].pitch-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+}
+
+/* Touch Tabs & Navigation */
+body.profile-touch-active .btn-primary-view,
+body.profile-tablet .btn-primary-view {
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+body.profile-touch-active .btn-layout-mode,
+body.profile-tablet .btn-layout-mode {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+body.profile-touch-active .panel-tab-btn,
+body.profile-tablet .panel-tab-btn {
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+/* Responsive Breakpoints for Tablet Screens (<= 1200px) */
+@media screen and (max-width: 1200px) {
+  .header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dj-console {
+    gap: 10px;
+  }
+
+  .mixer-panel {
+    min-width: 260px;
+  }
+
+  .cart-panel {
+    min-width: 260px;
+  }
+
+  .studio-info-column {
+    min-width: 260px;
+  }
+}
+
+/* Tablet Portrait & Compact Touch Screens (<= 900px) */
+@media screen and (max-width: 900px) {
+  .dj-console {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .deck-panel {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .mixer-panel {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .cart-panel {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .studio-info-column {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .mini-onair-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mini-deck-strip {
+    flex: 1 1 100%;
+  }
 }

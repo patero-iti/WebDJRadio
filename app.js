@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewMusicCountBadge = document.getElementById('view-music-count-badge');
   const btnMiniReturnStudio = document.getElementById('btn-mini-return-studio');
 
+  // DOM Elements - Device Touch & Ergonomics Profile
+  const btnProfileAuto = document.getElementById('btn-profile-auto');
+  const btnProfileTablet = document.getElementById('btn-profile-tablet');
+  const btnProfileDesktop = document.getElementById('btn-profile-desktop');
+
   // DOM Elements - Mini On-Air Monitor Bar
   const miniOnAirElements = {
     stripA: document.getElementById('mini-strip-a'),
@@ -465,6 +470,97 @@ document.addEventListener('DOMContentLoaded', () => {
   // Restore saved primary view (default to studio)
   const savedPrimaryView = localStorage.getItem('webdj_primary_view') || 'studio';
   setPrimaryView(savedPrimaryView);
+
+  // -------------------------------------------------------------
+  // 2c. Universal Design: Device Touch & Ergonomics Profile Engine
+  // -------------------------------------------------------------
+  function applyDeviceProfile(profileSetting) {
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const isTabletWidth = window.innerWidth <= 1200;
+
+    let effectiveProfile = profileSetting;
+    if (profileSetting === 'auto') {
+      effectiveProfile = (isTouch || isTabletWidth) ? 'tablet' : 'desktop';
+    }
+
+    const isTablet = effectiveProfile === 'tablet';
+    const isDesktop = effectiveProfile === 'desktop';
+
+    document.body.classList.toggle('profile-tablet', isTablet);
+    document.body.classList.toggle('profile-touch-active', isTablet || (profileSetting === 'auto' && isTouch));
+    document.body.classList.toggle('profile-desktop', isDesktop);
+
+    if (btnProfileAuto) btnProfileAuto.classList.toggle('active', profileSetting === 'auto');
+    if (btnProfileTablet) btnProfileTablet.classList.toggle('active', profileSetting === 'tablet');
+    if (btnProfileDesktop) btnProfileDesktop.classList.toggle('active', profileSetting === 'desktop');
+
+    localStorage.setItem('webdj_device_profile', profileSetting);
+  }
+
+  if (btnProfileAuto) {
+    btnProfileAuto.addEventListener('click', () => applyDeviceProfile('auto'));
+  }
+  if (btnProfileTablet) {
+    btnProfileTablet.addEventListener('click', () => applyDeviceProfile('tablet'));
+  }
+  if (btnProfileDesktop) {
+    btnProfileDesktop.addEventListener('click', () => applyDeviceProfile('desktop'));
+  }
+
+  // Window resize & orientation change to re-evaluate when in 'auto' profile
+  window.addEventListener('resize', () => {
+    const saved = localStorage.getItem('webdj_device_profile') || 'auto';
+    if (saved === 'auto') {
+      applyDeviceProfile('auto');
+    }
+  });
+
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      const saved = localStorage.getItem('webdj_device_profile') || 'auto';
+      if (saved === 'auto') {
+        applyDeviceProfile('auto');
+      }
+    }, 200);
+  });
+
+  // Restore saved device profile (default to 'auto')
+  const savedDeviceProfile = localStorage.getItem('webdj_device_profile') || 'auto';
+  applyDeviceProfile(savedDeviceProfile);
+
+  // Mobile / Tablet Lock Screen & MediaSession API Integration
+  function updateMediaSessionMetadata(deckId, trackObj) {
+    if ('mediaSession' in navigator && trackObj) {
+      try {
+        const artwork = trackObj.artworkUrl ? [
+          { src: trackObj.artworkUrl, sizes: '512x512', type: 'image/png' }
+        ] : [];
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: trackObj.title || 'Live Radio Stream',
+          artist: trackObj.artist || 'WebDJRadio',
+          album: 'WebDJRadio Studio Broadcast',
+          artwork
+        });
+      } catch (e) {}
+    }
+  }
+
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.setActionHandler('play', () => {
+        if (!engine.decks.A.isPlaying && !engine.decks.B.isPlaying) {
+          engine.togglePlay('A');
+        } else {
+          if (!engine.decks.A.isPlaying && deckLoadedTrackObj.A) engine.togglePlay('A');
+          else if (!engine.decks.B.isPlaying && deckLoadedTrackObj.B) engine.togglePlay('B');
+        }
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        if (engine.decks.A.isPlaying) engine.togglePlay('A');
+        if (engine.decks.B.isPlaying) engine.togglePlay('B');
+      });
+    } catch (e) {}
+  }
 
   // -------------------------------------------------------------
   // 3. Audio Engine Unlock & Readiness
@@ -1990,6 +2086,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
       deckLoadedTrackObj[deckId] = trackObj;
+      updateMediaSessionMetadata(deckId, trackObj);
       if (typeof updateNowPlayingTrivia === 'function') {
         updateNowPlayingTrivia(deckId, trackObj);
       }
