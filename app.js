@@ -273,8 +273,21 @@ document.addEventListener('DOMContentLoaded', () => {
     layoutVisibility = { ...defaultLayoutVisibility };
   }
 
+  function isTouchOrTabletDevice() {
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const isTabletWidth = window.innerWidth <= 1200;
+    return isTouch || isTabletWidth;
+  }
+
+  function getDefaultLayoutForDevice() {
+    return isTouchOrTabletDevice() ? 'radio-b' : 'radio-c';
+  }
+
   function applyLayoutVisibility() {
-    let currentMode = localStorage.getItem('webdj_layout_mode') || 'radio-c';
+    const userHasExplicitChoice = localStorage.getItem('webdj_layout_mode_user_selected') === 'true';
+    let currentMode = userHasExplicitChoice 
+      ? (localStorage.getItem('webdj_layout_mode') || getDefaultLayoutForDevice())
+      : getDefaultLayoutForDevice();
 
     // Apply visibility styles to buttons & sync checkboxes
     for (const [mode, isVisible] of Object.entries(layoutVisibility)) {
@@ -290,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // If current mode is now hidden, fallback to first visible mode
     if (!layoutVisibility[currentMode]) {
-      const firstVisible = Object.keys(layoutVisibility).find(m => layoutVisibility[m]) || 'radio-c';
+      const firstVisible = Object.keys(layoutVisibility).find(m => layoutVisibility[m]) || getDefaultLayoutForDevice();
       setLayoutMode(firstVisible);
     }
 
@@ -346,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  function setLayoutMode(mode) {
+  function setLayoutMode(mode, isUserAction = false) {
     const isDj = mode === 'dj';
     const isRadio = mode === 'radio';
     const isRadioB = mode === 'radio-b';
@@ -362,6 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLayoutRadioB) btnLayoutRadioB.classList.toggle('active', isRadioB);
     if (btnLayoutRadioC) btnLayoutRadioC.classList.toggle('active', isRadioC);
 
+    if (isUserAction) {
+      localStorage.setItem('webdj_layout_mode_user_selected', 'true');
+    }
     localStorage.setItem('webdj_layout_mode', mode);
 
     // In Radio A, Radio B, and Radio C modes, center the crossfader so both deck channel volume faders are 100% active
@@ -372,20 +388,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (btnLayoutDj) {
-    btnLayoutDj.addEventListener('click', () => setLayoutMode('dj'));
+    btnLayoutDj.addEventListener('click', () => setLayoutMode('dj', true));
   }
   if (btnLayoutRadio) {
-    btnLayoutRadio.addEventListener('click', () => setLayoutMode('radio'));
+    btnLayoutRadio.addEventListener('click', () => setLayoutMode('radio', true));
   }
   if (btnLayoutRadioB) {
-    btnLayoutRadioB.addEventListener('click', () => setLayoutMode('radio-b'));
+    btnLayoutRadioB.addEventListener('click', () => setLayoutMode('radio-b', true));
   }
   if (btnLayoutRadioC) {
-    btnLayoutRadioC.addEventListener('click', () => setLayoutMode('radio-c'));
+    btnLayoutRadioC.addEventListener('click', () => setLayoutMode('radio-c', true));
   }
 
-  // Restore saved layout mode or default to Radio A (radio-c) / DJ
-  const savedLayoutMode = localStorage.getItem('webdj_layout_mode') || 'radio-c';
+  // Restore saved layout mode or intelligently default based on device type:
+  // Desktop / Laptop -> Radio A (radio-c)
+  // Tablet / Mobile -> Radio B (radio-b)
+  const userHasExplicitChoice = localStorage.getItem('webdj_layout_mode_user_selected') === 'true';
+  const savedLayoutMode = userHasExplicitChoice 
+    ? (localStorage.getItem('webdj_layout_mode') || getDefaultLayoutForDevice())
+    : getDefaultLayoutForDevice();
+
   setLayoutMode(savedLayoutMode);
   applyLayoutVisibility();
 
@@ -495,6 +517,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnProfileDesktop) btnProfileDesktop.classList.toggle('active', profileSetting === 'desktop');
 
     localStorage.setItem('webdj_device_profile', profileSetting);
+
+    // If user has not explicitly locked in a specific layout button, sync layout with profile
+    const userHasExplicitChoice = localStorage.getItem('webdj_layout_mode_user_selected') === 'true';
+    if (!userHasExplicitChoice) {
+      const targetLayout = isTablet ? 'radio-b' : 'radio-c';
+      setLayoutMode(targetLayout, false);
+    }
   }
 
   if (btnProfileAuto) {

@@ -209,6 +209,10 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
 
 ### 3.9. Quad Layout Subsystem & Visibility Customizer (Radio A, Radio B, Radio C, DJ)
 * **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C (Hidden by Default) ] -> [ 🎧 DJ ] -> [ ⚙️ ]`.
+* **Device-Aware Adaptive Default Layout Loading**:
+  * **Desktop / Laptop Auto-Default**: Detects fine pointer mouse / desktop viewports and automatically loads **Radio A** (Studio Hub Clocks, Weather, Trivia, 5-Channel Mixer, and CART Wall).
+  * **Tablet / Mobile Auto-Default**: Detects coarse pointer / touchscreen glass or screen widths $\le 1200\text{px}$ and automatically loads **Radio B** (Pure Mixer + CART Wall) for maximum ergonomic touch control without visual crowding.
+  * **Persistent User Manual Override**: If a presenter explicitly clicks any layout button, their explicit selection is remembered and respected across subsequent launches.
 * **Layout Visibility Manager (`⚙️`)**:
   * An interactive configuration popover on the top switcher bar that allows hosts to toggle the visibility of any layout (`Radio A`, `Radio B`, `Radio C`, `DJ`).
   * **Radio C** is hidden by default to keep the interface focused, but remains completely intact in the codebase and can be restored or hidden instantly at any time.

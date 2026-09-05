@@ -1,8 +1,20 @@
 {
-  "version": "2.1.1",
+  "version": "2.1.2",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-05",
   "changelog": [
+    {
+      "version": "2.1.2",
+      "date": "2026-09-05",
+      "title": "Device-Aware Adaptive Default Layout Engine (Radio A for Desktop vs. Radio B for Tablet)",
+      "changes": [
+        "**Adaptive Default Layout Engine**",
+        "====================:)====================",
+        "Desktop / Laptop Automatic Default -> Radio A: When running on a desktop or laptop environment with precision mouse/pointer, the app automatically loads the flagship 'Radio A' studio layout (Studio Hub Clocks, Weather, Trivia Engine, 5-Channel Mixer, and CART Wall).",
+        "Tablet / Mobile Automatic Default -> Radio B: When running on iPad, Android tablets, or touch devices, the app automatically loads the streamlined 'Radio B' pure mixer layout (Large 160px vertical faders, peak VU meters, and CART Wall) optimized for touchscreen ergonomics without visual clutter.",
+        "Manual Override Preservation: If a broadcaster explicitly selects a layout (Radio A, Radio B, Radio C, or DJ), their explicit choice is remembered across sessions while preserving adaptive defaults for clean sessions."
+      ]
+    },
     {
       "version": "2.1.1",
       "date": "2026-09-05",
