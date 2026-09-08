@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchLibrary = document.getElementById('search-library');
   const libraryTbody = document.getElementById('library-tbody');
   const btnLayoutDj = document.getElementById('btn-layout-dj');
+  const btnLayoutDjTouch = document.getElementById('btn-layout-dj-touch');
   const btnLayoutRadio = document.getElementById('btn-layout-radio');
   const btnLayoutRadioB = document.getElementById('btn-layout-radio-b');
   const btnLayoutRadioC = document.getElementById('btn-layout-radio-c');
@@ -245,22 +246,25 @@ document.addEventListener('DOMContentLoaded', () => {
     'radio-c': document.getElementById('chk-vis-radio-c'),
     'radio-b': document.getElementById('chk-vis-radio-b'),
     'radio': document.getElementById('chk-vis-radio'),
-    'dj': document.getElementById('chk-vis-dj')
+    'dj': document.getElementById('chk-vis-dj'),
+    'dj-touch': document.getElementById('chk-vis-dj-touch')
   };
 
   const layoutButtons = {
     'radio-c': btnLayoutRadioC,
     'radio-b': btnLayoutRadioB,
     'radio': btnLayoutRadio,
-    'dj': btnLayoutDj
+    'dj': btnLayoutDj,
+    'dj-touch': btnLayoutDjTouch
   };
 
-  // Default layout visibility: Radio A (visible), Radio B (visible), Radio C (hidden by default), DJ (visible)
+  // Default layout visibility: Radio A (visible), Radio B (visible), Radio C (hidden by default), DJ (visible), DJ Touch (hidden by default)
   const defaultLayoutVisibility = {
     'radio-c': true,
     'radio-b': true,
     'radio': false,
-    'dj': true
+    'dj': true,
+    'dj-touch': false
   };
 
   let layoutVisibility = { ...defaultLayoutVisibility };
@@ -361,16 +365,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setLayoutMode(mode, isUserAction = false) {
     const isDj = mode === 'dj';
+    const isDjTouch = mode === 'dj-touch';
     const isRadio = mode === 'radio';
     const isRadioB = mode === 'radio-b';
     const isRadioC = mode === 'radio-c';
 
     document.body.classList.toggle('mode-dj', isDj);
+    document.body.classList.toggle('mode-dj-touch', isDjTouch);
     document.body.classList.toggle('mode-radio', isRadio);
     document.body.classList.toggle('mode-radio-b', isRadioB);
     document.body.classList.toggle('mode-radio-c', isRadioC);
     
     if (btnLayoutDj) btnLayoutDj.classList.toggle('active', isDj);
+    if (btnLayoutDjTouch) btnLayoutDjTouch.classList.toggle('active', isDjTouch);
     if (btnLayoutRadio) btnLayoutRadio.classList.toggle('active', isRadio);
     if (btnLayoutRadioB) btnLayoutRadioB.classList.toggle('active', isRadioB);
     if (btnLayoutRadioC) btnLayoutRadioC.classList.toggle('active', isRadioC);
@@ -389,6 +396,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnLayoutDj) {
     btnLayoutDj.addEventListener('click', () => setLayoutMode('dj', true));
+  }
+  if (btnLayoutDjTouch) {
+    btnLayoutDjTouch.addEventListener('click', () => setLayoutMode('dj-touch', true));
   }
   if (btnLayoutRadio) {
     btnLayoutRadio.addEventListener('click', () => setLayoutMode('radio', true));
@@ -2756,6 +2766,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Update Audio Engine
       if (isMaster) {
         engine.setMasterVolume(newVal);
+        if (typeof window.updateMasterTouchStripUI === 'function') {
+          window.updateMasterTouchStripUI(newVal);
+        }
       } else if (isFilter) {
         const deckId = knob.getAttribute('data-deck');
         engine.setFilter(deckId, newVal);
@@ -2789,6 +2802,9 @@ document.addEventListener('DOMContentLoaded', () => {
       updateRotaryKnobUI(knob, b.def);
       if (isMaster) {
         engine.setMasterVolume(b.def);
+        if (typeof window.updateMasterTouchStripUI === 'function') {
+          window.updateMasterTouchStripUI(b.def);
+        }
       } else if (isFilter) {
         const deckId = knob.getAttribute('data-deck');
         engine.setFilter(deckId, b.def);
@@ -4760,7 +4776,27 @@ document.addEventListener('DOMContentLoaded', () => {
           const param = knobCrush.getAttribute('data-param') || 'mix';
           updateRotaryKnobUI(knobCrush, dk.fx.bitcrusher[param]);
         }
+
+        // Sync Touch Strips UI
+        if (typeof window.updateFilterTouchStripUI === 'function') {
+          window.updateFilterTouchStripUI(d, dk.fx.filter || 0);
+        }
+        if (typeof window.updateTouchFXStripUI === 'function') {
+          const dlyParam = knobDly ? (knobDly.getAttribute('data-param') || 'feedback') : 'feedback';
+          const revParam = knobRev ? (knobRev.getAttribute('data-param') || 'mix') : 'mix';
+          const flgParam = knobFlg ? (knobFlg.getAttribute('data-param') || 'feedback') : 'feedback';
+          const crushParam = knobCrush ? (knobCrush.getAttribute('data-param') || 'mix') : 'mix';
+
+          window.updateTouchFXStripUI(d, 'delay', dk.fx.delay[dlyParam], dlyParam);
+          window.updateTouchFXStripUI(d, 'reverb', dk.fx.reverb[revParam], revParam);
+          window.updateTouchFXStripUI(d, 'flanger', dk.fx.flanger[flgParam], flgParam);
+          window.updateTouchFXStripUI(d, 'bitcrush', dk.fx.bitcrusher[crushParam], crushParam);
+        }
       });
+
+      if (typeof window.updateMasterTouchStripUI === 'function') {
+        window.updateMasterTouchStripUI(engine.masterVolume || 1.0);
+      }
     }
 
     // ------------------------------------------------------------------
@@ -4778,7 +4814,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       window.addEventListener('click', closeContextMenu);
       window.addEventListener('contextmenu', (e) => {
-        if (!e.target.closest('.deck-fx-item')) {
+        if (!e.target.closest('.deck-fx-item') && !e.target.closest('.touch-fx-row')) {
           closeContextMenu();
         }
       });
@@ -4822,23 +4858,29 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = `<span>${paramKey === currentParam ? '✓ ' : ''}${pDef.name}</span><span class="fx-param-badge">${pDef.label}</span>`;
             btn.addEventListener('click', (ev) => {
               ev.stopPropagation();
-              // Assign selected parameter to knob
+              // Assign selected parameter to knob & touch strip
               knob.setAttribute('data-param', paramKey);
               const sublabel = item.querySelector('.fx-knob-sublabel');
               if (sublabel) sublabel.textContent = pDef.label;
               knob.setAttribute('title', `${fxTitles[fxType] || fxType}: ${pDef.name}`);
+
+              const touchStrip = document.getElementById(`touch-strip-fx-${fxType}-${deckId.toLowerCase()}`);
+              if (touchStrip) touchStrip.setAttribute('data-param', paramKey);
 
               // Save preference in localStorage
               try {
                 localStorage.setItem(`wdjr_fx_param_${deckId}_${fxType}`, paramKey);
               } catch (_) {}
 
-              // Read live parameter value and update dial visual angle
+              // Read live parameter value and update dial & touch strip
               const dk = engine.decks[deckId];
               if (dk) {
                 const engineFx = fxType === 'bitcrush' ? dk.fx.bitcrusher : dk.fx[fxType];
                 const curVal = engineFx ? engineFx[paramKey] : pDef.default;
                 updateRotaryKnobUI(knob, curVal);
+                if (typeof window.updateTouchFXStripUI === 'function') {
+                  window.updateTouchFXStripUI(deckId, fxType, curVal, paramKey);
+                }
               }
 
               closeContextMenu();
@@ -4890,13 +4932,331 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (sublabel) sublabel.textContent = DECK_FX_PARAMS[fxType][savedParam].label;
                 knob.setAttribute('title', `${DECK_FX_PARAMS[fxType][savedParam].name}`);
               }
+              const touchStrip = document.getElementById(`touch-strip-fx-${fxType}-${deckId.toLowerCase()}`);
+              if (touchStrip) {
+                touchStrip.setAttribute('data-param', savedParam);
+              }
             }
           } catch (_) {}
         });
       });
     }
 
-    // Initialize context menu & initial UI sync
+    // ------------------------------------------------------------------
+    // 7.1. DJ Touch Interactive Touch Strips & Ribbon Controllers
+    // ------------------------------------------------------------------
+    function initTouchStrips() {
+      // 1. Master Volume Horizontal Touch Strip
+      const stripMaster = document.getElementById('touch-strip-master');
+      const knobMaster = document.getElementById('knob-master');
+
+      function updateMasterTouchStripUI(val) {
+        const clamped = Math.max(0, Math.min(1, parseFloat(val) || 0));
+        const fill = document.getElementById('touch-strip-master-fill');
+        const thumb = document.getElementById('touch-strip-master-thumb');
+        const valText = document.getElementById('master-touch-strip-val');
+        if (fill) fill.style.width = `${clamped * 100}%`;
+        if (thumb) thumb.style.left = `${clamped * 100}%`;
+        if (valText) valText.textContent = `${Math.round(clamped * 100)}%`;
+      }
+
+      if (stripMaster) {
+        let isDragging = false;
+        const handleMasterMove = (e) => {
+          const rect = stripMaster.getBoundingClientRect();
+          const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
+          const fraction = (clientX - rect.left) / rect.width;
+          const clamped = Math.max(0, Math.min(1, fraction));
+          engine.setMasterVolume(clamped);
+          updateMasterTouchStripUI(clamped);
+          if (knobMaster) updateRotaryKnobUI(knobMaster, clamped);
+        };
+
+        stripMaster.addEventListener('pointerdown', (e) => {
+          isDragging = true;
+          stripMaster.setPointerCapture(e.pointerId);
+          handleMasterMove(e);
+        });
+        stripMaster.addEventListener('pointermove', (e) => {
+          if (isDragging) handleMasterMove(e);
+        });
+        const stopMasterDrag = (e) => {
+          if (isDragging) {
+            isDragging = false;
+            try { stripMaster.releasePointerCapture(e.pointerId); } catch (_) {}
+          }
+        };
+        stripMaster.addEventListener('pointerup', stopMasterDrag);
+        stripMaster.addEventListener('pointercancel', stopMasterDrag);
+
+        // Double-tap or double-click to reset to 100% (1.0 unity gain)
+        stripMaster.addEventListener('dblclick', () => {
+          engine.setMasterVolume(1.0);
+          updateMasterTouchStripUI(1.0);
+          if (knobMaster) updateRotaryKnobUI(knobMaster, 1.0);
+        });
+      }
+
+      // 2. Dual Filter Vertical Touch Strips (Deck A & Deck B)
+      function updateFilterTouchStripUI(deckId, filterVal) {
+        const d = (deckId || '').toLowerCase();
+        const clamped = Math.max(-1.0, Math.min(1.0, parseFloat(filterVal) || 0));
+        const fill = document.getElementById(`touch-strip-filter-fill-${d}`);
+        const thumb = document.getElementById(`touch-strip-filter-thumb-${d}`);
+        const valText = document.getElementById(`filter-touch-val-${d}`);
+        
+        const norm = (clamped + 1.0) / 2.0; // 0 to 1
+        if (thumb) thumb.style.bottom = `${norm * 100}%`;
+
+        if (fill) {
+          if (clamped > 0.02) {
+            fill.classList.remove('lpf');
+            fill.style.bottom = '50%';
+            fill.style.height = `${(clamped / 1.0) * 50}%`;
+          } else if (clamped < -0.02) {
+            fill.classList.add('lpf');
+            fill.style.bottom = `${norm * 100}%`;
+            fill.style.height = `${((0 - clamped) / 1.0) * 50}%`;
+          } else {
+            fill.style.bottom = '50%';
+            fill.style.height = '0%';
+          }
+        }
+
+        if (valText) {
+          if (clamped > 0.02) {
+            valText.textContent = `HPF +${Math.round(clamped * 100)}%`;
+            valText.style.color = d === 'a' ? '#00f0ff' : '#ff007f';
+          } else if (clamped < -0.02) {
+            valText.textContent = `LPF -${Math.round(Math.abs(clamped) * 100)}%`;
+            valText.style.color = '#ff9100';
+          } else {
+            valText.textContent = 'FLAT';
+            valText.style.color = 'var(--text-muted)';
+          }
+        }
+      }
+
+      ['A', 'B'].forEach(deckId => {
+        const d = deckId.toLowerCase();
+        const stripFilter = document.getElementById(`touch-strip-filter-${d}`);
+        const knobFilter = document.getElementById(`knob-filter-${d}`);
+
+        if (stripFilter) {
+          let isDragging = false;
+          const handleFilterMove = (e) => {
+            const rect = stripFilter.getBoundingClientRect();
+            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : rect.bottom);
+            const fraction = 1 - (clientY - rect.top) / rect.height; // 0 to 1
+            let filterVal = (fraction - 0.5) * 2.0; // -1 to +1
+            // Snap to center zero detent
+            if (Math.abs(filterVal) < 0.06) filterVal = 0.0;
+            filterVal = Math.max(-1.0, Math.min(1.0, filterVal));
+
+            engine.setFilter(deckId, filterVal);
+            updateFilterTouchStripUI(deckId, filterVal);
+            if (knobFilter) updateRotaryKnobUI(knobFilter, filterVal);
+          };
+
+          stripFilter.addEventListener('pointerdown', (e) => {
+            isDragging = true;
+            stripFilter.setPointerCapture(e.pointerId);
+            handleFilterMove(e);
+          });
+          stripFilter.addEventListener('pointermove', (e) => {
+            if (isDragging) handleFilterMove(e);
+          });
+          const stopFilterDrag = (e) => {
+            if (isDragging) {
+              isDragging = false;
+              try { stripFilter.releasePointerCapture(e.pointerId); } catch (_) {}
+            }
+          };
+          stripFilter.addEventListener('pointerup', stopFilterDrag);
+          stripFilter.addEventListener('pointercancel', stopFilterDrag);
+
+          // Double-tap / double-click to snap flat
+          stripFilter.addEventListener('dblclick', () => {
+            engine.setFilter(deckId, 0.0);
+            updateFilterTouchStripUI(deckId, 0.0);
+            if (knobFilter) updateRotaryKnobUI(knobFilter, 0.0);
+          });
+        }
+      });
+
+      // 3. Horizontal FX Touch Strips & Cog Parameters
+      function updateTouchFXStripUI(deckId, fxType, val, paramKey) {
+        const d = (deckId || '').toLowerCase();
+        const pDef = DECK_FX_PARAMS[fxType]?.[paramKey] || { min: 0, max: 1, default: 0.5, label: 'VAL' };
+        const rawVal = parseFloat(val);
+        const clamped = Math.max(pDef.min, Math.min(pDef.max, isNaN(rawVal) ? pDef.default : rawVal));
+        const norm = (pDef.max === pDef.min) ? 0.5 : (clamped - pDef.min) / (pDef.max - pDef.min);
+
+        const fill = document.getElementById(`touch-strip-fx-${fxType}-fill-${d}`);
+        const thumb = document.getElementById(`touch-strip-fx-${fxType}-thumb-${d}`);
+        const badge = document.getElementById(`touch-fx-badge-${fxType}-${d}`);
+
+        if (fill) fill.style.width = `${norm * 100}%`;
+        if (thumb) thumb.style.left = `${norm * 100}%`;
+        if (badge) {
+          let displayVal = '';
+          if (pDef.unit === '%') {
+            displayVal = `${Math.round(norm * 100)}%`;
+          } else if (pDef.unit === 'beats') {
+            displayVal = `${clamped}b`;
+          } else if (pDef.unit === 'Hz') {
+            displayVal = clamped >= 1000 ? `${(clamped / 1000).toFixed(1)}k` : `${Math.round(clamped)}`;
+          } else if (pDef.unit === 's') {
+            displayVal = `${clamped.toFixed(1)}s`;
+          } else if (pDef.unit === 'bit') {
+            displayVal = `${Math.round(clamped)}bit`;
+          } else {
+            displayVal = `${clamped.toFixed(2)}`;
+          }
+          badge.textContent = `${pDef.label} ${displayVal}`;
+        }
+      }
+
+      ['A', 'B'].forEach(deckId => {
+        const d = deckId.toLowerCase();
+        ['delay', 'reverb', 'flanger', 'bitcrush'].forEach(fxType => {
+          // Toggle button
+          const btnTouchToggle = document.getElementById(`btn-touch-fx-toggle-${fxType}-${d}`);
+          const btnRotaryToggle = document.getElementById(`btn-fx-toggle-${fxType}-${d}`);
+          
+          if (btnTouchToggle) {
+            btnTouchToggle.addEventListener('click', () => {
+              const dk = engine.decks[deckId];
+              if (!dk) return;
+              const engineFx = fxType === 'bitcrush' ? dk.fx.bitcrusher : dk.fx[fxType];
+              const newState = !engineFx.active;
+              
+              if (fxType === 'delay') engine.setDelay(deckId, { active: newState });
+              else if (fxType === 'reverb') engine.setReverb(deckId, { active: newState });
+              else if (fxType === 'flanger') engine.setFlanger(deckId, { active: newState });
+              else if (fxType === 'bitcrush') engine.setBitcrusher(deckId, { active: newState });
+
+              btnTouchToggle.classList.toggle('active', newState);
+              if (btnRotaryToggle) btnRotaryToggle.classList.toggle('active', newState);
+            });
+          }
+
+          // Horizontal Touch Strip
+          const strip = document.getElementById(`touch-strip-fx-${fxType}-${d}`);
+          const knob = document.getElementById(`knob-fx-${fxType}-${d}`);
+          if (strip) {
+            let isDragging = false;
+            const handleFxMove = (e) => {
+              const rect = strip.getBoundingClientRect();
+              const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left);
+              const norm = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+              
+              const currentParam = strip.getAttribute('data-param') || (fxType === 'delay' || fxType === 'flanger' ? 'feedback' : 'mix');
+              const pDef = DECK_FX_PARAMS[fxType]?.[currentParam] || { min: 0, max: 1, default: 0.5 };
+              const calcVal = pDef.min + norm * (pDef.max - pDef.min);
+
+              if (fxType === 'delay') engine.setDelay(deckId, { [currentParam]: calcVal });
+              else if (fxType === 'reverb') engine.setReverb(deckId, { [currentParam]: calcVal });
+              else if (fxType === 'flanger') engine.setFlanger(deckId, { [currentParam]: calcVal });
+              else if (fxType === 'bitcrush') engine.setBitcrusher(deckId, { [currentParam]: calcVal });
+
+              updateTouchFXStripUI(deckId, fxType, calcVal, currentParam);
+              if (knob) updateRotaryKnobUI(knob, calcVal);
+            };
+
+            strip.addEventListener('pointerdown', (e) => {
+              isDragging = true;
+              strip.setPointerCapture(e.pointerId);
+              handleFxMove(e);
+            });
+            strip.addEventListener('pointermove', (e) => {
+              if (isDragging) handleFxMove(e);
+            });
+            const stopFxDrag = (e) => {
+              if (isDragging) {
+                isDragging = false;
+                try { strip.releasePointerCapture(e.pointerId); } catch (_) {}
+              }
+            };
+            strip.addEventListener('pointerup', stopFxDrag);
+            strip.addEventListener('pointercancel', stopFxDrag);
+          }
+
+          // Cog Button (Parameter selector popup)
+          const row = document.querySelector(`.touch-fx-row[data-deck="${deckId}"][data-fx="${fxType}"]`);
+          const cog = row ? row.querySelector('.btn-touch-fx-cog') : null;
+          if (cog) {
+            cog.addEventListener('click', (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              const paramsForFx = DECK_FX_PARAMS[fxType];
+              if (!paramsForFx) return;
+
+              const existing = document.querySelector('.fx-param-menu');
+              if (existing) existing.remove();
+
+              const currentParam = strip ? (strip.getAttribute('data-param') || (fxType === 'delay' || fxType === 'flanger' ? 'feedback' : 'mix')) : 'mix';
+              const menu = document.createElement('div');
+              menu.className = `fx-param-menu ${deckId === 'B' ? 'fx-param-menu-deck-b' : ''}`;
+
+              const fxTitles = {
+                delay: 'Echo & Delay Parameter',
+                reverb: 'Studio Reverb Parameter',
+                flanger: 'Flanger & Phaser Parameter',
+                bitcrush: 'Lo-Fi Bitcrusher Parameter'
+              };
+
+              const header = document.createElement('div');
+              header.className = 'fx-param-menu-header';
+              header.textContent = fxTitles[fxType] || 'Select Parameter';
+              menu.appendChild(header);
+
+              Object.entries(paramsForFx).forEach(([paramKey, pDef]) => {
+                const btn = document.createElement('button');
+                btn.className = `fx-param-menu-item ${paramKey === currentParam ? 'active' : ''}`;
+                btn.innerHTML = `<span>${paramKey === currentParam ? '✓ ' : ''}${pDef.name}</span><span class="fx-param-badge">${pDef.label}</span>`;
+                btn.addEventListener('click', (ev) => {
+                  ev.stopPropagation();
+                  if (strip) strip.setAttribute('data-param', paramKey);
+                  if (knob) knob.setAttribute('data-param', paramKey);
+
+                  const rotaryParent = knob?.closest('.deck-fx-item');
+                  const rotarySublabel = rotaryParent?.querySelector('.fx-knob-sublabel');
+                  if (rotarySublabel) rotarySublabel.textContent = pDef.label;
+
+                  try {
+                    localStorage.setItem(`wdjr_fx_param_${deckId}_${fxType}`, paramKey);
+                  } catch (_) {}
+
+                  const dk = engine.decks[deckId];
+                  if (dk) {
+                    const engineFx = fxType === 'bitcrush' ? dk.fx.bitcrusher : dk.fx[fxType];
+                    const curVal = engineFx ? engineFx[paramKey] : pDef.default;
+                    updateTouchFXStripUI(deckId, fxType, curVal, paramKey);
+                    if (knob) updateRotaryKnobUI(knob, curVal);
+                  }
+
+                  menu.remove();
+                });
+                menu.appendChild(btn);
+              });
+
+              document.body.appendChild(menu);
+              const cogRect = cog.getBoundingClientRect();
+              menu.style.left = `${Math.max(10, Math.min(window.innerWidth - 220, cogRect.left - 120))}px`;
+              menu.style.top = `${Math.max(10, Math.min(window.innerHeight - 200, cogRect.bottom + 6))}px`;
+            });
+          }
+        });
+      });
+
+      window.updateMasterTouchStripUI = updateMasterTouchStripUI;
+      window.updateFilterTouchStripUI = updateFilterTouchStripUI;
+      window.updateTouchFXStripUI = updateTouchFXStripUI;
+    }
+
+    // Initialize touch strips, context menu & initial UI sync
+    initTouchStrips();
     initDeckFXContextMenu();
     syncAllFXUI();
   })();

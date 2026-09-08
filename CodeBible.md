@@ -207,15 +207,15 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
   * **📂 Import JSON**: One-click file picker to load, validate, and restore saved MIDI mappings across any workstation or browser instance.
 * **1:1 Graphic Mirroring**: Bi-directional visual synchronization for crossfader, channel volume faders, master volume, CART fader, Live Mic fader, 3-band EQ, dual filter knobs, pitch faders, CART pads, and performance buttons.
 
-### 3.9. Quad Layout Subsystem & Visibility Customizer (Radio A, Radio B, Radio C, DJ)
-* **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C (Hidden by Default) ] -> [ 🎧 DJ ] -> [ ⚙️ ]`.
+### 3.9. Multi-Layout Subsystem & Visibility Customizer (Radio A, Radio B, Radio C, DJ, DJ Touch)
+* **Top Banner Switcher Sequence**: `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C (Hidden by Default) ] -> [ 🎧 DJ ] -> [ 📱 DJ Touch (Hidden by Default) ] -> [ ⚙️ ]`.
 * **Device-Aware Adaptive Default Layout Loading**:
   * **Desktop / Laptop Auto-Default**: Detects fine pointer mouse / desktop viewports and automatically loads **Radio A** (Studio Hub Clocks, Weather, Trivia, 5-Channel Mixer, and CART Wall).
   * **Tablet / Mobile Auto-Default**: Detects coarse pointer / touchscreen glass or screen widths $\le 1200\text{px}$ and automatically loads **Radio B** (Pure Mixer + CART Wall) for maximum ergonomic touch control without visual crowding.
   * **Persistent User Manual Override**: If a presenter explicitly clicks any layout button, their explicit selection is remembered and respected across subsequent launches.
 * **Layout Visibility Manager (`⚙️`)**:
-  * An interactive configuration popover on the top switcher bar that allows hosts to toggle the visibility of any layout (`Radio A`, `Radio B`, `Radio C`, `DJ`).
-  * **Radio C** is hidden by default to keep the interface focused, but remains completely intact in the codebase and can be restored or hidden instantly at any time.
+  * An interactive configuration popover on the top switcher bar that allows hosts to toggle the visibility of any layout (`Radio A`, `Radio B`, `Radio C`, `DJ`, `DJ Touch`).
+  * **Radio C** and **DJ Touch** are hidden by default to keep the interface focused, but remain completely intact in the codebase and can be restored or hidden instantly at any time.
   * Preferences persist in `localStorage` (`webdj_layout_visibility`).
 * **1. Radio A Studio Hub & On-Air Trivia Layout (`mode-radio-c`)**:
   * Flagship live radio console featuring two vertically stacked studio information panels directly to the left of the Web Radio Mixer (together matching the full height of the Mixer and CART Wall):
@@ -231,6 +231,8 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
   * Hides performance DJ controls (loops, roll bars, quick FX, 3-band EQ rack, crossfader).
 * **4. DJ Console Layout (`mode-dj`)**:
   * Comprehensive club DJ controller interface with dual performance decks, 4 Hot Cues, Beat Loops (1–8 beats), Beat Rolls, On-Deck Quick FX strips, 3-band rotary EQ, dual-filter sweeps, pitch tempo sliders, equal-power crossfader, and 4-channel broadcast mixer.
+* **5. DJ Touch Layout (`mode-dj-touch`)**:
+  * Touchscreen-optimized DJ console variation configured with dedicated touch-first ergonomics, larger tactile hit zones, and tablet-tailored modular component scaling (disabled by default in customize panel).
 
 ---
 

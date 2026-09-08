@@ -1,8 +1,22 @@
 {
-  "version": "2.1.2",
+  "version": "2.2.0",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-05",
+  "releaseDate": "2026-09-08",
   "changelog": [
+    {
+      "version": "2.2.0",
+      "date": "2026-09-08",
+      "title": "DJ Touch Layout Mode Architecture & Layout Customizer Integration",
+      "changes": [
+        "**'DJ Touch' Layout Mode Architecture**",
+        "====================:)====================",
+        "Dedicated 'DJ Touch' Layout Mode: Introduced `mode-dj-touch` as a distinct performance layout variation created specifically for touchscreens and mobile tablet devices.",
+        "Default Disabled in Customize Panel: Configured `dj-touch` to be turned OFF (hidden) by default in the layout switcher bar, easily enabled anytime via the '⚙️ CUSTOMIZE LAYOUTS' popover.",
+        "Horizontal Master Volume Touch Strip: Replaced rotary master dial with a full-width horizontal glowing ribbon touch strip with drag, tap-to-level, and double-tap unity reset (100%).",
+        "Dual Bipolar Filter & Stacked FX Ribbons: Added vertical bipolar filter strips for Decks A/B and horizontal ribbon strips for Delay, Reverb, Flanger, and Bitcrusher with ⚙️ parameter selector popovers.",
+        "Full Layout Engine Integration: Seamlessly registered across the layout manager, body mode classes, active indicators, and session persistence."
+      ]
+    },
     {
       "version": "2.1.2",
       "date": "2026-09-05",

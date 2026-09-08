@@ -2868,7 +2868,8 @@ input[type=range].crossfader-slider:active::-moz-range-thumb {
 }
 
 /* Hide Streaming card in DJ layout mode */
-body.mode-dj .broadcast-mixer-card {
+body.mode-dj .broadcast-mixer-card,
+body.mode-dj-touch .broadcast-mixer-card {
   display: none !important;
 }
 
@@ -4384,7 +4385,9 @@ body.mode-radio-b .channel-fader-strip.track-ending-warning .btn-mixer-play {
    CARTS Channel Strip (Web Radio Mixer)
    ========================================================================== */
 body.mode-dj .channel-fader-strip.carts-strip,
-body.mode-dj #mixer-strip-carts {
+body.mode-dj #mixer-strip-carts,
+body.mode-dj-touch .channel-fader-strip.carts-strip,
+body.mode-dj-touch #mixer-strip-carts {
   display: none !important;
 }
 
@@ -4487,6 +4490,7 @@ body.mode-radio-c .channel-fader-strip.carts-strip .mixer-time-val {
    Broadcast CART Wall Panel (Radio Presenter B & Radio C Layouts)
    ========================================================================== */
 body.mode-dj .cart-panel,
+body.mode-dj-touch .cart-panel,
 body.mode-radio .cart-panel {
   display: none !important;
 }
@@ -4732,6 +4736,7 @@ body.mode-radio-c .cart-panel {
 }
 
 body.mode-dj .studio-info-column,
+body.mode-dj-touch .studio-info-column,
 body.mode-radio .studio-info-column,
 body.mode-radio-b .studio-info-column {
   display: none !important;
@@ -5244,4 +5249,384 @@ body.profile-tablet .panel-tab-btn {
   .mini-deck-strip {
     flex: 1 1 100%;
   }
+}
+
+/* ==========================================================================
+   DJ Touch Layout Components (Touch Strips & Ribbon Controllers)
+   ========================================================================== */
+
+/* Default State: Touch strips hidden in non-DJ-Touch layouts */
+.master-touch-strip-container,
+.touch-filter-rack,
+.deck-fx-touch-stack {
+  display: none !important;
+}
+
+/* DJ Touch Layout Mode Activation */
+body.mode-dj-touch .master-knob-container,
+body.mode-dj-touch .eq-rack,
+body.mode-dj-touch .deck-fx-rotary-rack {
+  display: none !important;
+}
+
+body.mode-dj-touch .master-touch-strip-container {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+body.mode-dj-touch .touch-filter-rack {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+body.mode-dj-touch .deck-fx-touch-stack {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+/* Touch Strip Base Styles */
+.touch-strip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.touch-strip-title {
+  color: var(--text-muted);
+}
+
+.touch-strip-val {
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.touch-strip {
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+
+.touch-strip-track {
+  position: relative;
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+
+/* Horizontal Master Touch Strip */
+.master-touch-strip-container {
+  width: 100%;
+  align-self: stretch;
+  padding: 4px 6px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.master-touch-strip-container .horizontal-touch-strip,
+#touch-strip-master {
+  width: 100% !important;
+  min-width: 180px !important;
+  height: 32px !important;
+  position: relative !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+.master-touch-strip-container .touch-strip-track,
+#touch-strip-master .touch-strip-track {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 32px !important;
+  position: relative !important;
+  background: #0b111e !important;
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+#touch-strip-master-fill {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100% !important;
+  min-width: 4px !important;
+  background: linear-gradient(90deg, #00f0ff 0%, #39ff14 70%, #ff1744 100%) !important;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.6) !important;
+  opacity: 0.9 !important;
+  transition: width 0.05s ease-out !important;
+  pointer-events: none !important;
+}
+
+#touch-strip-master-thumb {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 16px !important;
+  height: 28px !important;
+  background: #ffffff !important;
+  border: 2px solid #00f0ff !important;
+  border-radius: 5px !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.9), 0 2px 6px rgba(0,0,0,0.9) !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+/* Dual Filter Vertical Touch Strip */
+.touch-filter-strip-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.touch-filter-strip-card .vertical-touch-strip {
+  width: 48px;
+  height: 130px;
+}
+
+.touch-filter-strip-card .touch-strip-track {
+  width: 100%;
+  height: 100%;
+}
+
+.touch-filter-strip-card .touch-strip-center-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+  z-index: 2;
+}
+
+.touch-filter-strip-card.deck-a .bipolar-fill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #00f0ff 0%, rgba(0, 240, 255, 0.3) 100%);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+.touch-filter-strip-card.deck-a .bipolar-fill.lpf {
+  background: linear-gradient(0deg, #ff9100 0%, rgba(255, 145, 0, 0.3) 100%);
+  box-shadow: 0 0 12px rgba(255, 145, 0, 0.5);
+}
+
+.touch-filter-strip-card.deck-b .bipolar-fill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #ff007f 0%, rgba(255, 0, 127, 0.3) 100%);
+  box-shadow: 0 0 12px rgba(255, 0, 127, 0.5);
+}
+
+.touch-filter-strip-card.deck-b .bipolar-fill.lpf {
+  background: linear-gradient(0deg, #ff9100 0%, rgba(255, 145, 0, 0.3) 100%);
+  box-shadow: 0 0 12px rgba(255, 145, 0, 0.5);
+}
+
+.touch-filter-strip-card .touch-strip-thumb {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 44px;
+  height: 12px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.touch-filter-strip-card.deck-a .touch-strip-thumb {
+  border: 2px solid #00f0ff;
+}
+
+.touch-filter-strip-card.deck-b .touch-strip-thumb {
+  border: 2px solid #ff007f;
+}
+
+.filter-strip-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 800;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* Horizontal FX Touch Strips */
+.touch-fx-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-touch-fx-toggle {
+  width: 54px;
+  height: 38px;
+  background: #141a29;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  touch-action: manipulation;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-touch-fx-toggle .fx-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+  transition: all 0.2s ease;
+}
+
+.btn-touch-fx-toggle.active {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+.deck-panel.deck-b .btn-touch-fx-toggle.active {
+  background: rgba(255, 0, 127, 0.15);
+  border-color: #ff007f;
+  color: #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+}
+
+.btn-touch-fx-toggle.active .fx-led {
+  background: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
+}
+
+.deck-panel.deck-b .btn-touch-fx-toggle.active .fx-led {
+  background: #ff007f;
+  box-shadow: 0 0 8px #ff007f;
+}
+
+.horizontal-touch-strip {
+  flex: 1;
+  height: 38px;
+  position: relative;
+}
+
+.horizontal-touch-strip .touch-strip-track {
+  width: 100%;
+  height: 100%;
+}
+
+.horizontal-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.2) 0%, rgba(0, 240, 255, 0.7) 100%);
+  border-right: 2px solid #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+.deck-panel.deck-b .horizontal-fill {
+  background: linear-gradient(90deg, rgba(255, 0, 127, 0.2) 0%, rgba(255, 0, 127, 0.7) 100%);
+  border-right: 2px solid #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+}
+
+.horizontal-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 32px;
+  background: #ffffff;
+  border: 2px solid #00f0ff;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 2px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+.deck-panel.deck-b .horizontal-thumb {
+  border-color: #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.8), 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.touch-strip-inline-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  letter-spacing: 0.5px;
+}
+
+.btn-touch-fx-cog {
+  width: 38px;
+  height: 38px;
+  background: #141a29;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-touch-fx-cog:hover,
+.btn-touch-fx-cog:active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
+  transform: rotate(30deg);
 }
