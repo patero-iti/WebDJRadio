@@ -1,8 +1,17 @@
 {
-  "version": "2.2.0",
+  "version": "2.2.1",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-08",
+  "releaseDate": "2026-09-09",
   "changelog": [
+    {
+      "version": "2.2.1",
+      "date": "2026-09-09",
+      "title": "DJ Touch Filter Header Vertical Stacking & Radio DADAA Brand Gradient for Master Touch Strip",
+      "changes": [
+        "**Filter Text Layout in DJ Touch**: Stacked filter titles ('FLTR A' / 'FLTR B') vertically directly above live values ('FLAT', 'HPF +xx%', 'LPF -xx%') to eliminate text crowding and improve touch readability in narrow channel strips.",
+        "**Radio DADAA Master Volume Gradient**: Restyled the horizontal master volume touch strip fill with a brand gradient transitioning from Soft Pink (`#fcebf7`) to Hot Pink (`#e83bb2`) with matching pink glow and thumb border."
+      ]
+    },
     {
       "version": "2.2.0",
       "date": "2026-09-08",
@@ -11,9 +20,9 @@
         "**'DJ Touch' Layout Mode Architecture**",
         "====================:)====================",
         "Dedicated 'DJ Touch' Layout Mode: Introduced `mode-dj-touch` as a distinct performance layout variation created specifically for touchscreens and mobile tablet devices.",
-        "Default Disabled in Customize Panel: Configured `dj-touch` to be turned OFF (hidden) by default in the layout switcher bar, easily enabled anytime via the '⚙️ CUSTOMIZE LAYOUTS' popover.",
+        "Default Disabled in Customize Panel: Configured `dj-touch` to be turned OFF (hidden) by default in the layout switcher bar, easily enabled anytime via the '\u2699\ufe0f CUSTOMIZE LAYOUTS' popover.",
         "Horizontal Master Volume Touch Strip: Replaced rotary master dial with a full-width horizontal glowing ribbon touch strip with drag, tap-to-level, and double-tap unity reset (100%).",
-        "Dual Bipolar Filter & Stacked FX Ribbons: Added vertical bipolar filter strips for Decks A/B and horizontal ribbon strips for Delay, Reverb, Flanger, and Bitcrusher with ⚙️ parameter selector popovers.",
+        "Dual Bipolar Filter & Stacked FX Ribbons: Added vertical bipolar filter strips for Decks A/B and horizontal ribbon strips for Delay, Reverb, Flanger, and Bitcrusher with \u2699\ufe0f parameter selector popovers.",
         "Full Layout Engine Integration: Seamlessly registered across the layout manager, body mode classes, active indicators, and session persistence."
       ]
     },
@@ -54,12 +63,12 @@
         "====================:)====================",
         "Unified Adaptive Single-Codebase Architecture: Runs on a single URL with zero engine duplication, keeping all local playlists, scanned tracks, volume presets, and CART wall pad assignments 100% synchronized across desktop, laptop, iPad, and Android tablets.",
         "Automatic Device Detection: Detects touchscreens and coarse pointer inputs via Pointer API and CSS interaction media queries (`@media (pointer: coarse)` and screen widths <= 1200px), automatically activating touch-first ergonomics.",
-        "Interactive Device Profile Switcher: Added top-level header switcher (`⚡ Auto`, `📱 Touch`, `🖥️ Desktop`) with user manual override and localStorage persistence.",
+        "Interactive Device Profile Switcher: Added top-level header switcher (`\u26a1 Auto`, `\ud83d\udcf1 Touch`, `\ud83d\udda5\ufe0f Desktop`) with user manual override and localStorage persistence.",
         "Touch-First Ergonomics & 48px Hitboxes: Expanded buttons (48px height), tactile vertical fader thumbs (38px with glowing neon borders), pitch thumbs (28px), and generous hit targets preventing on-air misses on touchscreen glass.",
         "Accidental Gesture & Bounce Protection: Integrated `touch-action: manipulation` and `overscroll-behavior: none` to eliminate browser elastic pull-to-refresh, double-tap zoom, and accidental text selection.",
         "MediaSession API Integration: Synchronizes active track metadata, album cover art, and transport action handlers (Play/Pause/Next) directly with iOS / iPadOS Control Center and Android lock-screen controls.",
         "Progressive Web App (PWA) Standalone Mode: Added `manifest.json` and Apple mobile web app meta tags allowing broadcasters to install WebDJRadio directly to iPad and Android home screens as a full-screen, chromeless app.",
-        "Streamlined Header Button Labels: Tidied top banner button labels for maximum clarity and compact symmetry (`📜 Updates`, `🎛 MIDI`, and `✨ FX`).",
+        "Streamlined Header Button Labels: Tidied top banner button labels for maximum clarity and compact symmetry (`\ud83d\udcdc Updates`, `\ud83c\udf9b MIDI`, and `\u2728 FX`).",
         "Radio DADAA Official Brand Theme & Tagline: Integrated the official style guide palette (Hot Pink `#e83bb2`, Black `#231218`) and angled 'LISTEN DIFFERENTLY' lockup badge, toggleable on and off instantly by clicking or touching the Radio DADAA logo in the top-left corner."
       ]
     },
@@ -71,12 +80,12 @@
         "**Zero-Scroll Tabbed Workspace (Universal Design & Broadcast Ergonomics)**",
         "====================:)====================",
         "Zero-Scroll Unified Viewport: Eliminated vertical page scrolling entirely by decoupling the studio performance console from the music and media workspace into clean, full-height primary views.",
-        "Primary View Switcher: Added top-level primary view switcher buttons in the header to effortlessly toggle between `🎙️ ON-AIR STUDIO` (Radio A, Radio B, Radio C, DJ Console) and `🗃️ MUSIC` (Track Library, Cued Playlists, and CART Library).",
+        "Primary View Switcher: Added top-level primary view switcher buttons in the header to effortlessly toggle between `\ud83c\udf99\ufe0f ON-AIR STUDIO` (Radio A, Radio B, Radio C, DJ Console) and `\ud83d\uddc3\ufe0f MUSIC` (Track Library, Cued Playlists, and CART Library).",
         "100% Seamless Web Audio Playback: Switching views uses zero-interruption DOM container toggling without affecting the underlying Web Audio graphs, deck playback, live microphones, talkover ducking, streaming, or active CARTS.",
         "Sticky Mini On-Air Monitor Bar: When managing music, playlists, or carts, a high-contrast sticky monitor bar keeps broadcasters in full control with live Deck A & Deck B track titles, artist names, album art thumbnails, live `-MM:SS.d` countdown gauges, 10s flashing ending red alerts, quick play/pause triggers, active CART counters, master CART stop button, and an instant return to studio button.",
         "Universal Design Keyboard Hotkeys: Broadcasters can press <kbd>Tab</kbd> or <kbd>`</kbd> to toggle instantly between Studio and Music views, or press <kbd>Esc</kbd> to return to the Studio console at any moment (ignoring keystrokes when editing text in inputs).",
         "Full-Height Library Workspace: Expanded the Track Library, Cued Playlists, and CART Library table containers to `58vh` for effortless browsing, tagging, searching, and queue management without cramped vertical constraints.",
-        "DJ Layout Streamlining: Automatically hides the bottom mixer streaming console card in the '🎧 DJ' layout, keeping full focus on DJ performance controls while retaining access to broadcasting via the header '📡 Broadcast' button."
+        "DJ Layout Streamlining: Automatically hides the bottom mixer streaming console card in the '\ud83c\udfa7 DJ' layout, keeping full focus on DJ performance controls while retaining access to broadcasting via the header '\ud83d\udce1 Broadcast' button."
       ]
     },
     {
@@ -86,16 +95,16 @@
       "changes": [
         "**Radio Layout Hierarchy (Radio A, Radio B, Radio C, DJ)**",
         "====================:)====================",
-        "Layout Mode Hierarchy: Renamed and organized the top banner layout mode switcher to `[ 🎙️ Radio A ] -> [ 📻 Radio B ] -> [ 📻 Radio C ] -> [ 🎧 DJ ]`.",
+        "Layout Mode Hierarchy: Renamed and organized the top banner layout mode switcher to `[ \ud83c\udf99\ufe0f Radio A ] -> [ \ud83d\udcfb Radio B ] -> [ \ud83d\udcfb Radio C ] -> [ \ud83c\udfa7 DJ ]`.",
         "Radio A (Flagship Studio Hub): The complete live broadcast console featuring vertically stacked Studio Hub clocks & live weather, Now Playing metadata & TheAudioDB/MusicBrainz trivia engine, 5-channel Web Radio Mixer, and the 4-slot square CART Wall.",
         "Radio B (Pure Mixer & Cart Wall): The streamlined pure mixer console with 160px vertical faders, precision '-MM:SS.d' countdown badges, 10s flashing ending alert, and the 4-slot CART Wall.",
         "Radio C (Dual-Deck Studio Workstation): Clean broadcast layout featuring dual playback decks with scrolling and overview waveforms, transport strips, pitch sliders, and central broadcast mixer.",
         "Dual Studio Digital Clocks: Features real-time precision digital clocks for Local Host Time (with automatic timezone city detection) and Perth Western Australia Time (AWST / UTC+8) for the main station broadcast headquarters.",
         "Live Broadcast Weather Monitors: Fetches real-time temperature and weather conditions via Open-Meteo API for both the Perth WA broadcast station and the host's local broadcast location.",
         "Now Playing Metadata & Artwork: Displays high-visibility album artwork, title, artist, release year, record label, BPM, and musical key for the active track.",
-        "Presenter Liner & Music Trivia Engine: Generates intelligent on-air talkover liners, harmonic mixing notes (Camelot wheel compatible), record release trivia, and artist biographies, complete with a '↺ Next Fact' presenter cycle button.",
+        "Presenter Liner & Music Trivia Engine: Generates intelligent on-air talkover liners, harmonic mixing notes (Camelot wheel compatible), record release trivia, and artist biographies, complete with a '\u21ba Next Fact' presenter cycle button.",
         "Live TheAudioDB & MusicBrainz Integration: Asynchronously enriches on-air trivia with real-world artist biographies, birth/formation history, country of origin, official record labels, and release discography notes via live public API queries with smart memory caching.",
-        "Layout Visibility Customizer (Hide / Unhide): Added a '⚙️' customize popover allowing broadcasters to hide or unhide any layout mode dynamically in the top bar. 'Radio C' is hidden by default while remaining 100% preserved and instant to unhide anytime."
+        "Layout Visibility Customizer (Hide / Unhide): Added a '\u2699\ufe0f' customize popover allowing broadcasters to hide or unhide any layout mode dynamically in the top bar. 'Radio C' is hidden by default while remaining 100% preserved and instant to unhide anytime."
       ]
     },
     {
@@ -106,12 +115,12 @@
         "**Broadcast CART Wall Subsystem & Studio Pad Controller**",
         "====================:)====================",
         "Dedicated CART Wall Pad Grid: Introduced a 4-slot square-shaped CART pad wall positioned directly to the right of the Web Radio Mixer in the 'Radio Presenter B' studio layout.",
-        "Single 'CARTS' Mixer Channel Strip: Created a dedicated gold/amber channel strip placed to the right of CH B (`[ MST ] -> [ MIC ] -> [ CH A ] -> [ CH B ] -> [ CARTS ]`) with full 160px vertical volume fader, real-time VU meter, active slot status counter, and instant master kill switch (⏹ STOP ALL).",
-        "Dedicated CART Library Tab: Added a 3rd top-level library tab alongside '📁 Track Library' and '📋 Cued Playlists' for managing sound effects, jingles, station sweepers, and station ID drops.",
-        "Quick Pad Assignment & Auditioning: Load any cart to pads via quick action buttons (`+C1`, `+C2`, `+C3`, `+C4`), audition previews (▶), and manage entries with search filtering.",
-        "Track Library Import Relocation & Renaming: Moved and unified import actions in the '📁 Track Library' tab toolbar as '➕ Import Files' and '📁 Import Folder', establishing clean visual and functional symmetry with the 'CART Library'.",
-        "Multi-Format Import, Folder Scanning & Drag-and-Drop: Import individual audio files or entire directories (`📁 Import Folder`) directly into the CART library, drag-and-drop files onto Cart Wall pads, or synthesize 4 instant broadcast demo jingles (`⚡ Demo Jingles`).",
-        "Top Banner Layout Switcher Reorganization: Reordered and renamed the layout switcher buttons to [ 📻 Radio A ] (Pure Mixer + CART Wall), [ 🎙️ Radio B ] (Dual Deck Studio Layout), and [ 🎧 DJ ] (Full DJ Controller Console).",
+        "Single 'CARTS' Mixer Channel Strip: Created a dedicated gold/amber channel strip placed to the right of CH B (`[ MST ] -> [ MIC ] -> [ CH A ] -> [ CH B ] -> [ CARTS ]`) with full 160px vertical volume fader, real-time VU meter, active slot status counter, and instant master kill switch (\u23f9 STOP ALL).",
+        "Dedicated CART Library Tab: Added a 3rd top-level library tab alongside '\ud83d\udcc1 Track Library' and '\ud83d\udccb Cued Playlists' for managing sound effects, jingles, station sweepers, and station ID drops.",
+        "Quick Pad Assignment & Auditioning: Load any cart to pads via quick action buttons (`+C1`, `+C2`, `+C3`, `+C4`), audition previews (\u25b6), and manage entries with search filtering.",
+        "Track Library Import Relocation & Renaming: Moved and unified import actions in the '\ud83d\udcc1 Track Library' tab toolbar as '\u2795 Import Files' and '\ud83d\udcc1 Import Folder', establishing clean visual and functional symmetry with the 'CART Library'.",
+        "Multi-Format Import, Folder Scanning & Drag-and-Drop: Import individual audio files or entire directories (`\ud83d\udcc1 Import Folder`) directly into the CART library, drag-and-drop files onto Cart Wall pads, or synthesize 4 instant broadcast demo jingles (`\u26a1 Demo Jingles`).",
+        "Top Banner Layout Switcher Reorganization: Reordered and renamed the layout switcher buttons to [ \ud83d\udcfb Radio A ] (Pure Mixer + CART Wall), [ \ud83c\udf99\ufe0f Radio B ] (Dual Deck Studio Layout), and [ \ud83c\udfa7 DJ ] (Full DJ Controller Console).",
         "Real-Time Countdown & Progress Glow: Pads feature animated progress bars, live time remaining readouts, active status LEDs, and retriggering capabilities."
       ]
     },
@@ -148,7 +157,7 @@
         "**Channel Strip Red Flashing Broadcast Alert**",
         "====================:)====================",
         "Broadcast-Grade Ending Warning: When a track has 10 seconds or less remaining on CH A or CH B, the corresponding mixer channel strip card pulses with an unmistakable flashing neon red alert (#ff1744).",
-        "Universal Layout Support: Flashes vividly across both '🎙️ Radio Presenter' and '📻 Radio Presenter B' (as well as DJ Console) layouts, alerting hosts and presenters even when deck faceplates are hidden.",
+        "Universal Layout Support: Flashes vividly across both '\ud83c\udf99\ufe0f Radio Presenter' and '\ud83d\udcfb Radio Presenter B' (as well as DJ Console) layouts, alerting hosts and presenters even when deck faceplates are hidden.",
         "Full Component Alert Highlighting: Synchronizes glowing red alert pulses across the channel card border, card background glow, album artwork badge, 'CH A'/'CH B' strip title label, track info badges, and square Play/Pause buttons.",
         "Real-Time Glitch-Free Monitoring: Powered by the 60fps Web Audio playback time monitor, instantly engaging and resetting seamlessly on deck transitions."
       ]
@@ -161,7 +170,7 @@
         "**Channel Strip Track Information Monitors (Radio Presenter B)**",
         "====================:)====================",
         "Dedicated Track Info Badges: Integrated compact real-time track metadata badges directly inside Channel A (CH A) and Channel B (CH B) mixer strips beneath the album artwork.",
-        "Exclusive to Radio Presenter B: Seamlessly displays the loaded/playing track title and artist name exclusively when in '📻 Radio Presenter B' mode, remaining hidden in DJ Console and standard Radio Presenter modes.",
+        "Exclusive to Radio Presenter B: Seamlessly displays the loaded/playing track title and artist name exclusively when in '\ud83d\udcfb Radio Presenter B' mode, remaining hidden in DJ Console and standard Radio Presenter modes.",
         "Live Playback Glow & Alert Warning: Active tracks illuminate with dynamic color-matched neon glow (Cyan for CH A, Magenta for CH B) and flash high-visibility alert red when less than 10 seconds remain on the playing track.",
         "Metadata Synchronization: Automatically reflects instant updates from ID3 tag parsing, track loading, playlist queue progression, and track info editor changes.",
         "Symmetrical Channel Layout: Preserves uniform height alignment across Master Output (MST), Channel A (CH A), Microphone (MIC), and Channel B (CH B) strips."
@@ -174,7 +183,7 @@
       "changes": [
         "**Pure Web Radio Mixer Layout Mode (Radio Presenter B)**",
         "====================:)====================",
-        "Dedicated Pure Mixer View: Added a 3rd layout mode '📻 Radio Presenter B' to the top header switcher that exclusively presents the central Web Radio Mixer while cleanly hiding Deck A and Deck B panels.",
+        "Dedicated Pure Mixer View: Added a 3rd layout mode '\ud83d\udcfb Radio Presenter B' to the top header switcher that exclusively presents the central Web Radio Mixer while cleanly hiding Deck A and Deck B panels.",
         "Full Studio Mixer Controls: Offers a focused, centered 4-channel broadcast interface (MST -> CH A -> MIC -> CH B) with luxury vertical volume faders, real-time stereo peak VU meters, album art badges, and the Auto-Deck Relay controller.",
         "Direct Transport Control: Full track playback control directly from the mixer's square Play/Pause buttons (CH A / CH B) and live microphone ON AIR button without requiring bulky deck faceplates on screen.",
         "Automatic Crossfader Protection: Automatically centers the crossfader (0.5) so both audio channels operate at full unattenuated volume.",
@@ -188,8 +197,8 @@
       "changes": [
         "**Portable MIDI Mappings JSON Storage**",
         "====================:)====================",
-        "One-Click JSON File Export: Added '💾 Export JSON' button to the MIDI Controller Setup modal to save all custom device mappings, learn bindings, and presets into structured .json files directly to your computer.",
-        "Cross-Device & Instance Import: Added '📂 Import JSON' button to load and restore any saved MIDI mapping JSON file on different browser instances, workstations, or computers.",
+        "One-Click JSON File Export: Added '\ud83d\udcbe Export JSON' button to the MIDI Controller Setup modal to save all custom device mappings, learn bindings, and presets into structured .json files directly to your computer.",
+        "Cross-Device & Instance Import: Added '\ud83d\udcc2 Import JSON' button to load and restore any saved MIDI mapping JSON file on different browser instances, workstations, or computers.",
         "File Validation & Immediate Activation: Validates CC/Note channel configurations and instantly loads mappings into the active Web MIDI engine and local storage."
       ]
     },
@@ -225,11 +234,11 @@
         "**Microphone Channel Routing & Mono Centering Matrix**",
         "====================:)====================",
         "Multi-Channel Interface Support: Solved the single-ear panning issue on 2-channel USB audio interfaces (Behringer U-Phoria UMC202HD, Focusrite Scarlett 2i2, etc.) where Input 1 routes exclusively to Left and Input 2 routes to Right.",
-        "Precision Channel Routing Selector: Added '🎚️ Mic Channel / Mono Mode' dropdown to B.U.T.T. / Audio Routing with 4 routing modes:",
-        "  • Mono — Input 1 / Left (Centered): Routes Channel 1 to both Left & Right headphone/broadcast channels equally.",
-        "  • Mono — Sum L+R (Centered Mix): Blends both inputs to center with -3dB headroom summing.",
-        "  • Mono — Input 2 / Right (Centered): Centers Channel 2 for mics plugged into input 2.",
-        "  • Stereo — Separate Left & Right: True unmixed stereo passthrough.",
+        "Precision Channel Routing Selector: Added '\ud83c\udf9a\ufe0f Mic Channel / Mono Mode' dropdown to B.U.T.T. / Audio Routing with 4 routing modes:",
+        "  \u2022 Mono \u2014 Input 1 / Left (Centered): Routes Channel 1 to both Left & Right headphone/broadcast channels equally.",
+        "  \u2022 Mono \u2014 Sum L+R (Centered Mix): Blends both inputs to center with -3dB headroom summing.",
+        "  \u2022 Mono \u2014 Input 2 / Right (Centered): Centers Channel 2 for mics plugged into input 2.",
+        "  \u2022 Stereo \u2014 Separate Left & Right: True unmixed stereo passthrough.",
         "Real-Time Glitch-Free Switching: Web Audio ChannelSplitter / ChannelMerger gain matrix updates on the fly without audio drops or reconnects.",
         "Persistent Preference: Automatically saves the chosen channel routing mode to localStorage."
       ]
@@ -313,7 +322,7 @@
       "changes": [
         "**Dual Layout System & Minimal Radio Studio Mode**",
         "====================:)====================",
-        "Header Layout Mode Selector: Added instant layout switching buttons in the top navigation bar to toggle seamlessly between '🎧 DJ Console' and '🎙️ Radio Presenter' modes.",
+        "Header Layout Mode Selector: Added instant layout switching buttons in the top navigation bar to toggle seamlessly between '\ud83c\udfa7 DJ Console' and '\ud83c\udf99\ufe0f Radio Presenter' modes.",
         "Minimal Radio Presenter Mode: Streamlined broadcast studio interface with clutter-free dual decks featuring large album artwork, track title/artist, dynamic waveforms, and oversized 52px transport buttons (CUE, PLAY/PAUSE, SYNC).",
         "Zero Clutter for Broadcasters: Cleanly hides turntable scratch jog wheels, hot cue pads (1-4), beat loop bars, beat roll pads, on-deck quick FX knobs, 3-band EQ rack, pitch sliders, and equal-power crossfader in Radio mode.",
         "Full Radio Studio Continuity: Retains channel volume faders, live microphone voiceover strip with VU meters & ON AIR indicator, Auto-Deck Relay controller, and dual cued playlist queues.",
@@ -331,7 +340,7 @@
         "Bypassed Chromium Internal WebRTC Buffers: Injected proprietary low-latency constraints (`googEchoCancellation: false`, `googAutoGainControl: false`, `googNoiseSuppression: false`, `latency: 0`) to stream directly from CoreAudio / WASAPI ring buffers.",
         "Zero-Delay Parallel Node Tapping: Replaced in-series AnalyserNode routing with zero-delay parallel taps for microphone and deck audio graphs.",
         "Matched Hardware Sample Rate: Bound audio stream ideal sample rate directly to AudioContext.sampleRate (48kHz/44.1kHz), eliminating OS resampling buffer latency.",
-        "Local Headphone Monitor / Stream-Only Toggle: Added '🎧 Local Headphone Monitor' toggle in B.U.T.T. / Audio Routing modal so DJs can mute their voice in local headphones while broadcasting 100% to the stream, enabling 0ms hardware direct monitoring."
+        "Local Headphone Monitor / Stream-Only Toggle: Added '\ud83c\udfa7 Local Headphone Monitor' toggle in B.U.T.T. / Audio Routing modal so DJs can mute their voice in local headphones while broadcasting 100% to the stream, enabling 0ms hardware direct monitoring."
       ]
     },
     {
@@ -355,7 +364,7 @@
         "**Live Microphone & External Audio Input Integration**",
         "====================:)====================",
         "Audio Input Device Selector: Added real-time device enumeration to the 'B.U.T.T. / Audio Routing' panel supporting internal mics, bluetooth headsets, audio interfaces, and line-in devices.",
-        "Web Radio Mixer Mic Channel: Added a dedicated MIC channel strip in the central mixer featuring a precision gain fader (0%–150%), real-time LED peak VU meter, and glowing ON AIR button.",
+        "Web Radio Mixer Mic Channel: Added a dedicated MIC channel strip in the central mixer featuring a precision gain fader (0%\u2013150%), real-time LED peak VU meter, and glowing ON AIR button.",
         "Talkover Auto-Ducking: Built-in 'TALK' toggle automatically ducks deck music by -9dB when the presenter speaks.",
         "Master & Broadcast Graph Mixing: Mic audio is mixed directly into the master Web Audio graph, feeding local speakers, soundcard outputs, and live radio streams (WebRTC, Icecast, Shoutcast, B.U.T.T.).",
         "Hotkeys & Device Change: Added 'M' keyboard shortcut for instant mic toggling and automated device re-enumeration on USB plug/unplug events."
@@ -381,10 +390,10 @@
       "changes": [
         "**Track Metadata Editing & Management**",
         "====================:)====================",
-        "Metadata Editor Modal: Open via ✏️ button on any track row, toolbar '✏️ Edit Info' button, or double-clicking any track row in the library table.",
+        "Metadata Editor Modal: Open via \u270f\ufe0f button on any track row, toolbar '\u270f\ufe0f Edit Info' button, or double-clicking any track row in the library table.",
         "Editable Track Properties: Adjust Track Title, Artist Name, Album/Release, BPM (Tempo), and Musical Key (Camelot notation dropdown).",
         "Artwork Replacement & Removal: Directly upload or replace cover images (JPEG/PNG/WEBP/GIF) or remove existing artwork with live visual preview.",
-        "One-Click DSP Tempo & Key Re-Analysis: Built-in '⚡ DSP' trigger inside the editor to re-calculate tempo and harmonic key on demand.",
+        "One-Click DSP Tempo & Key Re-Analysis: Built-in '\u26a1 DSP' trigger inside the editor to re-calculate tempo and harmonic key on demand.",
         "Live Deck & Playlist Synchronization: Saving updates instantly propagates metadata and artwork to active Deck A/B headers, overview strips, and cued playlist queues."
       ]
     },
@@ -524,7 +533,7 @@
         "Shoutcast v1/v2 Streaming: Dedicated Shoutcast streaming client with SID and password authentication.",
         "WebRTC P2P Direct Stream: Zero-server peer broadcast mode allowing direct browser-to-browser listening.",
         "Live Master Audio Tapping: Captures the live mix from masterGain and equal-power crossfader directly into Web Audio MediaStreamDestination.",
-        "Mixer & Header ON AIR Console: Dynamic '🔴 ON AIR' flashing status indicator, uptime timer, live bitrate, MBs sent, and stream diagnostics modal."
+        "Mixer & Header ON AIR Console: Dynamic '\ud83d\udd34 ON AIR' flashing status indicator, uptime timer, live bitrate, MBs sent, and stream diagnostics modal."
       ]
     },
     {
@@ -563,7 +572,7 @@
         "====================:)====================",
         "Cross-Deck Duplicate Detection: Automatically detects and highlights if a track is cued in both Deck A and Deck B playlists with a distinct amber warning badge.",
         "Intra-Deck Duplicate Detection: Detects if the same track is queued multiple times in the same deck with a red warning badge.",
-        "Live Tab Warning Indicator: The Cued Playlists tab badge displays a warning icon (⚠️) and count whenever duplicate tracks exist in either queue.",
+        "Live Tab Warning Indicator: The Cued Playlists tab badge displays a warning icon (\u26a0\ufe0f) and count whenever duplicate tracks exist in either queue.",
         "Status Feedback: Real-time notification when adding a song that is already queued in the opposite deck."
       ]
     },
@@ -576,7 +585,7 @@
         "====================:)====================",
         "Dedicated Deck Queues: Build, curate, and manage separate playlist queues for Deck A and Deck B independently.",
         "Nested Tab Navigation: Seamlessly switch between the full 'Track Library' and the dual 'Cued Playlists' view with live badge counts.",
-        "Queue Control Actions: Re-order tracks (Move Up / Down), instant load (⚡ Load Now), individual item removal, playlist shuffle, and clear queue.",
+        "Queue Control Actions: Re-order tracks (Move Up / Down), instant load (\u26a1 Load Now), individual item removal, playlist shuffle, and clear queue.",
         "Quick Library Queue Buttons: Added '+Q A' and '+Q B' action buttons directly on each row in the Track Library table.",
         "Auto-Deck Relay Integration: Continuous Auto-Deck playback now automatically draws from each deck's dedicated cued playlist first."
       ]
@@ -606,16 +615,15 @@
         "Web MIDI API : navigator.requestMIDIAccess() with hot-plug detection (devices shown live as you plug in).",
         "Built-in presets : Pioneer DDJ-200, DDJ-400, Numark Party Mix, Behringer CMD Studio/Micro.",
         "Auto-detect : Matches device name automatically and loads the right preset.",
-        "MIDI Learn : Select any action → click Start Learn → move a knob/button on controller → mapping saved.",
+        "MIDI Learn : Select any action \u2192 click Start Learn \u2192 move a knob/button on controller \u2192 mapping saved.",
         "Persistence : Mappings stored in localStorage and survive page reloads.",
-        "Mapped controls : Play/Pause, Cue, Sync, Loop, Hot Cues 1–4, Pitch, Volume, EQ High/Mid/Low, Jog Wheel, Crossfader, Master Volume.",
+        "Mapped controls : Play/Pause, Cue, Sync, Loop, Hot Cues 1\u20134, Pitch, Volume, EQ High/Mid/Low, Jog Wheel, Crossfader, Master Volume.",
         "Activity log :  Live monitor showing every incoming MIDI message with action name and deck.",
         "UI sync : CC changes mirror back to on-screen sliders (volume, pitch, crossfader).",
-        "Access it via the 🎛 MIDI Controller button in the header.",
-        "**✅ Knob Rotation Fix** ",
+        "Access it via the \ud83c\udf9b MIDI Controller button in the header.",
+        "**\u2705 Knob Rotation Fix** ",
         "====================:)====================",
         "The pointer indicator now pivots correctly from the centre of the knob circle using CSS transform-origin: 50% 17px on .rotary-pointer matching exactly where the knob's physical centre is relative to the line's top position."
-
       ]
     },
     {

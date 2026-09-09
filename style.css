@@ -5366,7 +5366,7 @@ body.mode-dj-touch .deck-fx-touch-stack {
   min-height: 32px !important;
   position: relative !important;
   background: #0b111e !important;
-  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  border: 1px solid rgba(232, 59, 178, 0.4) !important;
   border-radius: 8px !important;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9) !important;
   overflow: hidden !important;
@@ -5379,9 +5379,9 @@ body.mode-dj-touch .deck-fx-touch-stack {
   left: 0 !important;
   height: 100% !important;
   min-width: 4px !important;
-  background: linear-gradient(90deg, #00f0ff 0%, #39ff14 70%, #ff1744 100%) !important;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.6) !important;
-  opacity: 0.9 !important;
+  background: linear-gradient(90deg, #fcebf7 0%, #e83bb2 100%) !important;
+  box-shadow: 0 0 14px rgba(232, 59, 178, 0.6) !important;
+  opacity: 0.95 !important;
   transition: width 0.05s ease-out !important;
   pointer-events: none !important;
 }
@@ -5393,9 +5393,9 @@ body.mode-dj-touch .deck-fx-touch-stack {
   width: 16px !important;
   height: 28px !important;
   background: #ffffff !important;
-  border: 2px solid #00f0ff !important;
+  border: 2px solid #e83bb2 !important;
   border-radius: 5px !important;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.9), 0 2px 6px rgba(0,0,0,0.9) !important;
+  box-shadow: 0 0 12px rgba(232, 59, 178, 0.9), 0 2px 6px rgba(0,0,0,0.9) !important;
   pointer-events: none !important;
   z-index: 5 !important;
 }
@@ -5406,6 +5406,31 @@ body.mode-dj-touch .deck-fx-touch-stack {
   flex-direction: column;
   align-items: center;
   flex: 1;
+}
+
+.touch-filter-strip-card .touch-strip-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 2px !important;
+  width: 100% !important;
+  margin-bottom: 6px !important;
+}
+
+.touch-filter-strip-card .touch-strip-title {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  letter-spacing: 0.5px !important;
+}
+
+.touch-filter-strip-card .touch-strip-val {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
 }
 
 .touch-filter-strip-card .vertical-touch-strip {
