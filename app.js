@@ -4082,6 +4082,17 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => talkBtn.classList.remove('midi-indicator-flash'), 300);
           }
         }
+
+        // On-Deck FX Trigger updates (Desktop & Touch Ribbon racks)
+        if (action && action.startsWith('fx_') && action.endsWith('_toggle') && deck) {
+          const fxType = action.replace('fx_', '').replace('_toggle', '');
+          const dLower = deck.toLowerCase();
+          const touchBtn = document.getElementById(`btn-touch-fx-toggle-${dLower}-${fxType}`);
+          if (touchBtn && engine.decks[deck] && engine.decks[deck].fx[fxType]) {
+            const isActive = !!engine.decks[deck].fx[fxType].active;
+            touchBtn.classList.toggle('active', isActive);
+          }
+        }
       },
 
       onRollChange(action, deck, isPressed) {
@@ -4118,10 +4129,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const slider = document.getElementById(`vol-${deckKey}`);
           if (slider) slider.value = normValue;
         }
-        // 3. Master Volume Rotary Knob (knob-master: 0.0 to 1.0)
+        // 3. Master Volume (Touch Ribbon Slider & Legacy Knob)
         else if (action === 'master_volume') {
           const knob = document.getElementById('knob-master');
           if (knob) updateRotaryKnobUI(knob, normValue);
+          if (typeof window.updateMasterTouchStripUI === 'function') {
+            window.updateMasterTouchStripUI(normValue);
+          }
         }
         // 4. Deck EQ HI, MID, LOW Rotary Knobs (-24dB to +6dB)
         else if ((action === 'eq_high' || action === 'eq_mid' || action === 'eq_low') && deck) {
@@ -4143,28 +4157,90 @@ document.addEventListener('DOMContentLoaded', () => {
             valBadge.textContent = `${pct >= 0 ? '+' : ''}${pct}%`;
           }
         }
-        // 6. Dual Filter Knob (-1.0 to +1.0)
+        // 6. Dual Filter (Vertical Bipolar Touch Strip & Rotary Knob: -1.0 to +1.0)
         else if (action === 'filter' && deck) {
           const knob = document.getElementById(`knob-filter-${deckKey}`);
           const filterVal = (normValue - 0.5) * 2.0; // -1.0 to +1.0
           if (knob) updateRotaryKnobUI(knob, filterVal);
+          if (typeof window.updateFilterTouchStripUI === 'function') {
+            window.updateFilterTouchStripUI(deckKey, filterVal);
+          }
         }
-        // 7. On-Deck Quick FX Knobs
-        else if (action === 'fx_delay_feedback' && deck) {
-          const knob = document.getElementById(`knob-fx-delay-${deckKey}`);
-          if (knob) updateRotaryKnobUI(knob, normValue * 0.9);
-        }
-        else if (action === 'fx_reverb_mix' && deck) {
-          const knob = document.getElementById(`knob-fx-reverb-${deckKey}`);
-          if (knob) updateRotaryKnobUI(knob, normValue);
-        }
-        else if (action === 'fx_flanger_feedback' && deck) {
-          const knob = document.getElementById(`knob-fx-flanger-${deckKey}`);
-          if (knob) updateRotaryKnobUI(knob, normValue * 0.85);
-        }
-        else if (action === 'fx_bitcrush_mix' && deck) {
-          const knob = document.getElementById(`knob-fx-bitcrush-${deckKey}`);
-          if (knob) updateRotaryKnobUI(knob, normValue);
+        // 7. On-Deck FX Ribbon Controllers & Knobs
+        else if (action.startsWith('fx_') && deck) {
+          // Delay
+          if (action === 'fx_delay_feedback') {
+            const val = normValue * 0.9;
+            const knob = document.getElementById(`knob-fx-delay-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'delay', val, 'feedback');
+          } else if (action === 'fx_delay_mix') {
+            const val = normValue;
+            const knob = document.getElementById(`knob-fx-delay-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'delay', val, 'mix');
+          } else if (action === 'fx_delay_time') {
+            const val = 0.01 + normValue * (1.0 - 0.01);
+            const knob = document.getElementById(`knob-fx-delay-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'delay', val, 'time');
+          }
+          // Reverb
+          else if (action === 'fx_reverb_mix') {
+            const val = normValue;
+            const knob = document.getElementById(`knob-fx-reverb-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'reverb', val, 'mix');
+          } else if (action === 'fx_reverb_decay') {
+            const val = 0.5 + normValue * (10.0 - 0.5);
+            const knob = document.getElementById(`knob-fx-reverb-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'reverb', val, 'decay');
+          } else if (action === 'fx_reverb_predelay') {
+            const val = normValue * 0.1;
+            const knob = document.getElementById(`knob-fx-reverb-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'reverb', val, 'preDelay');
+          }
+          // Flanger
+          else if (action === 'fx_flanger_feedback') {
+            const val = normValue * 0.85;
+            const knob = document.getElementById(`knob-fx-flanger-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'flanger', val, 'feedback');
+          } else if (action === 'fx_flanger_mix') {
+            const val = normValue;
+            const knob = document.getElementById(`knob-fx-flanger-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'flanger', val, 'mix');
+          } else if (action === 'fx_flanger_rate') {
+            const val = 0.1 + normValue * (5.0 - 0.1);
+            const knob = document.getElementById(`knob-fx-flanger-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'flanger', val, 'rate');
+          } else if (action === 'fx_flanger_depth') {
+            const val = 0.0005 + normValue * (0.01 - 0.0005);
+            const knob = document.getElementById(`knob-fx-flanger-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'flanger', val, 'depth');
+          }
+          // Bitcrusher
+          else if (action === 'fx_bitcrush_mix') {
+            const val = normValue;
+            const knob = document.getElementById(`knob-fx-bitcrush-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'bitcrush', val, 'mix');
+          } else if (action === 'fx_bitcrush_depth') {
+            const val = Math.round(1 + normValue * (16 - 1));
+            const knob = document.getElementById(`knob-fx-bitcrush-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'bitcrush', val, 'bitDepth');
+          } else if (action === 'fx_bitcrush_normfreq') {
+            const val = 0.02 + normValue * (1.0 - 0.02);
+            const knob = document.getElementById(`knob-fx-bitcrush-${deckKey}`);
+            if (knob) updateRotaryKnobUI(knob, val);
+            if (typeof window.updateTouchFXStripUI === 'function') window.updateTouchFXStripUI(deck, 'bitcrush', val, 'normfreq');
+          }
         }
         // 8. CART Wall Master Volume Slider
         else if (action === 'cart_volume') {

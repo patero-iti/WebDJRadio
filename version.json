@@ -1,8 +1,18 @@
 {
-  "version": "2.2.1",
+  "version": "2.3.0",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-09",
+  "releaseDate": "2026-09-10",
   "changelog": [
+    {
+      "version": "2.3.0",
+      "date": "2026-09-10",
+      "title": "Universal Horizontal Master Volume Touch Ribbon & Touch MIDI Controller Integration",
+      "changes": [
+        "**Universal Master Touch Ribbon Slider**: Standardized the horizontal Master Volume touch ribbon slider across ALL layouts (Radio A, Radio B, Radio C, DJ Console, and DJ Touch), replacing the rotary master dial everywhere with smooth pointer/touch dragging, tap-to-level, and double-tap unity gain reset (100%).",
+        "**On-Deck Touch FX Ribbons in DJ Layout**: Replaced rotary FX dials on Deck A and Deck B in the 'DJ' (DJ Console) layout with the 4 horizontal stacked effect touch ribbon strips (Delay, Reverb, Flanger, Bitcrush) including toggle buttons, live parameter badges, and ⚙️ parameter selector popovers.",
+        "**Touch Ribbon MIDI Mapping Integration**: Updated USB MIDI mapping and dispatching to seamlessly modulate the Master Volume ribbon slider, Deck A/B bipolar vertical filter touch strips, and individual On-Deck FX ribbon parameters (Delay, Reverb, Flanger, Bitcrusher) with bidirectional engine and UI synchronization."
+      ]
+    },
     {
       "version": "2.2.1",
       "date": "2026-09-09",

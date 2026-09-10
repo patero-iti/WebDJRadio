@@ -25,23 +25,32 @@ const MIDI_ACTIONS = {
   eq_high:       { deck: true,  type: 'cc',      desc: 'EQ High' },
   eq_mid:        { deck: true,  type: 'cc',      desc: 'EQ Mid' },
   eq_low:        { deck: true,  type: 'cc',      desc: 'EQ Low' },
-  filter:        { deck: true,  type: 'cc',      desc: 'Dual Filter (LPF/HPF)' },
+  filter:        { deck: true,  type: 'cc',      desc: 'Dual Filter (LPF/HPF Touch Ribbon & Knob)' },
   jog_scratch:   { deck: true,  type: 'cc',      desc: 'Jog Wheel (Scratch)' },
   crossfader:    { deck: false, type: 'cc',      desc: 'Crossfader' },
-  master_volume: { deck: false, type: 'cc',      desc: 'Master Volume' },
+  master_volume: { deck: false, type: 'cc',      desc: 'Master Volume (Horizontal Touch Ribbon & Engine)' },
   beat_roll_1_8: { deck: true,  type: 'trigger', desc: 'Beat Roll 1/8 (Slip)' },
   beat_roll_1_4: { deck: true,  type: 'trigger', desc: 'Beat Roll 1/4 (Slip)' },
   beat_roll_1_2: { deck: true,  type: 'trigger', desc: 'Beat Roll 1/2 (Slip)' },
   beat_roll_1:   { deck: true,  type: 'trigger', desc: 'Beat Roll 1 Beat (Slip)' },
   beat_roll_2:   { deck: true,  type: 'trigger', desc: 'Beat Roll 2 Beats (Slip)' },
-  fx_delay_toggle:    { deck: true,  type: 'trigger', desc: 'FX Delay Toggle' },
+  fx_delay_toggle:    { deck: true,  type: 'trigger', desc: 'FX Delay Toggle (Touch & Deck)' },
+  fx_delay_mix:       { deck: true,  type: 'cc',      desc: 'FX Delay Mix / Wet' },
+  fx_delay_time:      { deck: true,  type: 'cc',      desc: 'FX Delay Time (0.01s - 1.0s)' },
   fx_delay_feedback:  { deck: true,  type: 'cc',      desc: 'FX Delay Feedback' },
-  fx_reverb_toggle:   { deck: true,  type: 'trigger', desc: 'FX Reverb Toggle' },
+  fx_reverb_toggle:   { deck: true,  type: 'trigger', desc: 'FX Reverb Toggle (Touch & Deck)' },
   fx_reverb_mix:      { deck: true,  type: 'cc',      desc: 'FX Reverb Wet/Dry' },
-  fx_flanger_toggle:  { deck: true,  type: 'trigger', desc: 'FX Flanger Toggle' },
+  fx_reverb_decay:    { deck: true,  type: 'cc',      desc: 'FX Reverb Decay (0.5s - 10s)' },
+  fx_reverb_predelay: { deck: true,  type: 'cc',      desc: 'FX Reverb PreDelay' },
+  fx_flanger_toggle:  { deck: true,  type: 'trigger', desc: 'FX Flanger Toggle (Touch & Deck)' },
+  fx_flanger_mix:     { deck: true,  type: 'cc',      desc: 'FX Flanger Mix / Wet' },
+  fx_flanger_rate:    { deck: true,  type: 'cc',      desc: 'FX Flanger Rate (0.1Hz - 5Hz)' },
+  fx_flanger_depth:   { deck: true,  type: 'cc',      desc: 'FX Flanger Depth' },
   fx_flanger_feedback:{ deck: true,  type: 'cc',      desc: 'FX Flanger Feedback' },
-  fx_bitcrush_toggle: { deck: true,  type: 'trigger', desc: 'FX Bitcrush Toggle' },
+  fx_bitcrush_toggle: { deck: true,  type: 'trigger', desc: 'FX Bitcrush Toggle (Touch & Deck)' },
   fx_bitcrush_mix:    { deck: true,  type: 'cc',      desc: 'FX Bitcrush Wet/Dry' },
+  fx_bitcrush_depth:  { deck: true,  type: 'cc',      desc: 'FX Bitcrush Depth (1 - 16 bits)' },
+  fx_bitcrush_normfreq:{ deck: true, type: 'cc',      desc: 'FX Bitcrush Downsample (0.02 - 1.0)' },
   auto_relay:         { deck: false, type: 'trigger', desc: 'Toggle Auto-Deck Relay' },
   cart_play_1:        { deck: false, type: 'trigger', desc: 'CART Pad 1 (Play / Retrigger)' },
   cart_play_2:        { deck: false, type: 'trigger', desc: 'CART Pad 2 (Play / Retrigger)' },
@@ -455,6 +464,19 @@ class MIDIControllerManager {
           if (this.ui.onTrigger) this.ui.onTrigger('fx_delay_toggle', deck);
         }
         break;
+      case 'fx_delay_mix':
+        if (deck) {
+          eng.setDelay(deck, { mix: normCC });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_delay_mix', deck, normCC);
+        }
+        break;
+      case 'fx_delay_time':
+        if (deck) {
+          const t = 0.01 + normCC * (1.0 - 0.01);
+          eng.setDelay(deck, { time: t });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_delay_time', deck, normCC);
+        }
+        break;
       case 'fx_delay_feedback':
         if (deck) {
           eng.setDelay(deck, { feedback: normCC * 0.9 });
@@ -474,11 +496,45 @@ class MIDIControllerManager {
           if (this.ui.onCCChange) this.ui.onCCChange('fx_reverb_mix', deck, normCC);
         }
         break;
+      case 'fx_reverb_decay':
+        if (deck) {
+          const d = 0.5 + normCC * (10.0 - 0.5);
+          eng.setReverb(deck, { decay: d });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_reverb_decay', deck, normCC);
+        }
+        break;
+      case 'fx_reverb_predelay':
+        if (deck) {
+          const pd = normCC * 0.1;
+          eng.setReverb(deck, { preDelay: pd });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_reverb_predelay', deck, normCC);
+        }
+        break;
       case 'fx_flanger_toggle':
         if (isNoteOn && deck) {
           const active = !eng.decks[deck].fx.flanger.active;
           eng.setFlanger(deck, { active });
           if (this.ui.onTrigger) this.ui.onTrigger('fx_flanger_toggle', deck);
+        }
+        break;
+      case 'fx_flanger_mix':
+        if (deck) {
+          eng.setFlanger(deck, { mix: normCC });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_flanger_mix', deck, normCC);
+        }
+        break;
+      case 'fx_flanger_rate':
+        if (deck) {
+          const r = 0.1 + normCC * (5.0 - 0.1);
+          eng.setFlanger(deck, { rate: r });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_flanger_rate', deck, normCC);
+        }
+        break;
+      case 'fx_flanger_depth':
+        if (deck) {
+          const dp = 0.0005 + normCC * (0.01 - 0.0005);
+          eng.setFlanger(deck, { depth: dp });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_flanger_depth', deck, normCC);
         }
         break;
       case 'fx_flanger_feedback':
@@ -498,6 +554,20 @@ class MIDIControllerManager {
         if (deck) {
           eng.setBitcrusher(deck, { mix: normCC });
           if (this.ui.onCCChange) this.ui.onCCChange('fx_bitcrush_mix', deck, normCC);
+        }
+        break;
+      case 'fx_bitcrush_depth':
+        if (deck) {
+          const bits = Math.round(1 + normCC * (16 - 1));
+          eng.setBitcrusher(deck, { bitDepth: bits });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_bitcrush_depth', deck, normCC);
+        }
+        break;
+      case 'fx_bitcrush_normfreq':
+        if (deck) {
+          const f = 0.02 + normCC * (1.0 - 0.02);
+          eng.setBitcrusher(deck, { normfreq: f });
+          if (this.ui.onCCChange) this.ui.onCCChange('fx_bitcrush_normfreq', deck, normCC);
         }
         break;
       case 'jog_scratch': {

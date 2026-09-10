@@ -5255,26 +5255,44 @@ body.profile-tablet .panel-tab-btn {
    DJ Touch Layout Components (Touch Strips & Ribbon Controllers)
    ========================================================================== */
 
-/* Default State: Touch strips hidden in non-DJ-Touch layouts */
-.master-touch-strip-container,
-.touch-filter-rack,
-.deck-fx-touch-stack {
+/* Master Volume: Horizontal Touch Ribbon Slider is standard across ALL layouts */
+.master-knob-container {
   display: none !important;
 }
 
-/* DJ Touch Layout Mode Activation */
-body.mode-dj-touch .master-knob-container,
-body.mode-dj-touch .eq-rack,
-body.mode-dj-touch .deck-fx-rotary-rack {
-  display: none !important;
-}
-
-body.mode-dj-touch .master-touch-strip-container {
+.master-touch-strip-container {
   display: flex !important;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   width: 100%;
+}
+
+/* On-Deck FX: Touch Ribbon FX Stacks are standard across both DJ and DJ Touch layouts */
+.deck-fx-rotary-rack {
+  display: none !important;
+}
+
+body.mode-dj .deck-fx-touch-stack,
+body.mode-dj-touch .deck-fx-touch-stack {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+/* Touch Filter Rack: Specific to DJ Touch (replaces 3-band EQ rack) */
+.touch-filter-rack {
+  display: none !important;
+}
+
+/* DJ Touch Layout Mode Activation */
+body.mode-dj-touch .eq-rack {
+  display: none !important;
 }
 
 body.mode-dj-touch .touch-filter-rack {
@@ -5287,17 +5305,6 @@ body.mode-dj-touch .touch-filter-rack {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   margin-bottom: 10px;
-}
-
-body.mode-dj-touch .deck-fx-touch-stack {
-  display: flex !important;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 6px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
 }
 
 /* Touch Strip Base Styles */
