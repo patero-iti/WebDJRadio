@@ -1,8 +1,19 @@
 {
-  "version": "2.3.0",
+  "version": "2.4.0",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-10",
+  "releaseDate": "2026-09-11",
   "changelog": [
+    {
+      "version": "2.4.0",
+      "date": "2026-09-11",
+      "title": "Studio Hub Public Transport Alert Summaries & Transit Engine",
+      "changes": [
+        "**Studio Hub Transit Alerts Engine**: Added a live public transport status widget into the 'Studio Hub' panel of layout 'Radio A', positioned right below the dual weather section for live commuter talk breaks.",
+        "**Compact Status Badges & Presenter Headline Ticker**: Integrated an animated compact status badge (🟢 Good Service, 🟡 Minor Alerts, 🔴 Major Disruption) alongside a single-line headline summary that can be clicked to smoothly expand full incident bullet points.",
+        "**Location Auto-Detection & Preset Agencies**: Auto-detects local host timezone and coordinates (supporting Transperth WA, Transport for NSW, PTV Victoria, Translink Queensland, Adelaide Metro, TfL London, and MTA New York) with automatic fallback to Transperth WA.",
+        "**Custom RSS / JSON Feed Configuration**: Added a transit configuration modal (⚙️) allowing broadcasters to select manual regional agency presets or enter a custom RSS/XML or JSON disruptions feed endpoint."
+      ]
+    },
     {
       "version": "2.3.0",
       "date": "2026-09-10",

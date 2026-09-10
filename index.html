@@ -438,6 +438,39 @@
               </div>
             </div>
           </div>
+
+          <!-- Studio Transit Alerts Section -->
+          <div class="studio-transit-section" id="studio-transit-section">
+            <div class="transit-header-row">
+              <div class="transit-agency-label">
+                <span class="transit-icon">🚆</span>
+                <span class="transit-title">TRANSIT</span>
+                <span class="transit-region-badge" id="transit-region-badge">Transperth (WA)</span>
+              </div>
+              <div class="transit-controls">
+                <button class="transit-status-badge status-good" id="transit-status-badge" type="button" title="Click to expand/collapse live disruption reports">
+                  <span class="transit-status-dot"></span>
+                  <span class="transit-status-text" id="transit-status-text">Good Service</span>
+                </button>
+                <button class="btn-transit-action" id="btn-transit-refresh" type="button" title="Refresh Transit Alerts">↺</button>
+                <button class="btn-transit-action" id="btn-transit-config" type="button" title="Configure Transit Agency Feed">⚙️</button>
+              </div>
+            </div>
+
+            <!-- Compact Headline Ticker / Presenter Line -->
+            <div class="transit-headline-row" id="transit-headline-row" title="Click to toggle disruption details">
+              <span class="transit-headline-icon" id="transit-headline-icon">📢</span>
+              <span class="transit-headline-text" id="transit-headline-text">Checking live transit alerts...</span>
+              <span class="transit-expand-caret" id="transit-expand-caret">▼</span>
+            </div>
+
+            <!-- Expandable Alert Details Drawer -->
+            <div class="transit-drawer" id="transit-drawer" style="display: none;">
+              <div class="transit-drawer-content" id="transit-drawer-content">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Bottom Panel: Now Playing (Metadata, Artist Bio, Trivia, Liner Notes) -->
@@ -476,6 +509,10 @@
             </div>
             <div class="trivia-box-content" id="nowplaying-trivia-text">
               Track information and presenter trivia will display here when a song is playing or cued on air.
+            </div>
+            <div class="trivia-scroll-hint" id="trivia-scroll-hint" title="Scroll down for more lore notes" style="display: none;">
+              <span>📜 More lore below</span>
+              <span class="scroll-hint-arrow">▼</span>
             </div>
           </div>
         </div>
@@ -1974,6 +2011,48 @@
         <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
           <button type="button" class="btn" id="btn-cancel-metadata-edit" style="padding: 8px 18px;">Cancel</button>
           <button type="button" class="btn btn-primary" id="btn-save-metadata-edit" style="padding: 8px 24px; font-weight: 700; background: var(--accent-color); color: #000;">💾 Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transit Feed Configuration Modal -->
+  <div class="modal-overlay" id="modal-transit-config" style="display: none;">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🚆 Transit Alert Settings</h3>
+        <button class="btn-modal-close" id="btn-close-transit-config">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="transit-provider-select" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Transit Feed Region</label>
+          <select id="transit-provider-select" class="input-field" style="width: 100%; box-sizing: border-box; cursor: pointer; padding: 8px 10px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--border-color); border-radius: 6px;">
+            <option value="auto">Auto-Detect (Local Location / Transperth WA Fallback)</option>
+            <option value="transperth">Transperth (Perth &amp; Western Australia)</option>
+            <option value="tfnsw">Transport for NSW (Sydney / NSW)</option>
+            <option value="ptv">Public Transport Victoria (Melbourne / VIC)</option>
+            <option value="translink">Translink (Brisbane / QLD)</option>
+            <option value="adelaide">Adelaide Metro (Adelaide / SA)</option>
+            <option value="tfl">Transport for London (London / UK)</option>
+            <option value="mta">MTA (New York / US)</option>
+            <option value="custom">Custom Feed (RSS / JSON Endpoint)</option>
+          </select>
+          <small style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            Automatically detects your studio or host city, or default to Transperth WA.
+          </small>
+        </div>
+
+        <div class="form-group" id="group-transit-custom-url" style="margin-bottom: 18px; display: none;">
+          <label for="transit-custom-url" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Custom Feed URL (RSS XML or JSON)</label>
+          <input type="url" id="transit-custom-url" class="input-field" placeholder="https://example.com/transit-alerts.rss or .json" style="width: 100%; box-sizing: border-box; padding: 8px 10px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--border-color); border-radius: 6px;" />
+          <small style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            Enter an agency RSS/XML or JSON disruptions feed endpoint.
+          </small>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+          <button type="button" class="btn" id="btn-cancel-transit-config" style="padding: 8px 18px;">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btn-save-transit-config" style="padding: 8px 24px; font-weight: 700; background: var(--accent-color); color: #000;">💾 Save &amp; Fetch</button>
         </div>
       </div>
     </div>
