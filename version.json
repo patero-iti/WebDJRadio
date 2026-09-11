@@ -11,7 +11,8 @@
         "**Studio Hub Transit Alerts Engine**: Added a live public transport status widget into the 'Studio Hub' panel of layout 'Radio A', positioned right below the dual weather section for live commuter talk breaks.",
         "**Compact Status Badges & Presenter Headline Ticker**: Integrated an animated compact status badge (🟢 Good Service, 🟡 Minor Alerts, 🔴 Major Disruption) alongside a single-line headline summary that can be clicked to smoothly expand full incident bullet points.",
         "**Location Auto-Detection & Preset Agencies**: Auto-detects local host timezone and coordinates (supporting Transperth WA, Transport for NSW, PTV Victoria, Translink Queensland, Adelaide Metro, TfL London, and MTA New York) with automatic fallback to Transperth WA.",
-        "**Custom RSS / JSON Feed Configuration**: Added a transit configuration modal (⚙️) allowing broadcasters to select manual regional agency presets or enter a custom RSS/XML or JSON disruptions feed endpoint."
+        "**Custom RSS / JSON Feed Configuration**: Added a transit configuration modal (⚙️) allowing broadcasters to select manual regional agency presets or enter a custom RSS/XML or JSON disruptions feed endpoint.",
+        "**Configurable Auto-XFade Transition Speed**: Added a persistent speed duration selector (`⚡ Fast (1s)`, `🌊 Med (2s)`, `⏳ Slow (3.5s)`, `📻 Broadcast (5s)`) directly into the Auto-Deck Relay control strip, allowing broadcasters to choose between swift beat transitions or slow, gradual radio crossfades."
       ]
     },
     {

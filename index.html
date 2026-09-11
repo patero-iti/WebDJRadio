@@ -807,10 +807,18 @@
             <span class="relay-text">AUTO-DECK RELAY</span>
           </button>
           <div class="relay-options">
-            <label class="relay-opt" title="Smoothly slide crossfader to active deck on transition">
-              <input type="checkbox" id="chk-auto-crossfade" checked>
-              <span>Auto-XFade</span>
-            </label>
+            <div class="relay-opt-group">
+              <label class="relay-opt" title="Smoothly slide crossfader to active deck on transition">
+                <input type="checkbox" id="chk-auto-crossfade" checked>
+                <span>Auto-XFade</span>
+              </label>
+              <select class="select-xfade-speed" id="select-xfade-speed" title="Auto-Crossfade Speed / Duration">
+                <option value="1000">⚡ Fast (1s)</option>
+                <option value="2000">🌊 Med (2s)</option>
+                <option value="3500">⏳ Slow (3.5s)</option>
+                <option value="5000">📻 Slow (5s)</option>
+              </select>
+            </div>
             <label class="relay-opt" title="Auto-load next track from library into the finished deck">
               <input type="checkbox" id="chk-auto-queue" checked>
               <span>Auto-Queue</span>

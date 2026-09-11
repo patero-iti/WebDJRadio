@@ -398,7 +398,7 @@ class WebRadioDecksEngine {
 
   pause(deckId) {
     const deck = this.decks[deckId];
-    if (!deck.isPlaying) return;
+    if (!deck || !deck.isPlaying) return;
 
     deck.pauseOffset = this.getCurrentTime(deckId);
     if (deck.source) {
@@ -407,6 +407,19 @@ class WebRadioDecksEngine {
       deck.source = null;
     }
     deck.isPlaying = false;
+  }
+
+  // Toggle Play/Pause on deck
+  togglePlay(deckId) {
+    const deck = this.decks[deckId];
+    if (!deck) return false;
+    if (deck.isPlaying) {
+      this.pause(deckId);
+      return false;
+    } else {
+      this.play(deckId);
+      return true;
+    }
   }
 
   stop(deckId) {

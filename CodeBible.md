@@ -153,8 +153,8 @@ Each deck operates an independent Web Audio DSP chain, while live microphone & a
   * **Live Cumulative Durations**: Displays individual track durations and real-time cumulative playlist runtimes.
 
 ### 3.5. Automated Continuous Playback (Auto-Deck Relay)
-* **Continuous Auto-Relay**: Automatically triggers playback on the opposite deck when the active song finishes.
-* **Smooth Auto-Crossfade**: Smooth cubic ease-in-out animation of the physical crossfader slider over the transition duration:
+* **Continuous Auto-Relay**: Automatically triggers playback on the opposite deck when the active song finishes, resetting crossfader to center on activation.
+* **Configurable Smooth Auto-Crossfade**: Multi-speed crossfade duration selector (`⚡ Fast (1s)`, `🌊 Med (2s)`, `⏳ Slow (3.5s)`, `📻 Broadcast (5s)`) with persistent `localStorage` memory and smooth cubic ease-in-out animation of the physical crossfader slider over the transition duration:
   $$\text{Progress}(t) = \begin{cases} 4t^3 & \text{if } t < 0.5 \\ 1 - \frac{(-2t + 2)^3}{2} & \text{if } t \ge 0.5 \end{cases}$$
 * **Auto-Queue**: Automatically pulls upcoming tracks from each deck's dedicated cued playlist (or library) to ensure 24/7 continuous broadcast play.
 

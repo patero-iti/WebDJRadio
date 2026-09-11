@@ -249,8 +249,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements - Auto-Deck Relay
   const btnAutoRelay = document.getElementById('btn-auto-relay');
   const chkAutoCrossfade = document.getElementById('chk-auto-crossfade');
+  const selectXfadeSpeed = document.getElementById('select-xfade-speed');
   const chkAutoQueue = document.getElementById('chk-auto-queue');
   let autoRelayEnabled = false;
+
+  const STORAGE_KEY_AUTO_XFADE_DURATION = 'webdj_auto_xfade_duration';
+  let autoXfadeDuration = parseInt(localStorage.getItem(STORAGE_KEY_AUTO_XFADE_DURATION), 10) || 1000;
+  if (selectXfadeSpeed) {
+    selectXfadeSpeed.value = autoXfadeDuration.toString();
+    selectXfadeSpeed.addEventListener('change', () => {
+      autoXfadeDuration = parseInt(selectXfadeSpeed.value, 10) || 1000;
+      localStorage.setItem(STORAGE_KEY_AUTO_XFADE_DURATION, autoXfadeDuration.toString());
+    });
+  }
 
   // Jog Rotation Angles
   const jogAngles = { A: 0, B: 0 };
@@ -478,12 +489,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mini Play/Pause Deck controls
   if (miniOnAirElements.btnPlayA) {
     miniOnAirElements.btnPlayA.addEventListener('click', () => {
-      engine.togglePlay('A');
+      if (deckAElements && deckAElements.btnPlay) {
+        deckAElements.btnPlay.click();
+      } else {
+        engine.togglePlay('A');
+      }
     });
   }
   if (miniOnAirElements.btnPlayB) {
     miniOnAirElements.btnPlayB.addEventListener('click', () => {
-      engine.togglePlay('B');
+      if (deckBElements && deckBElements.btnPlay) {
+        deckBElements.btnPlay.click();
+      } else {
+        engine.togglePlay('B');
+      }
     });
   }
   if (miniOnAirElements.btnCartStop) {
@@ -639,15 +658,27 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       navigator.mediaSession.setActionHandler('play', () => {
         if (!engine.decks.A.isPlaying && !engine.decks.B.isPlaying) {
-          engine.togglePlay('A');
+          if (deckAElements && deckAElements.btnPlay) deckAElements.btnPlay.click();
+          else engine.togglePlay('A');
         } else {
-          if (!engine.decks.A.isPlaying && deckLoadedTrackObj.A) engine.togglePlay('A');
-          else if (!engine.decks.B.isPlaying && deckLoadedTrackObj.B) engine.togglePlay('B');
+          if (!engine.decks.A.isPlaying && deckLoadedTrackObj.A) {
+            if (deckAElements && deckAElements.btnPlay) deckAElements.btnPlay.click();
+            else engine.togglePlay('A');
+          } else if (!engine.decks.B.isPlaying && deckLoadedTrackObj.B) {
+            if (deckBElements && deckBElements.btnPlay) deckBElements.btnPlay.click();
+            else engine.togglePlay('B');
+          }
         }
       });
       navigator.mediaSession.setActionHandler('pause', () => {
-        if (engine.decks.A.isPlaying) engine.togglePlay('A');
-        if (engine.decks.B.isPlaying) engine.togglePlay('B');
+        if (engine.decks.A.isPlaying) {
+          if (deckAElements && deckAElements.btnPlay) deckAElements.btnPlay.click();
+          else engine.togglePlay('A');
+        }
+        if (engine.decks.B.isPlaying) {
+          if (deckBElements && deckBElements.btnPlay) deckBElements.btnPlay.click();
+          else engine.togglePlay('B');
+        }
       });
     } catch (e) {}
   }
@@ -2616,9 +2647,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAutoRelay) {
       btnAutoRelay.classList.toggle('active', autoRelayEnabled);
     }
+
+    // Reset crossfader to central position (0.5) to ensure balanced startup
+    if (crossfadeAnimId) {
+      cancelAnimationFrame(crossfadeAnimId);
+      crossfadeAnimId = null;
+    }
+    if (crossfader) {
+      crossfader.value = 0.5;
+      engine.setCrossfader(0.5);
+    }
+
     audioStatusText.textContent = autoRelayEnabled
-      ? 'Auto-Deck Relay: Active (Deck A ⇄ Deck B Continuous)'
-      : 'Auto-Deck Relay: Disabled';
+      ? 'Auto-Deck Relay: Active (Deck A ⇄ Deck B Continuous • Crossfader Centered)'
+      : 'Auto-Deck Relay: Disabled (Crossfader Centered)';
   }
 
   if (btnAutoRelay) {
@@ -2641,7 +2683,7 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.play(nextDeckId);
 
       if (chkAutoCrossfade && chkAutoCrossfade.checked) {
-        animateCrossfader(nextDeckId === 'A' ? 0.0 : 1.0, 1000);
+        animateCrossfader(nextDeckId === 'A' ? 0.0 : 1.0, autoXfadeDuration);
       }
 
       // Auto-advance / pre-load next song into the finished deck
