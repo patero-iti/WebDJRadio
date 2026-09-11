@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     titleA: document.getElementById('mini-title-a'),
     artistA: document.getElementById('mini-artist-a'),
     timeBadgeA: document.getElementById('mini-time-badge-a'),
+    timeLabelA: document.getElementById('mini-time-label-a'),
     timeValA: document.getElementById('mini-time-val-a'),
     btnPlayA: document.getElementById('btn-mini-play-a'),
 
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     titleB: document.getElementById('mini-title-b'),
     artistB: document.getElementById('mini-artist-b'),
     timeBadgeB: document.getElementById('mini-time-badge-b'),
+    timeLabelB: document.getElementById('mini-time-label-b'),
     timeValB: document.getElementById('mini-time-val-b'),
     btnPlayB: document.getElementById('btn-mini-play-b')
   };
@@ -166,6 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
     artist: document.getElementById('deck-a-artist'),
     bpm: document.getElementById('deck-a-bpm'),
     key: document.getElementById('deck-a-key'),
+    timeBox: document.getElementById('deck-a-time-box'),
+    timeLabel: document.getElementById('deck-a-time-label'),
     time: document.getElementById('deck-a-time'),
     artImg: document.getElementById('deck-a-art'),
     artPlaceholder: document.getElementById('deck-a-art-placeholder'),
@@ -175,6 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
     mixerTrackInfo: document.getElementById('mixer-track-info-a'),
     mixerTitle: document.getElementById('mixer-track-title-a'),
     mixerArtist: document.getElementById('mixer-track-artist-a'),
+    mixerTimeBox: document.getElementById('mixer-time-box-a'),
+    mixerTimeLabel: document.getElementById('mixer-time-label-a'),
     mixerTimeLeft: document.getElementById('mixer-time-left-a'),
     waveformScrolling: document.getElementById('waveform-scrolling-a'),
     waveformOverview: document.getElementById('waveform-overview-a'),
@@ -200,6 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
     artist: document.getElementById('deck-b-artist'),
     bpm: document.getElementById('deck-b-bpm'),
     key: document.getElementById('deck-b-key'),
+    timeBox: document.getElementById('deck-b-time-box'),
+    timeLabel: document.getElementById('deck-b-time-label'),
     time: document.getElementById('deck-b-time'),
     artImg: document.getElementById('deck-b-art'),
     artPlaceholder: document.getElementById('deck-b-art-placeholder'),
@@ -209,6 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
     mixerTrackInfo: document.getElementById('mixer-track-info-b'),
     mixerTitle: document.getElementById('mixer-track-title-b'),
     mixerArtist: document.getElementById('mixer-track-artist-b'),
+    mixerTimeBox: document.getElementById('mixer-time-box-b'),
+    mixerTimeLabel: document.getElementById('mixer-time-label-b'),
     mixerTimeLeft: document.getElementById('mixer-time-left-b'),
     waveformScrolling: document.getElementById('waveform-scrolling-b'),
     waveformOverview: document.getElementById('waveform-overview-b'),
@@ -250,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAutoRelay = document.getElementById('btn-auto-relay');
   const chkAutoCrossfade = document.getElementById('chk-auto-crossfade');
   const selectXfadeSpeed = document.getElementById('select-xfade-speed');
+  const chkSmartSegue = document.getElementById('chk-smart-segue');
   const chkAutoQueue = document.getElementById('chk-auto-queue');
   let autoRelayEnabled = false;
 
@@ -261,6 +272,48 @@ document.addEventListener('DOMContentLoaded', () => {
       autoXfadeDuration = parseInt(selectXfadeSpeed.value, 10) || 1000;
       localStorage.setItem(STORAGE_KEY_AUTO_XFADE_DURATION, autoXfadeDuration.toString());
     });
+  }
+
+  const STORAGE_KEY_SMART_SEGUE = 'webdj_auto_smart_segue';
+  if (chkSmartSegue) {
+    const savedSegue = localStorage.getItem(STORAGE_KEY_SMART_SEGUE);
+    if (savedSegue !== null) {
+      chkSmartSegue.checked = savedSegue === 'true';
+    }
+    chkSmartSegue.addEventListener('change', () => {
+      localStorage.setItem(STORAGE_KEY_SMART_SEGUE, chkSmartSegue.checked ? 'true' : 'false');
+    });
+  }
+
+  const relaySegueTriggered = { A: false, B: false };
+  const segueLowCount = { A: 0, B: 0 };
+
+  // Mixer Track Time Mode (Remaining 'left' vs Elapsed 'time')
+  const STORAGE_KEY_MIXER_TIME_MODE_A = 'webdj_mixer_time_mode_a';
+  const STORAGE_KEY_MIXER_TIME_MODE_B = 'webdj_mixer_time_mode_b';
+  let mixerTimeModeA = localStorage.getItem(STORAGE_KEY_MIXER_TIME_MODE_A) || 'left';
+  let mixerTimeModeB = localStorage.getItem(STORAGE_KEY_MIXER_TIME_MODE_B) || 'left';
+
+  function updateMixerTimeTitles() {
+    const titleA = mixerTimeModeA === 'left' ? 'Time Remaining (Click to switch to Track Elapsed Time)' : 'Track Elapsed Time (Click to switch to Time Remaining)';
+    const titleB = mixerTimeModeB === 'left' ? 'Time Remaining (Click to switch to Track Elapsed Time)' : 'Track Elapsed Time (Click to switch to Time Remaining)';
+    if (deckAElements.timeBox) deckAElements.timeBox.title = titleA;
+    if (deckAElements.mixerTimeBox) deckAElements.mixerTimeBox.title = titleA;
+    if (miniOnAirElements.timeBadgeA) miniOnAirElements.timeBadgeA.title = titleA;
+    if (deckBElements.timeBox) deckBElements.timeBox.title = titleB;
+    if (deckBElements.mixerTimeBox) deckBElements.mixerTimeBox.title = titleB;
+    if (miniOnAirElements.timeBadgeB) miniOnAirElements.timeBadgeB.title = titleB;
+  }
+
+  function toggleMixerTimeMode(deckId) {
+    if (deckId === 'A') {
+      mixerTimeModeA = mixerTimeModeA === 'left' ? 'time' : 'left';
+      localStorage.setItem(STORAGE_KEY_MIXER_TIME_MODE_A, mixerTimeModeA);
+    } else if (deckId === 'B') {
+      mixerTimeModeB = mixerTimeModeB === 'left' ? 'time' : 'left';
+      localStorage.setItem(STORAGE_KEY_MIXER_TIME_MODE_B, mixerTimeModeB);
+    }
+    updateMixerTimeTitles();
   }
 
   // Jog Rotation Angles
@@ -510,6 +563,45 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.stopAllCarts();
     });
   }
+
+  // Time Display Click Listeners (Toggle Remaining / Track Elapsed Time)
+  if (deckAElements.timeBox) {
+    deckAElements.timeBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerTimeMode('A');
+    });
+  }
+  if (deckAElements.mixerTimeBox) {
+    deckAElements.mixerTimeBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerTimeMode('A');
+    });
+  }
+  if (miniOnAirElements.timeBadgeA) {
+    miniOnAirElements.timeBadgeA.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerTimeMode('A');
+    });
+  }
+  if (deckBElements.timeBox) {
+    deckBElements.timeBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerTimeMode('B');
+    });
+  }
+  if (deckBElements.mixerTimeBox) {
+    deckBElements.mixerTimeBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerTimeMode('B');
+    });
+  }
+  if (miniOnAirElements.timeBadgeB) {
+    miniOnAirElements.timeBadgeB.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerTimeMode('B');
+    });
+  }
+  updateMixerTimeTitles();
 
   // Global Keyboard Hotkeys:
   // Tab or Backquote (`) toggles between Studio & Music Management
@@ -2119,13 +2211,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       deck.loadedTrackId = trackObj.id;
+      relaySegueTriggered[deckId] = false;
+      segueLowCount[deckId] = 0;
       deckElem.title.textContent = deck.title;
       deckElem.artist.textContent = deck.artist;
       if (deckElem.mixerTitle) deckElem.mixerTitle.textContent = deck.title;
       if (deckElem.mixerArtist) deckElem.mixerArtist.textContent = deck.artist;
       if (deckElem.mixerTrackInfo) deckElem.mixerTrackInfo.title = `Loaded: ${deck.title} — ${deck.artist}`;
+      const isTimeMode = (deckId === 'A' ? mixerTimeModeA : mixerTimeModeB) === 'time';
+      if (deckElem.timeLabel) {
+        deckElem.timeLabel.textContent = isTimeMode ? 'TIME' : 'LEFT';
+      }
+      if (deckElem.time) {
+        deckElem.time.textContent = isTimeMode ? '00:00.0' : (deck.buffer ? `-${formatTime(deck.buffer.duration)}` : '00:00.0');
+      }
+      if (deckElem.mixerTimeLabel) {
+        deckElem.mixerTimeLabel.textContent = isTimeMode ? 'TIME' : 'LEFT';
+      }
       if (deckElem.mixerTimeLeft) {
-        deckElem.mixerTimeLeft.textContent = deck.buffer ? `-${formatTime(deck.buffer.duration)}` : '--:--';
+        deckElem.mixerTimeLeft.textContent = deck.buffer ? (isTimeMode ? '00:00' : `-${formatTime(deck.buffer.duration)}`) : '--:--';
       }
       deckElem.bpm.textContent = deck.bpm ? deck.bpm.toFixed(1) : '124.0';
       if (deckElem.key) deckElem.key.textContent = deck.key || '--';
@@ -2648,6 +2752,11 @@ document.addEventListener('DOMContentLoaded', () => {
       btnAutoRelay.classList.toggle('active', autoRelayEnabled);
     }
 
+    relaySegueTriggered.A = false;
+    relaySegueTriggered.B = false;
+    segueLowCount.A = 0;
+    segueLowCount.B = 0;
+
     // Reset crossfader to central position (0.5) to ensure balanced startup
     if (crossfadeAnimId) {
       cancelAnimationFrame(crossfadeAnimId);
@@ -2667,12 +2776,59 @@ document.addEventListener('DOMContentLoaded', () => {
     btnAutoRelay.addEventListener('click', () => toggleAutoRelay());
   }
 
+  // Smart Segue Early Fade-Out Handoff Trigger
+  async function triggerSmartSegueHandoff(fromDeckId, toDeckId, dbLevel) {
+    const toDeck = engine.decks[toDeckId];
+    audioStatusText.textContent = `Auto-Deck Relay: Smart Segue (${dbLevel.toFixed(1)} dB fade-out) → Launching Deck ${toDeckId}`;
+
+    const playIncoming = () => {
+      if (toDeck.pauseOffset >= toDeck.buffer.duration - 0.15) {
+        toDeck.pauseOffset = toDeck.cuePoint || 0;
+      }
+      engine.play(toDeckId);
+
+      if (chkAutoCrossfade && chkAutoCrossfade.checked) {
+        animateCrossfader(toDeckId === 'A' ? 0.0 : 1.0, autoXfadeDuration);
+      }
+    };
+
+    if (deckQueues[toDeckId].length > 0 && (!toDeck.buffer || toDeck.pauseOffset >= toDeck.buffer.duration - 0.15)) {
+      await popAndLoadNextFromQueue(toDeckId);
+      setTimeout(playIncoming, 80);
+    } else if (toDeck.buffer) {
+      playIncoming();
+    } else if (chkAutoQueue && chkAutoQueue.checked && libraryTracks.length > 0) {
+      const loaded = await queueNextLibraryTrack(toDeckId);
+      if (loaded && engine.decks[toDeckId].buffer) {
+        setTimeout(playIncoming, 80);
+      }
+    }
+  }
+
   // Web Audio track finish listener for automatic relay handoff
   engine.onTrackEnd = async (endedDeckId) => {
+    relaySegueTriggered[endedDeckId] = false;
+    segueLowCount[endedDeckId] = 0;
+
     if (!autoRelayEnabled) return;
 
     const nextDeckId = endedDeckId === 'A' ? 'B' : 'A';
     const nextDeck = engine.decks[nextDeckId];
+
+    // If next deck is already playing (via Smart Segue early trigger), handle queue pre-load for ended deck
+    if (nextDeck.isPlaying) {
+      audioStatusText.textContent = `Auto-Deck Relay: Deck ${endedDeckId} ended → Active on Deck ${nextDeckId}`;
+      if (chkAutoQueue && chkAutoQueue.checked) {
+        setTimeout(async () => {
+          if (deckQueues[endedDeckId].length > 0) {
+            await popAndLoadNextFromQueue(endedDeckId);
+          } else {
+            await queueNextLibraryTrack(endedDeckId);
+          }
+        }, 500);
+      }
+      return;
+    }
 
     audioStatusText.textContent = `Auto-Deck Relay: Deck ${endedDeckId} finished → Transitioning to Deck ${nextDeckId}`;
 
@@ -2989,10 +3145,19 @@ document.addEventListener('DOMContentLoaded', () => {
       deckAElements.mixerTrackInfo.classList.toggle('playing', deckA.isPlaying);
       deckAElements.mixerTrackInfo.classList.toggle('track-ending-warning', isEndingA);
     }
-    deckAElements.time.textContent = formatTime(curA);
     const remA = Math.max(0, durA - curA);
+    const isTimeModeA = mixerTimeModeA === 'time';
+    if (deckAElements.timeLabel) {
+      deckAElements.timeLabel.textContent = isTimeModeA ? 'TIME' : 'LEFT';
+    }
+    if (deckAElements.time) {
+      deckAElements.time.textContent = durA > 0 ? (isTimeModeA ? formatTime(curA) : `-${formatTime(remA)}`) : '00:00.0';
+    }
+    if (deckAElements.mixerTimeLabel) {
+      deckAElements.mixerTimeLabel.textContent = isTimeModeA ? 'TIME' : 'LEFT';
+    }
     if (deckAElements.mixerTimeLeft) {
-      deckAElements.mixerTimeLeft.textContent = durA > 0 ? `-${formatTime(remA)}` : '--:--';
+      deckAElements.mixerTimeLeft.textContent = durA > 0 ? (isTimeModeA ? formatTime(curA) : `-${formatTime(remA)}`) : '--:--';
     }
     if (deckAElements.title) {
       deckAElements.title.parentElement.classList.toggle('track-ending-warning', isEndingA);
@@ -3011,8 +3176,11 @@ document.addEventListener('DOMContentLoaded', () => {
       miniOnAirElements.btnPlayA.textContent = deckA.isPlaying ? '⏸' : '▶';
       miniOnAirElements.btnPlayA.classList.toggle('playing', deckA.isPlaying);
     }
+    if (miniOnAirElements.timeLabelA) {
+      miniOnAirElements.timeLabelA.textContent = isTimeModeA ? 'TIME' : 'LEFT';
+    }
     if (miniOnAirElements.timeValA) {
-      miniOnAirElements.timeValA.textContent = durA > 0 ? `-${formatTime(remA)}` : '--:--';
+      miniOnAirElements.timeValA.textContent = durA > 0 ? (isTimeModeA ? formatTime(curA) : `-${formatTime(remA)}`) : '--:--';
     }
     if (miniOnAirElements.stripA) {
       miniOnAirElements.stripA.classList.toggle('playing', deckA.isPlaying);
@@ -3044,10 +3212,19 @@ document.addEventListener('DOMContentLoaded', () => {
       deckBElements.mixerTrackInfo.classList.toggle('playing', deckB.isPlaying);
       deckBElements.mixerTrackInfo.classList.toggle('track-ending-warning', isEndingB);
     }
-    deckBElements.time.textContent = formatTime(curB);
     const remB = Math.max(0, durB - curB);
+    const isTimeModeB = mixerTimeModeB === 'time';
+    if (deckBElements.timeLabel) {
+      deckBElements.timeLabel.textContent = isTimeModeB ? 'TIME' : 'LEFT';
+    }
+    if (deckBElements.time) {
+      deckBElements.time.textContent = durB > 0 ? (isTimeModeB ? formatTime(curB) : `-${formatTime(remB)}`) : '00:00.0';
+    }
+    if (deckBElements.mixerTimeLabel) {
+      deckBElements.mixerTimeLabel.textContent = isTimeModeB ? 'TIME' : 'LEFT';
+    }
     if (deckBElements.mixerTimeLeft) {
-      deckBElements.mixerTimeLeft.textContent = durB > 0 ? `-${formatTime(remB)}` : '--:--';
+      deckBElements.mixerTimeLeft.textContent = durB > 0 ? (isTimeModeB ? formatTime(curB) : `-${formatTime(remB)}`) : '--:--';
     }
     if (deckBElements.title) {
       deckBElements.title.parentElement.classList.toggle('track-ending-warning', isEndingB);
@@ -3066,8 +3243,11 @@ document.addEventListener('DOMContentLoaded', () => {
       miniOnAirElements.btnPlayB.textContent = deckB.isPlaying ? '⏸' : '▶';
       miniOnAirElements.btnPlayB.classList.toggle('playing', deckB.isPlaying);
     }
+    if (miniOnAirElements.timeLabelB) {
+      miniOnAirElements.timeLabelB.textContent = isTimeModeB ? 'TIME' : 'LEFT';
+    }
     if (miniOnAirElements.timeValB) {
-      miniOnAirElements.timeValB.textContent = durB > 0 ? `-${formatTime(remB)}` : '--:--';
+      miniOnAirElements.timeValB.textContent = durB > 0 ? (isTimeModeB ? formatTime(curB) : `-${formatTime(remB)}`) : '--:--';
     }
     if (miniOnAirElements.stripB) {
       miniOnAirElements.stripB.classList.toggle('playing', deckB.isPlaying);
@@ -3081,6 +3261,41 @@ document.addEventListener('DOMContentLoaded', () => {
     if (deckB.isPlaying) {
       jogAngles.B += (1.5 * (deckB.playbackRate + deckB.pitchNudge));
       deckBElements.jog.style.transform = `rotate(${jogAngles.B}deg)`;
+    }
+
+    // Smart Segue / Outro Fade-Out Overlap Engine
+    if (autoRelayEnabled && chkSmartSegue && chkSmartSegue.checked) {
+      // Check Deck A outro segue
+      if (deckA.isPlaying && !deckB.isPlaying && durA > 0) {
+        if (remA <= 8.0 && remA >= 0.4 && !relaySegueTriggered.A) {
+          const dbA = engine.getDeckDbLevel('A');
+          if (dbA <= -21.0) {
+            segueLowCount.A++;
+            if (segueLowCount.A >= 10) {
+              relaySegueTriggered.A = true;
+              triggerSmartSegueHandoff('A', 'B', dbA);
+            }
+          } else {
+            segueLowCount.A = Math.max(0, segueLowCount.A - 1);
+          }
+        }
+      }
+
+      // Check Deck B outro segue
+      if (deckB.isPlaying && !deckA.isPlaying && durB > 0) {
+        if (remB <= 8.0 && remB >= 0.4 && !relaySegueTriggered.B) {
+          const dbB = engine.getDeckDbLevel('B');
+          if (dbB <= -21.0) {
+            segueLowCount.B++;
+            if (segueLowCount.B >= 10) {
+              relaySegueTriggered.B = true;
+              triggerSmartSegueHandoff('B', 'A', dbB);
+            }
+          } else {
+            segueLowCount.B = Math.max(0, segueLowCount.B - 1);
+          }
+        }
+      }
     }
 
     // VU Level Meters

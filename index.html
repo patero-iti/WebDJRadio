@@ -186,8 +186,8 @@
               <div class="readout-label">KEY</div>
               <div class="readout-val" id="deck-a-key">--</div>
             </div>
-            <div class="readout-box">
-              <div class="readout-label">TIME</div>
+            <div class="readout-box readout-box-time" id="deck-a-time-box" title="Deck A Time (Click to toggle Track Time / Remaining)">
+              <div class="readout-label" id="deck-a-time-label">TIME</div>
               <div class="readout-val" id="deck-a-time">00:00.0</div>
             </div>
           </div>
@@ -719,8 +719,8 @@
             <div class="mixer-track-info" id="mixer-track-info-a" title="Track Loaded on CH A">
               <div class="mixer-track-title" id="mixer-track-title-a">No Track Loaded</div>
               <div class="mixer-track-artist" id="mixer-track-artist-a">Deck A</div>
-              <div class="mixer-track-time" id="mixer-time-box-a" title="Time Remaining on CH A">
-                <span class="mixer-time-label">LEFT</span>
+              <div class="mixer-track-time" id="mixer-time-box-a" title="Time Remaining on CH A (Click to toggle Track Time / Remaining)">
+                <span class="mixer-time-label" id="mixer-time-label-a">LEFT</span>
                 <span class="mixer-time-val" id="mixer-time-left-a">--:--</span>
               </div>
             </div>
@@ -746,8 +746,8 @@
             <div class="mixer-track-info" id="mixer-track-info-b" title="Track Loaded on CH B">
               <div class="mixer-track-title" id="mixer-track-title-b">No Track Loaded</div>
               <div class="mixer-track-artist" id="mixer-track-artist-b">Deck B</div>
-              <div class="mixer-track-time" id="mixer-time-box-b" title="Time Remaining on CH B">
-                <span class="mixer-time-label">LEFT</span>
+              <div class="mixer-track-time" id="mixer-time-box-b" title="Time Remaining on CH B (Click to toggle Track Time / Remaining)">
+                <span class="mixer-time-label" id="mixer-time-label-b">LEFT</span>
                 <span class="mixer-time-val" id="mixer-time-left-b">--:--</span>
               </div>
             </div>
@@ -813,12 +813,16 @@
                 <span>Auto-XFade</span>
               </label>
               <select class="select-xfade-speed" id="select-xfade-speed" title="Auto-Crossfade Speed / Duration">
-                <option value="1000">⚡ Fast (1s)</option>
-                <option value="2000">🌊 Med (2s)</option>
-                <option value="3500">⏳ Slow (3.5s)</option>
-                <option value="5000">📻 Slow (5s)</option>
+                <option value="1000">1s</option>
+                <option value="2000">2s</option>
+                <option value="3500">3.5s</option>
+                <option value="5000">5s</option>
               </select>
             </div>
+            <label class="relay-opt" title="Smart Outro Overlap: Auto-trigger next deck when song fades below -22 dB during last 8-10 seconds">
+              <input type="checkbox" id="chk-smart-segue" checked>
+              <span>Smart Segue</span>
+            </label>
             <label class="relay-opt" title="Auto-load next track from library into the finished deck">
               <input type="checkbox" id="chk-auto-queue" checked>
               <span>Auto-Queue</span>
@@ -949,8 +953,8 @@
               <div class="readout-label">KEY</div>
               <div class="readout-val" id="deck-b-key">--</div>
             </div>
-            <div class="readout-box">
-              <div class="readout-label">TIME</div>
+            <div class="readout-box readout-box-time" id="deck-b-time-box" title="Deck B Time (Click to toggle Track Time / Remaining)">
+              <div class="readout-label" id="deck-b-time-label">TIME</div>
               <div class="readout-val" id="deck-b-time">00:00.0</div>
             </div>
           </div>
@@ -1161,8 +1165,8 @@
             <div class="mini-track-title" id="mini-title-a">No Track Loaded</div>
             <div class="mini-track-artist" id="mini-artist-a">Deck A Ready</div>
           </div>
-          <div class="mini-time-badge" id="mini-time-badge-a">
-            <span class="mini-time-label">LEFT</span>
+          <div class="mini-time-badge" id="mini-time-badge-a" title="Time Remaining on Deck A (Click to toggle Track Time / Remaining)">
+            <span class="mini-time-label" id="mini-time-label-a">LEFT</span>
             <span class="mini-time-val" id="mini-time-val-a">--:--</span>
           </div>
           <button class="btn-mini-play" id="btn-mini-play-a" type="button" title="Play / Pause Deck A">▶</button>
@@ -1178,8 +1182,8 @@
         <!-- Deck B Mini Monitor -->
         <div class="mini-deck-strip mini-deck-b" id="mini-strip-b">
           <button class="btn-mini-play" id="btn-mini-play-b" type="button" title="Play / Pause Deck B">▶</button>
-          <div class="mini-time-badge" id="mini-time-badge-b">
-            <span class="mini-time-label">LEFT</span>
+          <div class="mini-time-badge" id="mini-time-badge-b" title="Time Remaining on Deck B (Click to toggle Track Time / Remaining)">
+            <span class="mini-time-label" id="mini-time-label-b">LEFT</span>
             <span class="mini-time-val" id="mini-time-val-b">--:--</span>
           </div>
           <div class="mini-deck-meta">

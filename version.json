@@ -12,7 +12,8 @@
         "**Compact Status Badges & Presenter Headline Ticker**: Integrated an animated compact status badge (🟢 Good Service, 🟡 Minor Alerts, 🔴 Major Disruption) alongside a single-line headline summary that can be clicked to smoothly expand full incident bullet points.",
         "**Location Auto-Detection & Preset Agencies**: Auto-detects local host timezone and coordinates (supporting Transperth WA, Transport for NSW, PTV Victoria, Translink Queensland, Adelaide Metro, TfL London, and MTA New York) with automatic fallback to Transperth WA.",
         "**Custom RSS / JSON Feed Configuration**: Added a transit configuration modal (⚙️) allowing broadcasters to select manual regional agency presets or enter a custom RSS/XML or JSON disruptions feed endpoint.",
-        "**Configurable Auto-XFade Transition Speed**: Added a persistent speed duration selector (`⚡ Fast (1s)`, `🌊 Med (2s)`, `⏳ Slow (3.5s)`, `📻 Broadcast (5s)`) directly into the Auto-Deck Relay control strip, allowing broadcasters to choose between swift beat transitions or slow, gradual radio crossfades."
+        "**Configurable Auto-XFade Transition Speed**: Added a persistent speed duration selector (`⚡ Fast (1s)`, `🌊 Med (2s)`, `⏳ Slow (3.5s)`, `📻 Broadcast (5s)`) directly into the Auto-Deck Relay control strip, allowing broadcasters to choose between swift beat transitions or slow, gradual radio crossfades.",
+        "**Smart Segue Outro Fade-Out Overlap**: Added intelligent outro fade detection in Auto-Deck Relay. When a track fades below -21 dB during the final 8 seconds, the engine automatically launches the incoming deck and initiates the auto-crossfade to eliminate dead air."
       ]
     },
     {

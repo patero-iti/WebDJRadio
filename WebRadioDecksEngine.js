@@ -852,6 +852,22 @@ class WebRadioDecksEngine {
     return (sum / data.length) / 255;
   }
 
+  // Precise Decibel (dBFS) Metering for Smart Segue & Fade-Out Detection
+  getDeckDbLevel(deckId) {
+    const deck = this.decks[deckId];
+    if (!deck || !deck.isPlaying || !deck.nodes || !deck.nodes.analyser) return -100;
+    const analyser = deck.nodes.analyser;
+    const data = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(data);
+    let sumSquares = 0;
+    for (let i = 0; i < data.length; i++) {
+      sumSquares += data[i] * data[i];
+    }
+    const rms = Math.sqrt(sumSquares / data.length);
+    if (rms < 0.00001) return -100;
+    return 20 * Math.log10(rms);
+  }
+
   getMasterPeakLevel() {
     const data = new Uint8Array(this.masterAnalyser.frequencyBinCount);
     this.masterAnalyser.getByteFrequencyData(data);
