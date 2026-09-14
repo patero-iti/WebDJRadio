@@ -1,8 +1,18 @@
 {
-  "version": "2.4.1",
+  "version": "2.4.2",
   "name": "WebDJRadio Console",
   "releaseDate": "2026-09-14",
   "changelog": [
+    {
+      "version": "2.4.2",
+      "date": "2026-09-14",
+      "title": "Screen Wake Lock API & Background Audio Keep-Alive Engine",
+      "changes": [
+        "**Screen Wake Lock Header Toggle**: Added a dedicated `☀️ Awake` / `🌙 Allow Sleep` toggle button in the top navigation bar to prevent computer display dimming and OS sleep timers during live broadcasts and DJ sets.",
+        "**Background Audio Keep-Alive Architecture**: Integrated an inaudible background media keep-alive stream and visibility/focus auto-resume handlers to prevent browser audio graph suspension or OS App Nap throttling when the screen turns off or the tab is placed in the background.",
+        "**Audio Routing & B.U.T.T. Setup Modal Controls**: Added configurable checkboxes (`☀️ Keep Screen Awake` & `🔄 Background Audio Keep-Alive`) with live status feedback in the Audio Routing / B.U.T.T. Broadcast modal with automatic preference persistence in `localStorage`."
+      ]
+    },
     {
       "version": "2.4.1",
       "date": "2026-09-14",

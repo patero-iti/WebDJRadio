@@ -145,6 +145,10 @@
       <button class="btn" id="btn-fx-panel" title="Open Studio Software FX Rack (Filter, Delay, Reverb, Flanger, Bitcrusher, Beat Roll)">
         <span>✨ FX</span>
       </button>
+      <button class="btn btn-keep-awake active" id="btn-keep-awake" type="button" title="Screen Wake Lock: Prevent computer and screen from sleeping during playback (Click to toggle)">
+        <span class="wake-icon" id="header-wake-icon">☀️</span>
+        <span id="header-wake-text">Awake</span>
+      </button>
       <button class="btn btn-broadcast" id="btn-broadcast-panel" title="Configure live streaming to WebRTC (WHIP), Icecast, or Shoutcast">
         <span class="broadcast-dot" id="header-broadcast-dot"></span>
         <span id="header-broadcast-text">📡 Broadcast</span>
@@ -152,6 +156,7 @@
       <button class="btn btn-primary" id="btn-unlock-audio">
         <span>⚡ Unlock Engine</span>
       </button>
+      <audio id="bg-audio-keepalive" loop playsinline style="display:none;"></audio>
     </div>
   </header>
 
@@ -1677,6 +1682,24 @@
                     <input type="checkbox" id="chk-mic-noise-suppress">
                     <span>Noise Suppress</span>
                   </label>
+                </div>
+
+                <!-- Screen Sleep & Background Playback Engine -->
+                <div style="margin-top: 10px; background: rgba(255,215,0,0.04); border: 1px solid rgba(255,215,0,0.18); border-radius: 6px; padding: 8px 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: #ffd700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <span>☀️ Screen Sleep &amp; Background Audio Settings:</span>
+                  </div>
+                  <div style="display: flex; gap: 14px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
+                    <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Prevent computer display from dimming or sleeping while on air (Screen Wake Lock API)">
+                      <input type="checkbox" id="chk-keep-screen-awake" checked>
+                      <span style="color: #fff; font-weight: 600;">☀️ Keep Screen Awake</span>
+                    </label>
+                    <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Maintain continuous audio playback without browser throttling if the display turns off or tab is in background">
+                      <input type="checkbox" id="chk-background-audio-keepalive" checked>
+                      <span style="color: #fff; font-weight: 600;">🔄 Background Audio Keep-Alive</span>
+                    </label>
+                  </div>
+                  <small class="field-hint" id="wake-lock-status-hint" style="margin-top: 4px; display: block;">Status: Screen Wake Lock Active (Display will stay ON)</small>
                 </div>
               </div>
             </div>

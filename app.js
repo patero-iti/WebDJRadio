@@ -777,6 +777,175 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------
+  // 3. Screen Wake Lock & Background Audio Keep-Alive Subsystem
+  // -------------------------------------------------------------
+  const btnKeepAwake = document.getElementById('btn-keep-awake');
+  const headerWakeIcon = document.getElementById('header-wake-icon');
+  const headerWakeText = document.getElementById('header-wake-text');
+  const chkKeepScreenAwake = document.getElementById('chk-keep-screen-awake');
+  const chkBackgroundAudioKeepalive = document.getElementById('chk-background-audio-keepalive');
+  const wakeLockStatusHint = document.getElementById('wake-lock-status-hint');
+  const bgAudioKeepalive = document.getElementById('bg-audio-keepalive');
+
+  let screenWakeLockSentinel = null;
+  let isKeepScreenAwakeEnabled = localStorage.getItem('webdj_keep_screen_awake') !== 'false';
+  let isBackgroundAudioKeepAliveEnabled = localStorage.getItem('webdj_background_audio_keepalive') !== 'false';
+
+  // Minimal 1-second silent WAV base64 data URI (loopable keep-alive anchor)
+  const SILENT_AUDIO_DATA_URI = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAP8A/w==';
+
+  function initBackgroundAudioKeepAlive() {
+    if (!bgAudioKeepalive) return;
+    if (!bgAudioKeepalive.src) {
+      bgAudioKeepalive.src = SILENT_AUDIO_DATA_URI;
+      bgAudioKeepalive.volume = 0.001; // Inaudible background anchor to maintain CoreAudio / WASAPI stream priority
+    }
+    if (isBackgroundAudioKeepAliveEnabled && engine && engine.ctx && engine.ctx.state === 'running') {
+      bgAudioKeepalive.play().catch(() => {});
+    } else {
+      bgAudioKeepalive.pause();
+    }
+  }
+
+  function updateWakeLockUI() {
+    const isSupported = ('wakeLock' in navigator);
+    const isActive = isSupported && (screenWakeLockSentinel !== null && !screenWakeLockSentinel.released);
+
+    if (btnKeepAwake) {
+      btnKeepAwake.classList.toggle('active', isKeepScreenAwakeEnabled);
+      btnKeepAwake.classList.toggle('inactive', !isKeepScreenAwakeEnabled);
+      if (headerWakeIcon) {
+        headerWakeIcon.textContent = isKeepScreenAwakeEnabled ? (isActive ? '☀️' : '⏳') : '🌙';
+      }
+      if (headerWakeText) {
+        headerWakeText.textContent = isKeepScreenAwakeEnabled ? (isActive ? 'Awake' : 'Awake (Standby)') : 'Allow Sleep';
+      }
+    }
+
+    if (chkKeepScreenAwake) {
+      chkKeepScreenAwake.checked = isKeepScreenAwakeEnabled;
+    }
+    if (chkBackgroundAudioKeepalive) {
+      chkBackgroundAudioKeepalive.checked = isBackgroundAudioKeepAliveEnabled;
+    }
+
+    if (wakeLockStatusHint) {
+      if (!isSupported) {
+        wakeLockStatusHint.textContent = 'Status: Screen Wake Lock API not supported in this browser. (Background Audio Keep-Alive active)';
+        wakeLockStatusHint.style.color = 'var(--text-muted)';
+      } else if (!isKeepScreenAwakeEnabled) {
+        wakeLockStatusHint.textContent = 'Status: Sleep Allowed (Screen may turn off according to OS power settings)';
+        wakeLockStatusHint.style.color = 'var(--text-muted)';
+      } else if (isActive) {
+        wakeLockStatusHint.textContent = 'Status: Screen Wake Lock Active (Display will stay ON during playback)';
+        wakeLockStatusHint.style.color = '#38ef7d';
+      } else {
+        wakeLockStatusHint.textContent = 'Status: Screen Wake Lock Enabled (Will reactivate as soon as tab is visible)';
+        wakeLockStatusHint.style.color = '#ffd700';
+      }
+    }
+  }
+
+  async function requestScreenWakeLock() {
+    if (!('wakeLock' in navigator)) {
+      updateWakeLockUI();
+      return;
+    }
+    if (!isKeepScreenAwakeEnabled) {
+      await releaseScreenWakeLock();
+      return;
+    }
+    if (screenWakeLockSentinel && !screenWakeLockSentinel.released) {
+      updateWakeLockUI();
+      return;
+    }
+    try {
+      screenWakeLockSentinel = await navigator.wakeLock.request('screen');
+      screenWakeLockSentinel.addEventListener('release', () => {
+        screenWakeLockSentinel = null;
+        updateWakeLockUI();
+      });
+      updateWakeLockUI();
+    } catch (err) {
+      // Typically occurs if document is hidden or power policy restricts wake locks
+      screenWakeLockSentinel = null;
+      updateWakeLockUI();
+    }
+  }
+
+  async function releaseScreenWakeLock() {
+    if (screenWakeLockSentinel) {
+      try {
+        await screenWakeLockSentinel.release();
+      } catch (err) {}
+      screenWakeLockSentinel = null;
+    }
+    updateWakeLockUI();
+  }
+
+  function toggleKeepScreenAwake(enabled) {
+    if (typeof enabled === 'boolean') {
+      isKeepScreenAwakeEnabled = enabled;
+    } else {
+      isKeepScreenAwakeEnabled = !isKeepScreenAwakeEnabled;
+    }
+    localStorage.setItem('webdj_keep_screen_awake', isKeepScreenAwakeEnabled ? 'true' : 'false');
+    if (isKeepScreenAwakeEnabled) {
+      requestScreenWakeLock();
+    } else {
+      releaseScreenWakeLock();
+    }
+    updateWakeLockUI();
+  }
+
+  if (btnKeepAwake) {
+    btnKeepAwake.addEventListener('click', () => {
+      toggleKeepScreenAwake();
+    });
+  }
+
+  if (chkKeepScreenAwake) {
+    chkKeepScreenAwake.addEventListener('change', () => {
+      toggleKeepScreenAwake(chkKeepScreenAwake.checked);
+    });
+  }
+
+  if (chkBackgroundAudioKeepalive) {
+    chkBackgroundAudioKeepalive.addEventListener('change', () => {
+      isBackgroundAudioKeepAliveEnabled = chkBackgroundAudioKeepalive.checked;
+      localStorage.setItem('webdj_background_audio_keepalive', isBackgroundAudioKeepAliveEnabled ? 'true' : 'false');
+      initBackgroundAudioKeepAlive();
+    });
+  }
+
+  // Re-acquire Wake Lock and resume Web Audio when tab becomes visible or receives focus
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible') {
+      if (isKeepScreenAwakeEnabled) {
+        await requestScreenWakeLock();
+      }
+      if (engine && engine.ctx && engine.ctx.state === 'suspended') {
+        engine.ctx.resume().catch(() => {});
+      }
+    }
+  });
+
+  window.addEventListener('focus', async () => {
+    if (isKeepScreenAwakeEnabled && document.visibilityState === 'visible') {
+      await requestScreenWakeLock();
+    }
+    if (engine && engine.ctx && engine.ctx.state === 'suspended') {
+      engine.ctx.resume().catch(() => {});
+    }
+  });
+
+  // Initial wake lock state initialization
+  updateWakeLockUI();
+  if (isKeepScreenAwakeEnabled) {
+    requestScreenWakeLock();
+  }
+
+  // -------------------------------------------------------------
   // 3. Audio Engine Unlock & Readiness
   // -------------------------------------------------------------
   async function unlockAudioContext() {
@@ -785,6 +954,10 @@ document.addEventListener('DOMContentLoaded', () => {
       audioStatusDot.classList.add('active');
       audioStatusText.textContent = 'Audio Engine Active (44.1kHz / Interactive)';
       btnUnlockAudio.style.display = 'none';
+      if (isKeepScreenAwakeEnabled) {
+        requestScreenWakeLock();
+      }
+      initBackgroundAudioKeepAlive();
     }
   }
 

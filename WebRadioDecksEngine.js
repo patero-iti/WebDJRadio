@@ -115,6 +115,15 @@ class WebRadioDecksEngine {
     // Track finish event callback for auto-relay/continuous play
     this.onTrackEnd = null;
 
+    // Auto-resume AudioContext if the browser or OS suspends it during background tab / screen sleep
+    if (this.ctx && typeof this.ctx.addEventListener === 'function') {
+      this.ctx.addEventListener('statechange', () => {
+        if (this.ctx.state === 'suspended' && (this.decks?.A?.isPlaying || this.decks?.B?.isPlaying || this.isMicActive)) {
+          this.ctx.resume().catch(() => {});
+        }
+      });
+    }
+
     this.setCrossfader(0.5); // Centered equal-power crossfade
   }
 
