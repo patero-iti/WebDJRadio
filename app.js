@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const fileInputGlobal = document.getElementById('file-input-global');
   const searchLibrary = document.getElementById('search-library');
   const libraryTbody = document.getElementById('library-tbody');
+  const btnClearLibrary = document.getElementById('btn-clear-library');
   const btnLayoutDj = document.getElementById('btn-layout-dj');
   const btnLayoutDjTouch = document.getElementById('btn-layout-dj-touch');
   const btnLayoutRadio = document.getElementById('btn-layout-radio');
@@ -1441,6 +1442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="btn-table-queue queue-btn-a btn-table-queue-add" data-id="${track.id}" data-deck="A" title="Add to Deck A Cued Playlist">+Q A</button>
             <button class="btn-table-queue queue-btn-b btn-table-queue-add" data-id="${track.id}" data-deck="B" title="Add to Deck B Cued Playlist">+Q B</button>
             <button class="btn btn-table-edit" data-id="${track.id}" title="Edit Metadata (Title, Artist, BPM, Key, Cover Art)" style="padding: 2px 7px; font-size: 11px;">✏️</button>
+            <button class="btn btn-danger btn-table-delete" data-id="${track.id}" title="Remove Track from Library" style="padding: 2px 7px; font-size: 11px;">🗑</button>
           </div>
         </td>
       `;
@@ -1490,6 +1492,48 @@ document.addEventListener('DOMContentLoaded', () => {
         openMetadataEditor(id);
       });
     });
+
+    // Action buttons inside table (Delete Track)
+    document.querySelectorAll('.btn-table-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        removeTrackFromLibrary(id);
+      });
+    });
+  }
+
+  // Remove individual track from library
+  function removeTrackFromLibrary(trackId) {
+    if (!trackId) return;
+    const trackIndex = libraryTracks.findIndex(t => t.id === trackId);
+    if (trackIndex >= 0) {
+      const track = libraryTracks[trackIndex];
+      libraryTracks.splice(trackIndex, 1);
+      if (selectedTrackId === trackId) {
+        selectedTrackId = null;
+      }
+      renderLibraryTable();
+      audioStatusText.textContent = `Removed "${track.title}" from Track Library`;
+    }
+  }
+
+  // Clear all tracks from library
+  function clearTrackLibrary() {
+    if (!libraryTracks || libraryTracks.length === 0) {
+      audioStatusText.textContent = 'Track Library is already empty.';
+      return;
+    }
+    if (confirm(`Are you sure you want to remove all ${libraryTracks.length} track(s) from the Track Library?`)) {
+      libraryTracks = [];
+      selectedTrackId = null;
+      renderLibraryTable();
+      audioStatusText.textContent = 'Track Library cleared.';
+    }
+  }
+
+  if (btnClearLibrary) {
+    btnClearLibrary.addEventListener('click', clearTrackLibrary);
   }
 
   searchLibrary.addEventListener('input', renderLibraryTable);
@@ -3098,6 +3142,15 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'KeyP':
         toggleAutoRelay();
         break;
+      case 'Delete':
+      case 'Backspace': {
+        const currentPrimaryView = localStorage.getItem('webdj_primary_view') || 'studio';
+        if (currentPrimaryView === 'music' && selectedTrackId) {
+          e.preventDefault();
+          removeTrackFromLibrary(selectedTrackId);
+        }
+        break;
+      }
       case 'KeyB': {
         const bm = document.getElementById('broadcast-modal');
         if (bm) bm.style.display = (bm.style.display === 'none' || !bm.style.display) ? 'flex' : 'none';

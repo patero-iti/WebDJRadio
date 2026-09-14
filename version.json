@@ -1,8 +1,18 @@
 {
-  "version": "2.4.0",
+  "version": "2.4.1",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-11",
+  "releaseDate": "2026-09-14",
   "changelog": [
+    {
+      "version": "2.4.1",
+      "date": "2026-09-14",
+      "title": "Track Library Deletion & Clear All Management",
+      "changes": [
+        "**Track Library Individual Track Removal**: Added a dedicated delete action button (`🗑`) in the Actions column of every track in the Track Library table to remove unwanted songs individually.",
+        "**Track Library 'Clear All' Button**: Added a prominent `🗑 Clear` button in the Track Library toolbar header with safety confirmation prompt to instantly clear all imported songs from the active library.",
+        "**Keyboard Shortcut Deletion**: Enabled `Delete` and `Backspace` hotkeys to quickly remove the currently selected library track when browsing music in the Track Library."
+      ]
+    },
     {
       "version": "2.4.0",
       "date": "2026-09-11",
