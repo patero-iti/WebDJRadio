@@ -1,0 +1,159 @@
+{
+  "title": "WebDJRadio Help Guide",
+  "version": "2.4.6",
+  "lastUpdated": "2026-10-16",
+  "sections": [
+    {
+      "id": "quickstart",
+      "icon": "⚡",
+      "title": "Quick Start Guide",
+      "summary": "Get up and running with audio playback, music loading, and studio controls in seconds.",
+      "articles": [
+        {
+          "heading": "1. Unlocking the Web Audio Engine",
+          "body": "Modern browsers (Chrome, Edge, Safari, Firefox) require user interaction before playing audio. When you launch WebDJRadio, click the prominent **⚡ Unlock Engine** button in the top navigation bar. Once unlocked, the audio engine enters the *Running* state and all audio buses become active."
+        },
+        {
+          "heading": "2. Loading Music into Decks",
+          "body": "WebDJRadio supports MP3, WAV, FLAC, OGG, and M4A audio files through multiple loading methods:\n- **Drag & Drop**: Drag any audio file from your computer directly onto Deck A or Deck B to decode and load it instantly.\n- **Scan Local Music Folder**: Click **📁 Scan Music Folder** in the Track Library to select your music directory using the File System Access API. All songs will be scanned, analyzed, and added to your active library.\n- **Add Audio Files**: Click **➕ Add Files** to pick individual audio files from your system.\n- **Built-in Synth Demo Tracks**: If you have no local files ready, click **⚡ Load Demo Beats** to generate high-fidelity synthesized House, Techno, or Disco tracks directly via Web Audio synthesis."
+        },
+        {
+          "heading": "3. Switching Workstation Layouts",
+          "body": "WebDJRadio provides specialized studio console layouts tailored to different broadcasting and performance workflows. Use the **Layout** selector in the top bar to switch between:\n- **Radio A**: Full presenter console with dual decks, central mixer, Studio Hub, transit alerts, and dual weather widgets.\n- **Radio B**: Streamlined layout prioritizing large playlist queues and track metadata.\n- **Radio C**: Compact broadcast view optimized for small displays and auxiliary studio monitors.\n- **DJ Console**: Classic DJ performance setup with prominent waveforms, tempo pitch faders, and rotary FX controls.\n- **DJ Touch**: Touch-optimized interface with tactile ribbon sliders for live tablets and touchscreens."
+        }
+      ]
+    },
+    {
+      "id": "decks_mixer",
+      "icon": "🎛️",
+      "title": "Dual Decks & Mixer Controls",
+      "summary": "Mastering playback, scrolling waveforms, beat loops, hot cues, 3-band EQs, and the crossfader.",
+      "articles": [
+        {
+          "heading": "Transport Controls (Play, Pause, Cue)",
+          "body": "- **Play / Pause**: Starts or stops playback. Hit <kbd>Space</kbd> for Deck A and <kbd>Enter</kbd> for Deck B. When Sync is locked, playback automatically quantizes to the exact beat of the opposite deck.\n- **CUE Button**: When playing, pressing CUE instantly returns playback to the active cue point and pauses. When paused, pressing and holding CUE provides temporary preview playback until released.\n- **SYNC Button**: Toggles full beatmatching and phase lock with the opposite deck (illuminates when active)."
+        },
+        {
+          "heading": "Professional Beatmatching, Phase Lock & Visual Phase Meter",
+          "body": "- **Tempo & Phase Alignment**: Clicking **SYNC** locks both tempo (BPM) and transient phase. The incoming deck micro-snaps so both kick drums land at the exact same instant, eliminating trainwrecking.\n- **Dynamic Master Lock**: When a deck is synced, modulating the Master deck's pitch slider automatically keeps the follower deck synchronized in tempo in real time.\n- **Visual Beat Phase Meter**: Located directly above the crossfader in the mixer. When both decks are playing, the cursor indicates phase alignment: **Green (Center)** = Kicks locked on beat; **Yellow** = Slight phase drift; **Red** = Off-beat.\n- **Downbeat Beat Grid Markers**: Beat grids detect the first audio transient downbeat, marking beat 1 of every 4-beat bar with a prominent red marker and numbered tag on the scrolling waveform."
+        },
+        {
+          "heading": "Dynamic Scrolling Waveforms & Scrubbing",
+          "body": "- **60 FPS Scrolling Waveform**: Displays high-resolution, frequency-colored audio peaks gliding under a fixed center playhead marker with real-time beat grid lines.\n- **Dual Scrubbing**: Click and drag inside the zoomed waveform canvas for micro-nudging and needle drops. Click anywhere along the slim **Overview Bar** below the waveform for instant macro-seeking across the entire track."
+        },
+        {
+          "heading": "Pitch & Tempo Fader",
+          "body": "- Adjust playback speed within a ±8% range. The readout displays current BPM and speed deviation percentage. Double-click the slider handle at any time to instantly reset pitch back to 0.0% (original tempo)."
+        },
+        {
+          "heading": "Hot Cues & Beat Looping",
+          "body": "- **Hot Cues (1–4)**: Click any empty Hot Cue pad (or use keys <kbd>Q</kbd>, <kbd>W</kbd>, <kbd>E</kbd>, <kbd>R</kbd> for Deck A; <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd> for Deck B) to set a marker at the current playhead position. Clicking an active pad instantly jumps to that point. Right-click any cue pad to clear it.\n- **Beat Loops**: Click **1**, **2**, **4**, or **8** to activate an instant auto-quantized beat loop. Click the **LOOP** button to exit or manually engage the loop."
+        },
+        {
+          "heading": "3-Band Isolator EQ & Sound FX",
+          "body": "- **High EQ**: High-shelf filter at 3200 Hz with ±12 dB boost/cut.\n- **Mid EQ**: Peaking bandpass filter at 1000 Hz (Q = 1.0) with ±12 dB boost/cut.\n- **Low EQ**: Low-shelf bass filter at 320 Hz with ±12 dB boost/cut.\n- **Bipolar Filter**: Center neutral; turn counter-clockwise for low-pass filter (LPF) or clockwise for high-pass filter (HPF).\n- **On-Deck FX Ribbons**: Modulate Delay, Reverb, Flanger, and Bitcrusher with live parameter popovers (⚙️)."
+        },
+        {
+          "heading": "Equal-Power Crossfader & Touch Master Volume",
+          "body": "- **Equal-Power Crossfader**: Smoothly blends audio between Deck A and Deck B using constant-power sinusoidal gain curves (cos/sin) to prevent volume dips during transitions. Use <kbd>←</kbd> and <kbd>→</kbd> arrow keys to adjust.\n- **Universal Master Volume Touch Ribbon**: Horizontal touch ribbon located in the mixer header. Slide or tap to adjust output volume (0% to 150%). Double-tap to instantly reset to 100% unity gain."
+        }
+      ]
+    },
+    {
+      "id": "library_queues",
+      "icon": "📋",
+      "title": "Track Library & Cued Playlists",
+      "summary": "Organize your music collection, manage dedicated queues for Deck A & B, detect duplicates, and export setlists.",
+      "articles": [
+        {
+          "heading": "Track Library Management",
+          "body": "- **Search & Filter**: Type any artist, title, or keyword into the search bar to filter your imported library instantly.\n- **Direct Deck Loading**: Click the **Deck A** or **Deck B** button on any table row to load the track immediately.\n- **Track Deletion**: Click the trash can icon (🗑) on any row to remove that individual track from the library. To wipe the entire collection, click the **🗑 Clear** button in the library toolbar.\n- **Instant Duration Extraction**: Track durations are automatically decoded upon import so you can plan set times accurately."
+        },
+        {
+          "heading": "Dedicated Deck A & Deck B Cued Playlists",
+          "body": "- Switch to the **Cued Playlists** tab to view separate, curated playback queues for Deck A and Deck B.\n- Click **+Q A** or **+Q B** in the library to append songs to either queue.\n- Use the ▲ and ▼ buttons to reorder songs inside a queue, or click **⚡ Load Now** to push a track to the deck immediately.\n- Real-time badges show the runtime duration of each queue and combined setlist time."
+        },
+        {
+          "heading": "Duplicate Track Warning System",
+          "body": "- **Cross-Deck Duplicate**: If a song is queued in both Deck A and Deck B, it is visually tagged with an amber warning badge (`⚠️ In Deck B` / `⚠️ In Deck A`).\n- **Intra-Queue Duplicate**: If a song is queued multiple times in the same deck, it is highlighted with a red badge (`⚠️ Duplicate (2x)`).\n- The Cued Playlists tab header displays a warning badge whenever duplicates are present to avoid accidental repeated plays."
+        },
+        {
+          "heading": "Saving & Exporting/Importing Setlists",
+          "body": "- Click **💾 Save Setlist** to store your current Deck A & B queues into browser storage with custom names.\n- Click **📂 Saved Setlists** to open the Setlist Manager modal to view, load, or delete saved sessions.\n- Click **📤 Export JSON** to download a portable `.json` setlist file to your computer.\n- Click **📥 Import JSON** to restore any previously exported playlist file back into active queues."
+        }
+      ]
+    },
+    {
+      "id": "auto_relay",
+      "icon": "📻",
+      "title": "Auto-Deck Relay & Radio Automation",
+      "summary": "Continuous broadcast playback with smart segue outro overlap, auto-queuing, and customizable transition speeds.",
+      "articles": [
+        {
+          "heading": "Continuous Radio Relay (Hands-Free Playback)",
+          "body": "- Press the **AUTO RELAY** button in the mixer (or press <kbd>P</kbd>) to activate automated continuous playback.\n- When the active track nears completion, WebDJRadio automatically cues and launches the next track on the opposite deck and glides the crossfader across with zero dead air."
+        },
+        {
+          "heading": "Configurable Crossfade Speeds",
+          "body": "Select your desired crossfade transition duration directly from the Relay control panel:\n- **⚡ Fast (1s)**: Crisp, energetic cuts for quick pop/dance mixes.\n- **🌊 Med (2s)**: Balanced, smooth transitions suited for most music formats.\n- **⏳ Slow (3.5s)**: Extended gentle blend for acoustic, jazz, and ambient.\n- **📻 Broadcast (5s)**: Long radio-style segue for traditional FM/online broadcast station sound."
+        },
+        {
+          "heading": "Smart Segue Outro Fade-Out Overlap",
+          "body": "WebDJRadio continuously monitors audio levels during the final 8 seconds of every track. If an outro track naturally fades below **-21 dB**, the engine triggers the incoming deck early to start the segue immediately, completely eliminating dead air at the ends of songs."
+        },
+        {
+          "heading": "Auto-Queue from Playlists & Library",
+          "body": "While Auto-Relay is active, the engine automatically draws the next track from that deck's dedicated cued playlist. If the playlist is empty, it automatically pulls the next unplayed track from the general Track Library so music never stops playing."
+        }
+      ]
+    },
+    {
+      "id": "audio_routing",
+      "icon": "🔊",
+      "title": "Audio Routing & B.U.T.T. Setup (Myriad Cloud)",
+      "summary": "Route your master mix into virtual audio cables and B.U.T.T. to broadcast live to Myriad Cloud and external streaming servers.",
+      "articles": [
+        {
+          "heading": "Why Route Through B.U.T.T.?",
+          "body": "Browser security sandboxes and server CORS policies prevent web browsers from maintaining raw TCP Shoutcast/Icecast connections directly to cloud providers like Myriad Cloud. WebDJRadio solves this by routing master audio directly to virtual soundcards (such as BlackHole or Loopback), allowing the industry-standard **B.U.T.T. (Broadcast Using This Tool)** standalone encoder to deliver your stream to Myriad Cloud with 100% reliability."
+        },
+        {
+          "heading": "Step-by-Step Audio Routing Setup",
+          "body": "1. Click **🔊 Audio** in the top navigation bar to open the Audio Settings & Soundcard Routing modal.\n2. In **🎧 Master Audio Output Device**, select your virtual soundcard (e.g. *BlackHole 2ch*, *VB-Audio Cable*, or *Loopback*). If names appear generic, click **🔄 Refresh** and grant microphone/audio permissions.\n3. Open **B.U.T.T.** on your computer, open **Settings → Audio**, and set the **Audio Device / Ingestion Device** to the *same* virtual audio device (e.g. *BlackHole 2ch*).\n4. In B.U.T.T., configure your Myriad Cloud or Icecast/Shoutcast server credentials (Host, Port, Mount, Password).\n5. In B.U.T.T., click **Play / Connect** to go live! All tracks, crossfader blends, EQs, and CART sound effects played in WebDJRadio will stream directly to your station."
+        },
+        {
+          "heading": "Screen Wake Lock & Background Audio Keep-Alive",
+          "body": "- **☀️ Screen Wake Lock**: Click the **☀️ Awake** button in the header (or check the box inside the Audio modal) to prevent your operating system from dimming the screen or entering sleep mode during a live show.\n- **🔄 Background Audio Keep-Alive**: When enabled, WebDJRadio maintains an inaudible background audio loop to ensure the browser audio engine is never suspended or throttled when switching tabs or minimizing the window."
+        }
+      ]
+    },
+    {
+      "id": "midi",
+      "icon": "🎛",
+      "title": "USB MIDI Hardware Controllers",
+      "summary": "Connect plug-and-play DJ controllers or map custom hardware knobs, sliders, and buttons with MIDI Learn.",
+      "articles": [
+        {
+          "heading": "Plug-and-Play DJ Controller Presets",
+          "body": "Connect any USB MIDI DJ controller to your computer. Click **🎛 MIDI** in the top header. WebDJRadio automatically detects connected hardware and includes built-in presets for:\n- **Pioneer DDJ-200**\n- **Pioneer DDJ-400**\n- **Numark Party Mix**\n- **Behringer CMD Studio & Micro**"
+        },
+        {
+          "heading": "Custom MIDI Learn",
+          "body": "To map any knob, slider, or button on any MIDI controller:\n1. Open the **🎛 MIDI** panel.\n2. Select the target action from the dropdown (e.g. *Deck A Play*, *Crossfader*, *Master Volume*, *Deck B Filter*).\n3. Click **Start Learn**.\n4. Move the physical knob, push the button, or slide the fader on your controller.\n5. The assignment is saved automatically to `localStorage` and persists across browser sessions."
+        }
+      ]
+    },
+    {
+      "id": "shortcuts",
+      "icon": "⌨️",
+      "title": "Keyboard Shortcuts Reference",
+      "summary": "Complete quick-reference cheat sheet for all keyboard hotkeys across WebDJRadio.",
+      "articles": [
+        {
+          "heading": "Deck Playback & Transport Hotkeys",
+          "body": "| Hotkey | Assigned Function |\n|---|---|\n| <kbd>Space</kbd> | Play / Pause Deck A |\n| <kbd>Enter</kbd> | Play / Pause Deck B |\n| <kbd>Q</kbd> / <kbd>W</kbd> / <kbd>E</kbd> / <kbd>R</kbd> | Trigger Hot Cues 1, 2, 3, 4 (Deck A) |\n| <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd> | Trigger Hot Cues 1, 2, 3, 4 (Deck B) |\n| <kbd>←</kbd> (Left Arrow) | Nudge Crossfader toward Deck A |\n| <kbd>→</kbd> (Right Arrow) | Nudge Crossfader toward Deck B |\n| <kbd>P</kbd> | Toggle Auto-Deck Relay Play (Continuous Broadcast) |\n| <kbd>Tab</kbd> / <kbd>`</kbd> | Toggle between Studio Console & Music Management |\n| <kbd>X</kbd> | Toggle Studio Software FX Rack |\n| <kbd>Shift</kbd> + <kbd>M</kbd> | Toggle USB MIDI Controller Setup |\n| <kbd>?</kbd> / <kbd>H</kbd> / <kbd>F1</kbd> | Open this Help Guide & Shortcuts Reference |\n| <kbd>Delete</kbd> / <kbd>Backspace</kbd> | Delete selected track from Track Library |\n| <kbd>Escape</kbd> | Close any open modal dialog |"
+        }
+      ]
+    }
+  ]
+}

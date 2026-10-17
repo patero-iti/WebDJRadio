@@ -57,10 +57,7 @@ const MIDI_ACTIONS = {
   cart_play_3:        { deck: false, type: 'trigger', desc: 'CART Pad 3 (Play / Retrigger)' },
   cart_play_4:        { deck: false, type: 'trigger', desc: 'CART Pad 4 (Play / Retrigger)' },
   cart_stop_all:      { deck: false, type: 'trigger', desc: 'CART Wall (Stop All Carts)' },
-  cart_volume:        { deck: false, type: 'cc',      desc: 'CART Master Volume Fader' },
-  mic_toggle:         { deck: false, type: 'trigger', desc: 'Live Mic ON AIR / Mute Toggle' },
-  mic_talkover:       { deck: false, type: 'trigger', desc: 'Live Mic Talkover Ducking Toggle' },
-  mic_volume:         { deck: false, type: 'cc',      desc: 'Live Mic Gain / Volume Fader' },
+  cart_volume:        { deck: false, type: 'cc',      desc: 'CART Master Volume Fader' }
 };
 
 const MIDI_PRESETS = [
@@ -389,7 +386,11 @@ class MIDIControllerManager {
         break;
       case 'sync':
         if (isNoteOn) {
-          eng.syncBPM(deck, deck === 'A' ? 'B' : 'A');
+          if (typeof eng.toggleSync === 'function') {
+            eng.toggleSync(deck);
+          } else {
+            eng.syncBPM(deck, deck === 'A' ? 'B' : 'A');
+          }
           this.ui.onTrigger('sync', deck);
         }
         break;
@@ -626,26 +627,6 @@ class MIDIControllerManager {
         eng.setCartVolume(normCC);
         this.ui.onCCChange('cart_volume', null, normCC);
         break;
-      case 'mic_toggle':
-        if (isNoteOn) {
-          const btn = document.getElementById('btn-mic-toggle');
-          if (btn) btn.click();
-          this.ui.onTrigger('mic_toggle', null);
-        }
-        break;
-      case 'mic_talkover':
-        if (isNoteOn) {
-          const btn = document.getElementById('btn-talkover-toggle');
-          if (btn) btn.click();
-          this.ui.onTrigger('mic_talkover', null);
-        }
-        break;
-      case 'mic_volume': {
-        const micGain = normCC * 1.5;
-        eng.setMicVolume(micGain);
-        this.ui.onCCChange('mic_volume', null, normCC);
-        break;
-      }
       default:
         break;
     }

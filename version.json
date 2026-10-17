@@ -1,8 +1,53 @@
 {
-  "version": "2.4.2",
+  "version": "2.4.6",
   "name": "WebDJRadio Console",
-  "releaseDate": "2026-09-14",
+  "releaseDate": "2026-10-16",
   "changelog": [
+    {
+      "version": "2.4.6",
+      "date": "2026-10-16",
+      "title": "Professional DJ Beatmatching, Phase Lock & Visual Phase Meter Overhaul",
+      "changes": [
+        "**True Beatmatching & Phase Snap**: Upgraded the Sync engine from simple BPM tempo matching to professional phase alignment, calculating the exact sub-millisecond distance between kick transients and snapping the incoming deck directly on-beat.",
+        "**Dynamic Master/Follower Sync Lock**: Implemented active sync lock with illuminated LED feedback on the SYNC buttons; moving the Master deck pitch slider dynamically adjusts the synced follower deck in real time.",
+        "**Quantized Beat Start**: Starting playback on a synced deck while the opposite deck is live automatically quantizes the start point to land perfectly in-phase with the playing beat grid.",
+        "**Visual Beat Phase Meter**: Added an animated, color-coded DJ beat phase meter directly above the mixer crossfader providing real-time visual feedback (🟢 Locked on Beat, 🟡 Drifting, 🔴 Off-Beat).",
+        "**Transient Downbeat Detection & Enhanced Beat Grids**: Integrated first-downbeat transient detection in AudioDSPAnalyzer, highlighting measure 1 of every 4-beat bar with a prominent red marker and numbered tag on the scrolling waveform."
+      ]
+    },
+    {
+      "version": "2.4.5",
+      "date": "2026-10-16",
+      "title": "Interactive In-App User Manual & Live Shortcuts System",
+      "changes": [
+        "**Dedicated User Manual Header Button**: Added a prominent '❓ Help' button in the main top navigation bar alongside quick access hotkeys (<kbd>?</kbd>, <kbd>H</kbd>, <kbd>F1</kbd>).",
+        "**Interactive In-App Help Modal**: Built a dedicated Help Guide interface with tabbed category navigation and real-time instant keyword search filtering across all topics and features.",
+        "**Dynamic Documentation Architecture (`manual.json`)**: Structured the complete broadcaster and DJ guide into a centralized `manual.json` file, allowing documentation and shortcuts to update automatically whenever features are added or modified.",
+        "**Comprehensive Features & Shortcuts Reference**: Detailed coverage of audio engine unlocking, deck controls, scrolling waveforms, cued playlists, duplicate detection, Auto-Relay automation, B.U.T.T. soundcard routing for Myriad Cloud, USB MIDI, and a complete keyboard shortcuts cheat sheet."
+      ]
+    },
+    {
+      "version": "2.4.4",
+      "date": "2026-10-16",
+      "title": "Dedicated Audio Routing Header & In-App Broadcast Decommission",
+      "changes": [
+        "**Dedicated Audio Navigation Button**: Moved the B.U.T.T. and soundcard routing settings out of the broadcast modal and placed a dedicated '🔊 Audio' button directly in the main top header adjacent to '🎛 MIDI'.",
+        "**Audio Routing & Soundcard Setup Modal**: Converted the settings panel into a clean, dedicated Audio modal (`audio-modal`) focused purely on soundcard selection, output routing (BlackHole, virtual audio cables, USB soundcards for B.U.T.T. ingestion), Screen Wake Lock, and background audio keep-alive options.",
+        "**In-App Broadcast Subsystem Decommission**: Completely removed the obsolete in-browser streaming section (WebRTC WHIP, Icecast 2, Shoutcast, P2P direct streaming, mixer broadcast card, and stream status monitors) due to Myriad Cloud in-browser protocol limitations, streamlining external broadcast transmission via B.U.T.T.",
+        "**CSS & Asset Cleanup**: Purged all unused broadcast classes, mixer stream cards, and script references across all workstation layouts."
+      ]
+    },
+    {
+      "version": "2.4.3",
+      "date": "2026-10-16",
+      "title": "Live Microphone & External Audio Input Decommission",
+      "changes": [
+        "**Mixer Channel Strip Removal**: Removed the Live Microphone channel strip (MIC), gain fader, VU peak meter, and ON AIR / talkover buttons from the Web Radio mixer across all workstation layouts.",
+        "**Audio Graph Streamlining**: Decommissioned the live microphone Web Audio DSP routing matrix and auto-ducking chain from WebRadioDecksEngine, connecting the music bus and CART wall directly to the master bus and live broadcast stream.",
+        "**Broadcast Setup Simplification**: Removed audio input device selection, mono routing modes, and microphone signal processing options from the B.U.T.T. / Audio Routing configuration modal.",
+        "**Shortcut & MIDI Cleanup**: Removed the 'M' microphone toggle hotkey and corresponding USB MIDI Note/CC mappings (`mic_toggle`, `mic_talkover`, `mic_volume`)."
+      ]
+    },
     {
       "version": "2.4.2",
       "date": "2026-09-14",
@@ -10,7 +55,8 @@
       "changes": [
         "**Screen Wake Lock Header Toggle**: Added a dedicated `☀️ Awake` / `🌙 Allow Sleep` toggle button in the top navigation bar to prevent computer display dimming and OS sleep timers during live broadcasts and DJ sets.",
         "**Background Audio Keep-Alive Architecture**: Integrated an inaudible background media keep-alive stream and visibility/focus auto-resume handlers to prevent browser audio graph suspension or OS App Nap throttling when the screen turns off or the tab is placed in the background.",
-        "**Audio Routing & B.U.T.T. Setup Modal Controls**: Added configurable checkboxes (`☀️ Keep Screen Awake` & `🔄 Background Audio Keep-Alive`) with live status feedback in the Audio Routing / B.U.T.T. Broadcast modal with automatic preference persistence in `localStorage`."
+        "**Audio Routing & B.U.T.T. Setup Modal Controls**: Added configurable checkboxes (`☀️ Keep Screen Awake` & `🔄 Background Audio Keep-Alive`) with live status feedback in the Audio Routing / B.U.T.T. Broadcast modal with automatic preference persistence in `localStorage`.",
+        "**Online Metadata & High-Res Cover Art API**: Migrated live track metadata and album art lookups from MusicBrainz to the iTunes Search API and TheAudioDB, eliminating HTTP 503 rate-limiting errors in the console and delivering instant, high-resolution 600x600 cover artwork, release years, album titles, and genres."
       ]
     },
     {
