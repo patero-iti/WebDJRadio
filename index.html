@@ -136,8 +136,14 @@
         </button>
       </div>
 
+      <button class="btn" id="btn-manual" title="Help Guide & Keyboard Shortcuts (Press ? or H to open)">
+        <span>❓ Help</span>
+      </button>
       <button class="btn" id="btn-changelog" title="Version & Update History">
         <span>📜 Updates</span>
+      </button>
+      <button class="btn" id="btn-audio-panel" title="Audio Device Routing & Soundcard Setup (B.U.T.T.)">
+        <span>🔊 Audio</span>
       </button>
       <button class="btn" id="btn-midi-panel" title="USB MIDI Controller Setup">
         <span>🎛 MIDI</span>
@@ -148,10 +154,6 @@
       <button class="btn btn-keep-awake active" id="btn-keep-awake" type="button" title="Screen Wake Lock: Prevent computer and screen from sleeping during playback (Click to toggle)">
         <span class="wake-icon" id="header-wake-icon">☀️</span>
         <span id="header-wake-text">Awake</span>
-      </button>
-      <button class="btn btn-broadcast" id="btn-broadcast-panel" title="Configure live streaming to WebRTC (WHIP), Icecast, or Shoutcast">
-        <span class="broadcast-dot" id="header-broadcast-dot"></span>
-        <span id="header-broadcast-text">📡 Broadcast</span>
       </button>
       <button class="btn btn-primary" id="btn-unlock-audio">
         <span>⚡ Unlock Engine</span>
@@ -683,37 +685,6 @@
             </div>
           </div>
 
-          <!-- Mic / Live Input Channel Strip -->
-          <div class="channel-fader-strip mic-strip" id="mixer-strip-mic">
-            <div class="mixer-ch-art mixer-mic-art" id="mixer-art-mic" title="Microphone Live Input">
-              <div class="mixer-art-icon" id="mixer-art-placeholder-mic">🎙️</div>
-            </div>
-            <div class="mixer-track-info" id="mixer-track-info-mic">
-              <div class="mixer-track-title" id="mixer-track-title-mic">LIVE MIC</div>
-              <div class="mixer-track-artist" id="mixer-track-artist-mic">Direct Voice</div>
-              <div class="mixer-track-time">
-                <span class="mixer-time-label">STATUS</span>
-                <span class="mixer-time-val" id="mixer-mic-status-text">MUTED</span>
-              </div>
-            </div>
-            <span class="strip-label">MIC</span>
-            <div class="fader-and-meter">
-              <div class="vu-meter-bar">
-                <div class="vu-fill" id="vu-mic"></div>
-              </div>
-              <input type="range" class="vertical-fader mic-fader" id="vol-mic" min="0" max="1.5" step="0.01" value="1" title="Microphone / Live Input Gain">
-            </div>
-            <div class="mic-channel-actions">
-              <button class="btn-channel-square btn-mic-toggle" id="btn-mic-toggle" title="Toggle Live Microphone (Key: M)">
-                <span class="mic-led" id="mic-led"></span>
-                <span class="btn-square-icon">🎙️</span>
-                <span class="mic-btn-text" id="mic-btn-text">MIC</span>
-              </button>
-              <button class="btn-talkover-toggle" id="btn-talkover-toggle" title="Auto-duck music volume when mic is active">
-                <span>TALK</span>
-              </button>
-            </div>
-          </div>
 
           <!-- Deck A Channel Strip -->
           <div class="channel-fader-strip deck-a" id="mixer-strip-a">
@@ -795,8 +766,21 @@
           </div>
         </div>
 
-        <!-- Equal-Power Crossfader -->
+        <!-- Equal-Power Crossfader & Beat Phase Meter -->
         <div class="crossfader-container">
+          <!-- Live Beat Phase Meter (DJ Beatmatching Visualizer) -->
+          <div class="beat-phase-box" id="beat-phase-box" title="Beat Phase Alignment: Green center marker indicates kicks and beats are locked in phase">
+            <div class="phase-meter-header">
+              <span class="phase-meter-tag" id="phase-tag-a">DECK A</span>
+              <span class="phase-meter-title">BEAT PHASE</span>
+              <span class="phase-meter-tag" id="phase-tag-b">DECK B</span>
+            </div>
+            <div class="phase-track">
+              <div class="phase-center-notch"></div>
+              <div class="phase-cursor" id="phase-cursor"></div>
+            </div>
+          </div>
+
           <div class="crossfader-labels">
             <span class="tag-a">A</span>
             <span class="tag-b">B</span>
@@ -835,21 +819,6 @@
           </div>
         </div>
 
-        <!-- Live Broadcast Stream Console -->
-        <div class="broadcast-mixer-card">
-          <div class="broadcast-mixer-header">
-            <span class="broadcast-tag">STREAMING</span>
-            <span class="broadcast-status-pill" id="mixer-broadcast-status">OFFLINE</span>
-          </div>
-          <button class="btn-mixer-broadcast" id="btn-mixer-broadcast" title="Toggle Live Broadcast / Open Stream Setup">
-            <span class="broadcast-rec-icon" id="mixer-broadcast-icon">🔴</span>
-            <span id="mixer-broadcast-btn-text">GO LIVE</span>
-          </button>
-          <div class="broadcast-mixer-readouts">
-            <span class="broadcast-stat" id="mixer-broadcast-timer">00:00:00</span>
-            <span class="broadcast-stat" id="mixer-broadcast-mode">WebRTC WHIP</span>
-          </div>
-        </div>
       </section>
 
       <!-- BROADCAST CART WALL PANEL (Shown in Radio Presenter B Layout) -->
@@ -1487,144 +1456,20 @@
     </div>
   </div>
 
-  <!-- Live Radio Broadcast & Streaming Setup Modal -->
-  <div class="modal-overlay" id="broadcast-modal" style="display: none;">
-    <div class="modal-content" style="max-width: 740px;">
+  <!-- Audio Settings & Soundcard Routing Modal -->
+  <div class="modal-overlay" id="audio-modal" style="display: none;">
+    <div class="modal-content" style="max-width: 640px;">
       <div class="modal-header">
-        <h3 class="modal-title">📡 Live Radio Broadcasting &amp; Streaming</h3>
-        <button class="btn-modal-close" id="btn-close-broadcast-modal">&times;</button>
+        <h3 class="modal-title">🔊 Audio Settings &amp; Soundcard Routing</h3>
+        <button class="btn-modal-close" id="btn-close-audio-modal">&times;</button>
       </div>
       <div class="modal-body">
-        
-        <!-- Live Status Bar -->
-        <div class="broadcast-banner" id="broadcast-status-banner">
-          <div class="broadcast-banner-left">
-            <span class="live-dot" id="modal-broadcast-dot"></span>
-            <span class="live-status-text" id="modal-broadcast-status-text">OFFLINE</span>
-            <span class="live-timer-text" id="modal-broadcast-timer">00:00:00</span>
-          </div>
-          <div class="broadcast-banner-right">
-            <button class="btn btn-danger" id="btn-modal-toggle-broadcast">
-              <span id="modal-toggle-broadcast-text">🔴 GO LIVE</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Protocol Tabs -->
-        <div class="panel-tabs-bar" style="margin-top: 12px;">
-          <button class="tab-btn active" id="tab-broadcast-webrtc">
-            <span>⚡ WebRTC (WHIP)</span>
-          </button>
-          <button class="tab-btn" id="tab-broadcast-icecast">
-            <span>📻 Icecast 2</span>
-          </button>
-          <button class="tab-btn" id="tab-broadcast-butt">
-            <span>🎧 B.U.T.T. / Audio Routing</span>
-          </button>
-          <button class="tab-btn" id="tab-broadcast-shoutcast">
-            <span>🎙 Shoutcast</span>
-          </button>
-          <button class="tab-btn" id="tab-broadcast-p2p">
-            <span>🔗 P2P Direct</span>
-          </button>
-        </div>
-
-        <!-- Protocol Content 1: WebRTC WHIP -->
-        <div class="broadcast-tab-content" id="bcontent-webrtc">
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <label>WHIP Endpoint URL</label>
-              <input type="text" id="bcast-webrtc-url" placeholder="https://customer-xxx.cloudflarestream.com/.../webRTC/publish or http://localhost:8080/app/stream/whip" value="">
-              <small class="field-hint">Compatible with Cloudflare Stream, OvenMediaEngine, Janus, LiveKit, MediaSoup, Restream, etc.</small>
-            </div>
-            <div class="form-group">
-              <label>Bearer Token / Auth Key (Optional)</label>
-              <input type="password" id="bcast-webrtc-token" placeholder="Bearer Token / Secret">
-            </div>
-            <div class="form-group">
-              <label>Audio Bitrate</label>
-              <select id="bcast-webrtc-bitrate">
-                <option value="128">128 kbps (Standard Opus Stereo)</option>
-                <option value="192">192 kbps (High Fidelity)</option>
-                <option value="256" selected>256 kbps (Studio Quality Stereo)</option>
-                <option value="320">320 kbps (Maximum 48kHz)</option>
-              </select>
-            </div>
-            <div class="form-group full-width">
-              <label>STUN / TURN Servers</label>
-              <input type="text" id="bcast-webrtc-ice" value="stun:stun.l.google.com:19302">
-            </div>
-          </div>
-        </div>
-
-        <!-- Protocol Content 2: Icecast (Icecast 2 / BUTT Settings) -->
-        <div class="broadcast-tab-content" id="bcontent-icecast" style="display: none;">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Address / Host (e.g. BUTT Address)</label>
-              <input type="text" id="bcast-icecast-address" placeholder="stream.example.com or localhost" value="localhost">
-            </div>
-            <div class="form-group">
-              <label>Port</label>
-              <input type="number" id="bcast-icecast-port" placeholder="8000" value="8000">
-            </div>
-            <div class="form-group">
-              <label>Icecast Mountpoint</label>
-              <input type="text" id="bcast-icecast-mount" placeholder="/live.ogg or /stream" value="/live.ogg">
-            </div>
-            <div class="form-group">
-              <label>Icecast User (Default: source)</label>
-              <input type="text" id="bcast-icecast-user" placeholder="source" value="source">
-            </div>
-            <div class="form-group">
-              <label>Password</label>
-              <input type="password" id="bcast-icecast-pass" placeholder="Source Password" value="">
-            </div>
-            <div class="form-group">
-              <label>Audio Format &amp; Bitrate</label>
-              <select id="bcast-icecast-bitrate">
-                <option value="128">128 kbps (Ogg Opus)</option>
-                <option value="192" selected>192 kbps (Ogg Opus High-Fi)</option>
-                <option value="256">256 kbps (Studio Quality)</option>
-                <option value="320">320 kbps (Maximum 48kHz)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Station Name</label>
-              <input type="text" id="bcast-icecast-name" value="WebDJ Radio Live">
-            </div>
-            <div class="form-group">
-              <label>Genre</label>
-              <input type="text" id="bcast-icecast-genre" value="Electronic / DJ Mix">
-            </div>
-            <div class="form-group">
-              <label>Use SSL / HTTPS (Port 443 / 8443)</label>
-              <select id="bcast-icecast-ssl">
-                <option value="http" selected>HTTP (Standard Port 8000)</option>
-                <option value="https">HTTPS (Secure Stream)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Connection Method</label>
-              <select id="bcast-icecast-protocol">
-                <option value="http_put" selected>Direct HTTP PUT (Standard Icecast 2)</option>
-                <option value="websocket_bridge">WebSocket Relay Bridge (ws://... / wss://...)</option>
-              </select>
-            </div>
-          </div>
-          <div class="field-hint" style="margin-top: 8px; color: var(--text-dim); font-size: 11px; line-height: 1.5;">
-            💡 <em>Matches BUTT settings. Note: Browsers stream via web HTTP/PUT. If your Icecast server blocks cross-origin requests (CORS), enable CORS headers in <code>icecast.xml</code> or select <strong>WebRTC (WHIP)</strong> for native browser-to-server streaming.</em>
-          </div>
-        </div>
-
-        <!-- Protocol Content 3: B.U.T.T. & Myriad Cloud Audio Routing -->
-        <div class="broadcast-tab-content" id="bcontent-butt" style="display: none;">
           <div class="butt-integration-card" style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
             <div style="font-weight: 800; font-size: 14px; color: var(--text-main); margin-bottom: 6px;">
               🎙️ Audio Hardware Routing &amp; Stream Ingestion (B.U.T.T. / Soundcards)
             </div>
             <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;">
-              Configure master output soundcard routing (for B.U.T.T., BlackHole, Loopback) and select your live broadcast input device (Microphone, Bluetooth headset, Audio Interface / Line-In).
+              Configure master output soundcard routing (for B.U.T.T., BlackHole, Loopback).
             </p>
 
             <div class="form-grid" style="margin-bottom: 12px;">
@@ -1632,7 +1477,7 @@
               <div class="form-group full-width">
                 <label>🎧 Master Audio Output Device</label>
                 <div style="display: flex; gap: 8px;">
-                  <select id="bcast-audio-device-select" style="flex: 1;">
+                  <select id="audio-device-select" style="flex: 1;">
                     <option value="">Default Audio Output (Speakers / Headphones)</option>
                   </select>
                   <button class="btn btn-sm" id="btn-refresh-audio-devices" type="button" title="Refresh available output soundcards">🔄 Refresh</button>
@@ -1640,67 +1485,22 @@
                 <small class="field-hint" id="audio-device-status">Active Output: System Default</small>
               </div>
 
-              <!-- Live Microphone / Audio Input Device -->
-              <div class="form-group full-width" style="margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
-                <label>🎙️ Live Microphone / Audio Input Device</label>
-                <div style="display: flex; gap: 8px;">
-                  <select id="bcast-audio-input-select" style="flex: 1;">
-                    <option value="">Default Audio Input (Internal Microphone)</option>
-                  </select>
-                  <button class="btn btn-sm" id="btn-refresh-audio-inputs" type="button" title="Refresh available microphone / input soundcards">🔄 Refresh</button>
+              <!-- Screen Sleep & Background Playback Engine -->
+              <div class="form-group full-width" style="margin-top: 10px; background: rgba(255,215,0,0.04); border: 1px solid rgba(255,215,0,0.18); border-radius: 6px; padding: 8px 10px;">
+                <div style="font-size: 11px; font-weight: 700; color: #ffd700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                  <span>☀️ Screen Sleep &amp; Background Audio Settings:</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-                  <small class="field-hint" id="audio-input-status">Active Input: Not Connected (Click 'Connect Mic' or the MIC button on mixer)</small>
-                  <button class="btn btn-sm" id="btn-modal-test-mic" type="button" style="font-size: 11px; padding: 2px 8px;">🎙️ Connect / Test Mic</button>
-                </div>
-                <!-- Mic Input Channel Routing / Mono Mode (Behringer UMC202HD, Focusrite, etc.) -->
-                <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px; background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.15); border-radius: 6px; padding: 6px 10px;">
-                  <label for="bcast-mic-channel-mode" style="font-size: 11px; font-weight: 700; color: #00f0ff; margin-bottom: 0; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-                    <span>🎚️ Mic Channel / Mono Mode:</span>
+                <div style="display: flex; gap: 14px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
+                  <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Prevent computer display from dimming or sleeping while on air (Screen Wake Lock API)">
+                    <input type="checkbox" id="chk-keep-screen-awake" checked>
+                    <span style="color: #fff; font-weight: 600;">☀️ Keep Screen Awake</span>
                   </label>
-                  <select id="bcast-mic-channel-mode" style="flex: 1; font-size: 11px; padding: 3px 6px; height: 28px; background: #0c101c; border: 1px solid var(--border-color); color: #fff; border-radius: 4px;" title="Select Mono routing to center Input 1 (Left) or Input 2 (Right) for Behringer UMC202HD & 2-channel audio interfaces">
-                    <option value="mono-left">Mono — Input 1 / Left (Centered — Behringer UMC / Scarlett / 2-Ch Interfaces)</option>
-                    <option value="mono-sum">Mono — Sum L+R (Centered Mix)</option>
-                    <option value="mono-right">Mono — Input 2 / Right (Centered)</option>
-                    <option value="stereo">Stereo — Separate Left &amp; Right</option>
-                  </select>
-                </div>
-                <div style="display: flex; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 4px;">
-                  <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Studio Clean disables browser echo/noise gating so your voice never cuts off">
-                    <input type="checkbox" id="chk-mic-raw-mode" checked>
-                    <span style="color: #00f0ff; font-weight: 700;">Studio Raw Mode</span>
-                  </label>
-                  <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Uncheck to mute microphone in your local headphones/speakers while keeping it 100% active in the broadcast stream & B.U.T.T. (eliminates sidetone latency)">
-                    <input type="checkbox" id="chk-mic-local-monitor" checked>
-                    <span>🎧 Local Headphone Monitor</span>
-                  </label>
-                  <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Enable only if experiencing acoustic feedback through open speakers">
-                    <input type="checkbox" id="chk-mic-echo-cancel">
-                    <span>Echo Cancel</span>
-                  </label>
-                  <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
-                    <input type="checkbox" id="chk-mic-noise-suppress">
-                    <span>Noise Suppress</span>
+                  <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Maintain continuous audio playback without browser throttling if the display turns off or tab is in background">
+                    <input type="checkbox" id="chk-background-audio-keepalive" checked>
+                    <span style="color: #fff; font-weight: 600;">🔄 Background Audio Keep-Alive</span>
                   </label>
                 </div>
-
-                <!-- Screen Sleep & Background Playback Engine -->
-                <div style="margin-top: 10px; background: rgba(255,215,0,0.04); border: 1px solid rgba(255,215,0,0.18); border-radius: 6px; padding: 8px 10px;">
-                  <div style="font-size: 11px; font-weight: 700; color: #ffd700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-                    <span>☀️ Screen Sleep &amp; Background Audio Settings:</span>
-                  </div>
-                  <div style="display: flex; gap: 14px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
-                    <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Prevent computer display from dimming or sleeping while on air (Screen Wake Lock API)">
-                      <input type="checkbox" id="chk-keep-screen-awake" checked>
-                      <span style="color: #fff; font-weight: 600;">☀️ Keep Screen Awake</span>
-                    </label>
-                    <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;" title="Maintain continuous audio playback without browser throttling if the display turns off or tab is in background">
-                      <input type="checkbox" id="chk-background-audio-keepalive" checked>
-                      <span style="color: #fff; font-weight: 600;">🔄 Background Audio Keep-Alive</span>
-                    </label>
-                  </div>
-                  <small class="field-hint" id="wake-lock-status-hint" style="margin-top: 4px; display: block;">Status: Screen Wake Lock Active (Display will stay ON)</small>
-                </div>
+                <small class="field-hint" id="wake-lock-status-hint" style="margin-top: 4px; display: block;">Status: Screen Wake Lock Active (Display will stay ON)</small>
               </div>
             </div>
 
@@ -1708,77 +1508,9 @@
               <div style="font-weight: 700; color: #00f0ff; margin-bottom: 4px;">Quick 3-Step Setup for Myriad Cloud &amp; B.U.T.T.:</div>
               <div><strong>1.</strong> In the Master Output dropdown above, select your virtual audio cable (e.g. <code>BlackHole 2ch</code>, <code>Loopback</code>, or <code>VB-Cable</code>).</div>
               <div><strong>2.</strong> Open <strong>B.U.T.T.</strong> &rarr; <strong>Settings</strong> &rarr; <strong>Audio</strong> &rarr; Set <strong>Audio Device</strong> to the same virtual cable.</div>
-              <div><strong>3.</strong> In B.U.T.T., click <strong>Play / Connect</strong> to go live to Myriad Cloud with full music and mic mixing!</div>
+              <div><strong>3.</strong> In B.U.T.T., click <strong>Play / Connect</strong> to go live to Myriad Cloud with full music mixing!</div>
             </div>
           </div>
-        </div>
-
-        <!-- Protocol Content 4: Shoutcast -->
-        <div class="broadcast-tab-content" id="bcontent-shoutcast" style="display: none;">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Server Host / URL</label>
-              <input type="text" id="bcast-shoutcast-server" placeholder="http://stream.example.com:8000" value="http://localhost:8000">
-            </div>
-            <div class="form-group">
-              <label>Stream ID (SID)</label>
-              <input type="number" id="bcast-shoutcast-sid" value="1">
-            </div>
-            <div class="form-group">
-              <label>Source Password</label>
-              <input type="password" id="bcast-shoutcast-pass" placeholder="Password" value="">
-            </div>
-            <div class="form-group">
-              <label>Bitrate</label>
-              <select id="bcast-shoutcast-bitrate">
-                <option value="128">128 kbps</option>
-                <option value="192" selected>192 kbps</option>
-                <option value="320">320 kbps</option>
-              </select>
-            </div>
-            <div class="form-group full-width">
-              <label>Station Name</label>
-              <input type="text" id="bcast-shoutcast-name" value="WebDJ Radio Live">
-            </div>
-          </div>
-        </div>
-
-        <!-- Protocol Content 4: WebRTC P2P Direct Stream -->
-        <div class="broadcast-tab-content" id="bcontent-p2p" style="display: none;">
-          <div class="p2p-direct-box">
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-              Broadcast direct from your browser to peer listeners without any external server required.
-            </p>
-            <div class="form-group full-width">
-              <label>Local Stream SDP Offer</label>
-              <textarea id="bcast-p2p-sdp" rows="4" style="width:100%; font-family:var(--font-mono); font-size:11px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); color:var(--text-main); padding:8px; border-radius:4px;" readonly placeholder="Click 'GO LIVE' to generate peer broadcast token..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Live Stream Stats & Monitor -->
-        <div class="stream-stats-panel">
-          <div class="stream-stats-grid">
-            <div class="stat-box">
-              <span class="stat-label">DATA SENT</span>
-              <span class="stat-value" id="stat-data-sent">0.00 MB</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">AVG BITRATE</span>
-              <span class="stat-value" id="stat-avg-bitrate">-- kbps</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">NOW PLAYING</span>
-              <span class="stat-value" id="stat-now-playing" style="font-size: 11px; color: #00f0ff;">WebDJ Live Mix</span>
-            </div>
-          </div>
-
-          <!-- Live Event Log -->
-          <div class="broadcast-log-box" id="broadcast-log-box">
-            <div class="log-entry log-info">[System] Radio broadcast subsystem ready. Configure your stream settings above and click GO LIVE.</div>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -2094,6 +1826,34 @@
     </div>
   </div>
 
+  <!-- User Help & Keyboard Shortcuts Modal -->
+  <div class="modal-overlay" id="manual-modal" style="display: none;">
+    <div class="modal-content manual-modal-content">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h3 class="modal-title">❓ WebDJRadio Help &amp; Shortcuts</h3>
+          <span class="manual-ver-badge" id="manual-version-tag">v2.4.6</span>
+        </div>
+        <button class="btn-modal-close" id="btn-close-manual-modal">&times;</button>
+      </div>
+      <div class="manual-toolbar">
+        <div class="manual-search-wrapper">
+          <span class="manual-search-icon">🔍</span>
+          <input type="text" id="manual-search-input" placeholder="Search help topics, controls, and shortcuts (e.g. crossfader, loop, BUTT, space)..." autocomplete="off">
+          <button type="button" class="manual-search-clear-btn" id="manual-search-clear" style="display: none;">✕</button>
+        </div>
+      </div>
+      <div class="manual-modal-body">
+        <aside class="manual-nav" id="manual-nav">
+          <!-- Rendered dynamically from manual.json -->
+        </aside>
+        <main class="manual-content-view" id="manual-content-view">
+          <!-- Rendered dynamically from manual.json -->
+        </main>
+      </div>
+    </div>
+  </div>
+
   <!-- Version Notes Modal -->
   <div class="modal-overlay" id="changelog-modal" style="display: none;">
     <div class="modal-content">
@@ -2113,17 +1873,16 @@
     <div class="keyboard-hints">
       <span><span class="key-cap">Space</span> Play/Pause A</span>
       <span><span class="key-cap">Enter</span> Play/Pause B</span>
-      <span><span class="key-cap">M</span> Mic On/Mute</span>
       <span><span class="key-cap">Q/W/E/R</span> Hot Cues A</span>
       <span><span class="key-cap">1/2/3/4</span> Hot Cues B</span>
       <span><span class="key-cap">← / →</span> Crossfader</span>
+      <span><span class="key-cap">?</span> Help</span>
     </div>
   </footer>
 
   <!-- Scripts -->
   <script src="audio-analysis.js?v=1.9.8"></script>
   <script src="WebRadioDecksEngine.js?v=1.9.8"></script>
-  <script src="broadcast.js?v=1.9.8"></script>
   <script src="midi.js?v=1.9.8"></script>
   <script src="app.js?v=1.9.8"></script>
 </body>

@@ -20,67 +20,15 @@ class WebRadioDecksEngine {
     this.masterAnalyser.fftSize = 256;
     this.masterAnalyser.smoothingTimeConstant = 0.8;
     
-    // Live Microphone / Audio Input Node Chain & Matrix Router
-    this.micStream = null;
-    this.micSourceNode = null;
-    this.micChannelMode = 'mono-left'; // 'mono-left' (Input 1 -> Center), 'mono-right' (Input 2 -> Center), 'mono-sum' (L+R sum -> Center), 'stereo'
-
-    // Channel Routing Matrix for Stereo & Multi-Channel Audio Interfaces (e.g. Behringer UMC202HD, Focusrite Scarlett)
-    this.micSplitter = this.ctx.createChannelSplitter(2);
-    this.micLeftGainL = this.ctx.createGain();
-    this.micLeftGainR = this.ctx.createGain();
-    this.micRightGainL = this.ctx.createGain();
-    this.micRightGainR = this.ctx.createGain();
-    this.micMerger = this.ctx.createChannelMerger(2);
-
-    this.micSplitter.connect(this.micLeftGainL, 0);
-    this.micSplitter.connect(this.micLeftGainR, 0);
-    this.micSplitter.connect(this.micRightGainL, 1);
-    this.micSplitter.connect(this.micRightGainR, 1);
-
-    this.micLeftGainL.connect(this.micMerger, 0, 0);
-    this.micLeftGainR.connect(this.micMerger, 0, 1);
-    this.micRightGainL.connect(this.micMerger, 0, 0);
-    this.micRightGainR.connect(this.micMerger, 0, 1);
-
-    this.micGain = this.ctx.createGain();
-    this.micGain.gain.value = 0.0; // starts muted/inactive
-    this.micMerger.connect(this.micGain);
-
-    this.setMicChannelMode(this.micChannelMode);
-
-    this.micVolume = 1.0;
-    this.isMicActive = false;
-    this.micDeviceId = '';
-    this.micEchoCancellation = false; // Studio Clean (disables browser VAD / gating)
-    this.micNoiseSuppression = false;  // Full bandwidth audio
-    this.micAutoGainControl = false;   // Zero compression / volume ducking
-    this.micLocalMonitor = true;       // Hear own voice in local headphones/speakers
-    this.talkoverDucking = false;
-    this.duckingGain = 0.35; // -9dB music ducking when talkover is active
-    
-    // Analyser Node for Mic VU Meter (connected in parallel for 0ms delay)
-    this.micAnalyser = this.ctx.createAnalyser();
-    this.micAnalyser.fftSize = 256;
-    this.micAnalyser.smoothingTimeConstant = 0.7;
-    this.micGain.connect(this.micAnalyser);
-
-    // Local monitor gain node (controls mic level sent to local headphones/speakers)
-    this.localMonitorGain = this.ctx.createGain();
-    this.localMonitorGain.gain.value = 1.0;
-    this.micGain.connect(this.localMonitorGain);
-
     // Audio routing into Master Output:
-    // 1. Music and local mic monitor feed local destination
+    // 1. Music feeds local destination
     this.musicBus.connect(this.masterGain);
-    this.localMonitorGain.connect(this.masterGain);
     this.masterGain.connect(this.masterAnalyser);
     this.masterAnalyser.connect(this.ctx.destination);
 
     // 2. Broadcast stream bus (feeds WebRTC, Icecast, Shoutcast, B.U.T.T.)
     this.broadcastBus = this.ctx.createGain();
     this.musicBus.connect(this.broadcastBus);
-    this.micGain.connect(this.broadcastBus);
 
     // CART Subsystem Node Chain & Analyzers (Mixes to Master & Stream)
     this.cartGain = this.ctx.createGain();
@@ -118,7 +66,7 @@ class WebRadioDecksEngine {
     // Auto-resume AudioContext if the browser or OS suspends it during background tab / screen sleep
     if (this.ctx && typeof this.ctx.addEventListener === 'function') {
       this.ctx.addEventListener('statechange', () => {
-        if (this.ctx.state === 'suspended' && (this.decks?.A?.isPlaying || this.decks?.B?.isPlaying || this.isMicActive)) {
+        if (this.ctx.state === 'suspended' && (this.decks?.A?.isPlaying || this.decks?.B?.isPlaying)) {
           this.ctx.resume().catch(() => {});
         }
       });
@@ -291,6 +239,9 @@ class WebRadioDecksEngine {
       playbackRate: 1.0,
       pitchNudge: 0,
       bpm: 120,
+      gridOffset: 0,
+      syncActive: false,
+      isMaster: false,
       title: `Deck ${id} Track`,
       artist: 'Unknown Artist',
       cuePoint: 0,
@@ -360,6 +311,9 @@ class WebRadioDecksEngine {
     deck.artist = metadata.artist || 'WebDJ Collection';
     deck.bpm = (metadata.bpm && metadata.bpm > 0) ? metadata.bpm : this._estimateBPM(decodedBuffer);
     deck.key = metadata.key || this._estimateKey(decodedBuffer);
+    deck.gridOffset = this._estimateDownbeat(decodedBuffer, deck.bpm);
+    deck.syncActive = false;
+    deck.isMaster = false;
 
     return deck;
   }
@@ -370,6 +324,19 @@ class WebRadioDecksEngine {
     if (!deck.buffer || deck.isPlaying) return;
 
     this.unlockAudio();
+
+    // Quantized Play trigger: if Sync is active and other deck is playing, snap start to beat phase
+    const otherDeckId = deckId === 'A' ? 'B' : 'A';
+    const otherDeck = this.decks[otherDeckId];
+    if (deck.syncActive && otherDeck && otherDeck.isPlaying && deck.bpm && otherDeck.bpm) {
+      const otherPhase = this.getBeatPhase(otherDeckId);
+      const myPhase = this.getBeatPhase(deckId);
+      let diff = otherPhase.beatProgress - myPhase.beatProgress;
+      if (diff > 0.5) diff -= 1.0;
+      if (diff < -0.5) diff += 1.0;
+      const myBeatSec = 60.0 / Math.max(1, deck.bpm * (deck.playbackRate + deck.pitchNudge));
+      deck.pauseOffset = Math.max(0, Math.min(deck.buffer.duration - 0.1, deck.pauseOffset + (diff * myBeatSec)));
+    }
 
     deck.source = this.ctx.createBufferSource();
     deck.source.buffer = deck.buffer;
@@ -521,14 +488,6 @@ class WebRadioDecksEngine {
     }
   }
 
-  // Toggle local headphone/speaker monitoring for microphone
-  setMicLocalMonitor(enabled) {
-    this.micLocalMonitor = !!enabled;
-    const target = this.micLocalMonitor ? 1.0 : 0.0;
-    if (this.localMonitorGain) {
-      this.localMonitorGain.gain.setTargetAtTime(target, this.ctx.currentTime, 0.02);
-    }
-  }
 
   // Live Master Audio Stream for Broadcasting / Streaming (WebRTC, Icecast, Shoutcast)
   getMasterMediaStream() {
@@ -573,196 +532,18 @@ class WebRadioDecksEngine {
     }
   }
 
-  // Set and connect Live Microphone / Audio Input Device (Bluetooth, Interface, Line-In)
-  async setAudioInputDevice(deviceId, options = {}) {
-    this.micDeviceId = deviceId || '';
-    if (typeof options.echoCancellation === 'boolean') this.micEchoCancellation = options.echoCancellation;
-    if (typeof options.noiseSuppression === 'boolean') this.micNoiseSuppression = options.noiseSuppression;
-    if (typeof options.autoGainControl === 'boolean') this.micAutoGainControl = options.autoGainControl;
-
-    // Stop active stream tracks if any
-    if (this.micStream) {
-      try {
-        this.micStream.getTracks().forEach(t => t.stop());
-      } catch (_) {}
-      this.micStream = null;
-    }
-    if (this.micSourceNode) {
-      try {
-        this.micSourceNode.disconnect();
-      } catch (_) {}
-      this.micSourceNode = null;
-    }
-
-    try {
-      const audioConstraints = {
-        echoCancellation: !!this.micEchoCancellation,
-        noiseSuppression: !!this.micNoiseSuppression,
-        autoGainControl: !!this.micAutoGainControl,
-        channelCount: { ideal: 2 },
-        sampleRate: { ideal: 48000 },
-        latency: { ideal: 0.005 }
-      };
-      if (this.micDeviceId) {
-        audioConstraints.deviceId = { exact: this.micDeviceId };
-      }
-
-      this.micStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-      this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
-      this.micSourceNode.connect(this.micSplitter);
-      this.setMicChannelMode(this.micChannelMode);
-
-      // If mic is active, apply gain
-      if (this.isMicActive) {
-        this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
-      }
-      return true;
-    } catch (err) {
-      // Fallback with unconstrained deviceId if strict audio options rejected
-      try {
-        const fallbackConstraints = {
-          audio: this.micDeviceId
-            ? { deviceId: this.micDeviceId, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-            : { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-        };
-        this.micStream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
-        this.micSourceNode = this.ctx.createMediaStreamSource(this.micStream);
-        this.micSourceNode.connect(this.micSplitter);
-        this.setMicChannelMode(this.micChannelMode);
-        if (this.isMicActive) {
-          this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
-        }
-        return true;
-      } catch (fallbackErr) {
-        console.warn('Could not connect audio input device:', fallbackErr);
-        return false;
-      }
-    }
-  }
-
-  // Set Microphone Channel Mode / Mono Routing (e.g. Behringer UMC202HD, Focusrite Scarlett, Sum L+R, Stereo)
-  setMicChannelMode(mode) {
-    this.micChannelMode = mode || 'mono-left';
-    const now = this.ctx.currentTime;
-    const ramp = 0.02;
-
-    switch (this.micChannelMode) {
-      case 'mono-left':
-      case 'input-1':
-        // Channel 0 (Input 1 / Left) sent to both Left & Right equally (Centered)
-        this.micLeftGainL.gain.setTargetAtTime(1.0, now, ramp);
-        this.micLeftGainR.gain.setTargetAtTime(1.0, now, ramp);
-        this.micRightGainL.gain.setTargetAtTime(0.0, now, ramp);
-        this.micRightGainR.gain.setTargetAtTime(0.0, now, ramp);
-        break;
-
-      case 'mono-right':
-      case 'input-2':
-        // Channel 1 (Input 2 / Right) sent to both Left & Right equally (Centered)
-        this.micLeftGainL.gain.setTargetAtTime(0.0, now, ramp);
-        this.micLeftGainR.gain.setTargetAtTime(0.0, now, ramp);
-        this.micRightGainL.gain.setTargetAtTime(1.0, now, ramp);
-        this.micRightGainR.gain.setTargetAtTime(1.0, now, ramp);
-        break;
-
-      case 'mono-sum':
-        // Sum both Left & Right inputs and center them
-        this.micLeftGainL.gain.setTargetAtTime(0.707, now, ramp);
-        this.micLeftGainR.gain.setTargetAtTime(0.707, now, ramp);
-        this.micRightGainL.gain.setTargetAtTime(0.707, now, ramp);
-        this.micRightGainR.gain.setTargetAtTime(0.707, now, ramp);
-        break;
-
-      case 'stereo':
-      default:
-        // Standard stereo passthrough (L -> L, R -> R)
-        this.micLeftGainL.gain.setTargetAtTime(1.0, now, ramp);
-        this.micLeftGainR.gain.setTargetAtTime(0.0, now, ramp);
-        this.micRightGainL.gain.setTargetAtTime(0.0, now, ramp);
-        this.micRightGainR.gain.setTargetAtTime(1.0, now, ramp);
-        break;
-    }
-  }
-
-  // Set Microphone Volume / Gain (0.0 to 1.5)
-  setMicVolume(volume) {
-    this.micVolume = Math.max(0, Math.min(2.0, parseFloat(volume) || 0));
-    if (this.isMicActive) {
-      this.micGain.gain.setTargetAtTime(this.micVolume, this.ctx.currentTime, 0.02);
-    }
-  }
-
-  // Toggle or Set Microphone Active State (Mute / Unmute / ON AIR)
-  async setMicActive(active) {
-    this.isMicActive = !!active;
-
-    // Connect stream on first activation if needed
-    if (this.isMicActive && !this.micStream) {
-      const ok = await this.setAudioInputDevice(this.micDeviceId);
-      if (!ok) {
-        this.isMicActive = false;
-        return false;
-      }
-    }
-
-    const targetGain = this.isMicActive ? this.micVolume : 0.0;
-    this.micGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.03);
-
-    // Apply auto-ducking to music if talkover is enabled
-    this._applyTalkoverDucking();
-    return this.isMicActive;
-  }
-
-  // Toggle Talkover Ducking
-  setTalkoverDucking(enabled) {
-    this.talkoverDucking = !!enabled;
-    this._applyTalkoverDucking();
-  }
-
-  _applyTalkoverDucking() {
-    const duckFactor = (this.talkoverDucking && this.isMicActive) ? this.duckingGain : 1.0;
-    const gainA = Math.cos(this.crossfaderPosition * 0.5 * Math.PI) * duckFactor;
-    const gainB = Math.sin(this.crossfaderPosition * 0.5 * Math.PI) * duckFactor;
-
-    this.decks.A.nodes.xfadeGain.gain.setTargetAtTime(gainA, this.ctx.currentTime, 0.04);
-    this.decks.B.nodes.xfadeGain.gain.setTargetAtTime(gainB, this.ctx.currentTime, 0.04);
-  }
-
-  getMicPeakLevel() {
-    if (!this.isMicActive || !this.micStream) return 0;
-    const data = new Uint8Array(this.micAnalyser.frequencyBinCount);
-    this.micAnalyser.getByteFrequencyData(data);
-    let sum = 0;
-    for (let i = 0; i < data.length; i++) {
-      sum += data[i];
-    }
-    return Math.min(1.0, (sum / data.length) / 180 * (this.micVolume || 1.0));
-  }
-
-  static async getAudioInputDevices(requestPermission = false) {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-      return [];
-    }
-    try {
-      if (requestPermission && navigator.mediaDevices.getUserMedia) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          stream.getTracks().forEach(track => track.stop());
-        } catch (permErr) {
-          console.warn('Audio input device permission prompt declined:', permErr);
-        }
-      }
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      return devices.filter(d => d.kind === 'audioinput');
-    } catch (_) {
-      return [];
-    }
-  }
-
   // Equal-Power Crossfader Curve (0.0 = Deck A, 1.0 = Deck B)
   setCrossfader(position) {
     this.crossfaderPosition = Math.max(0, Math.min(1, parseFloat(position)));
-    this._applyTalkoverDucking();
+    this._applyCrossfader();
+  }
+
+  _applyCrossfader() {
+    const gainA = Math.cos(this.crossfaderPosition * 0.5 * Math.PI);
+    const gainB = Math.sin(this.crossfaderPosition * 0.5 * Math.PI);
+
+    this.decks.A.nodes.xfadeGain.gain.setTargetAtTime(gainA, this.ctx.currentTime, 0.04);
+    this.decks.B.nodes.xfadeGain.gain.setTargetAtTime(gainB, this.ctx.currentTime, 0.04);
   }
 
   // Pitch / Playback Rate slider setting (e.g., rate = 1.0 for 100%, 1.08 for +8%)
@@ -771,6 +552,21 @@ class WebRadioDecksEngine {
     deck.playbackRate = parseFloat(rate);
     if (deck.source) {
       deck.source.playbackRate.setTargetAtTime(deck.playbackRate + deck.pitchNudge, this.ctx.currentTime, 0.02);
+    }
+
+    // Dynamic Sync Lock: If this deck is Master, propagate tempo to synced follower deck
+    const otherDeckId = deckId === 'A' ? 'B' : 'A';
+    const otherDeck = this.decks[otherDeckId];
+    if (otherDeck && otherDeck.syncActive && !deck.syncActive && deck.bpm && otherDeck.bpm) {
+      const targetBpm = deck.bpm * (deck.playbackRate + deck.pitchNudge);
+      const followerRate = targetBpm / otherDeck.bpm;
+      otherDeck.playbackRate = followerRate;
+      if (otherDeck.source) {
+        otherDeck.source.playbackRate.setTargetAtTime(otherDeck.playbackRate + otherDeck.pitchNudge, this.ctx.currentTime, 0.02);
+      }
+      if (typeof this.onSyncRateChanged === 'function') {
+        this.onSyncRateChanged(otherDeckId, followerRate);
+      }
     }
   }
 
@@ -831,17 +627,102 @@ class WebRadioDecksEngine {
     }
   }
 
-  // BPM Synchronization (Sync Deck A to Deck B or vice-versa)
-  syncBPM(targetDeckId, sourceDeckId) {
+  // Get beat grid phase for a deck: returns { beatProgress, barProgress, beatSec, currentBeat }
+  getBeatPhase(deckId) {
+    const deck = this.decks[deckId];
+    if (!deck || !deck.bpm || !deck.buffer) {
+      return { beatProgress: 0, barProgress: 0, beatSec: 0.5, currentBeat: 0 };
+    }
+    const curTime = this.getCurrentTime(deckId);
+    const effectiveBpm = deck.bpm * (deck.playbackRate + deck.pitchNudge);
+    const beatSec = 60.0 / Math.max(1, effectiveBpm);
+    const gridOffset = deck.gridOffset || 0.0;
+    
+    const relTime = curTime - gridOffset;
+    const totalBeats = relTime / beatSec;
+    const beatProgress = ((totalBeats % 1) + 1) % 1; // 0.0 to 1.0 within beat
+    const barProgress = ((totalBeats % 4) + 4) % 4;  // 0.0 to 4.0 within 4-beat bar
+    const currentBeat = Math.floor(totalBeats);
+
+    return { beatProgress, barProgress, beatSec, currentBeat };
+  }
+
+  // Calculate phase difference between Deck A and Deck B (-0.5 to +0.5 beats)
+  // 0.0 means perfectly aligned kicks. Negative means Deck B is ahead; positive means Deck B is behind.
+  getPhaseDifference(deckAId = 'A', deckBId = 'B') {
+    const deckA = this.decks[deckAId];
+    const deckB = this.decks[deckBId];
+    if (!deckA || !deckB || !deckA.buffer || !deckB.buffer || !deckA.bpm || !deckB.bpm) {
+      return 0.0;
+    }
+
+    const phaseA = this.getBeatPhase(deckAId);
+    const phaseB = this.getBeatPhase(deckBId);
+
+    let diff = phaseB.beatProgress - phaseA.beatProgress;
+    if (diff > 0.5) diff -= 1.0;
+    if (diff < -0.5) diff += 1.0;
+
+    return diff;
+  }
+
+  // Comprehensive Beatmatching & Phase Sync
+  beatSync(targetDeckId, sourceDeckId) {
     const target = this.decks[targetDeckId];
     const source = this.decks[sourceDeckId];
-    if (!target.bpm || !source.bpm) return;
+    if (!target.bpm || !source.bpm) return false;
 
-    const targetBaseBpm = target.bpm;
+    // 1. Tempo Match (BPM Sync)
     const sourceEffectiveBpm = source.bpm * (source.playbackRate + source.pitchNudge);
-    const newRate = sourceEffectiveBpm / targetBaseBpm;
-
+    const newRate = sourceEffectiveBpm / target.bpm;
     this.setPlaybackRate(targetDeckId, newRate);
+
+    // 2. Phase Match & Beat Snap
+    if (source.isPlaying && target.buffer) {
+      const sourcePhase = this.getBeatPhase(sourceDeckId);
+      const targetPhase = this.getBeatPhase(targetDeckId);
+
+      let diffBeats = sourcePhase.beatProgress - targetPhase.beatProgress;
+      if (diffBeats > 0.5) diffBeats -= 1.0;
+      if (diffBeats < -0.5) diffBeats += 1.0;
+
+      // Only shift if there is a noticeable phase difference (> 3ms)
+      const targetBeatSec = 60.0 / (target.bpm * target.playbackRate);
+      const shiftSeconds = diffBeats * targetBeatSec;
+
+      if (target.isPlaying) {
+        const curTime = this.getCurrentTime(targetDeckId);
+        const newTime = Math.max(0, Math.min(target.buffer.duration - 0.1, curTime + shiftSeconds));
+        this.seek(targetDeckId, newTime);
+      } else {
+        const curTime = target.pauseOffset;
+        const newTime = Math.max(0, Math.min(target.buffer.duration - 0.1, curTime + shiftSeconds));
+        target.pauseOffset = newTime;
+      }
+    }
+
+    // 3. Mark Sync active
+    target.syncActive = true;
+    source.isMaster = true;
+    return true;
+  }
+
+  // Toggle active Sync lock on a deck
+  toggleSync(deckId) {
+    const deck = this.decks[deckId];
+    const otherDeckId = deckId === 'A' ? 'B' : 'A';
+    if (deck.syncActive) {
+      deck.syncActive = false;
+      return false;
+    } else {
+      this.beatSync(deckId, otherDeckId);
+      return true;
+    }
+  }
+
+  // Backwards compatibility alias
+  syncBPM(targetDeckId, sourceDeckId) {
+    return this.beatSync(targetDeckId, sourceDeckId);
   }
 
   getDeck(deckId) {
@@ -899,6 +780,13 @@ class WebRadioDecksEngine {
       return AudioDSPAnalyzer.analyzeKey(audioBuffer);
     }
     return '8A (Am)';
+  }
+
+  _estimateDownbeat(audioBuffer, bpm) {
+    if (typeof AudioDSPAnalyzer !== 'undefined' && AudioDSPAnalyzer.findFirstDownbeat) {
+      return AudioDSPAnalyzer.findFirstDownbeat(audioBuffer, bpm);
+    }
+    return 0.0;
   }
 
   /**

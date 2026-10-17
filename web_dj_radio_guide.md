@@ -64,7 +64,7 @@ The audio pipeline is managed by [`WebRadioDecksEngine.js`](file:///Users/dennis
    - **Beat Grid Overlay & Hot Cue Flags**: Visual beat markers synced with BPM and Hot Cue tags rendered on the scrolling waveform.
    - **Overview Strip & Dual Scrubbing**: Full track preview bar with progress fill and dual scrubbing (macro-seek on overview + micro-seek on scrolling canvas).
    - **Turntable / Jog Wheel**: Rotating platter animation with mouse drag-scratching.
-   - **Pitch / Playback Rate**: $\pm 8\%$ pitch slider with double-click reset and BPM sync.
+   - **Pitch / Playback Rate & Professional Beatmatching**: $\pm 8\%$ pitch slider with double-click reset and true **Beat Phase Sync**. One-touch SYNC locks both BPM and beat phase with sub-millisecond transient alignment, dynamic Master/Follower tempo sync, quantized play triggers, downbeat detection on beat grids, and an animated crossfader Beat Phase Meter.
    - **4 Hot Cues**: Store timestamp, instant recall, right-click clear.
    - **Beat Loops**: Instant 1, 2, 4, 8 beat loops and manual loop toggle.
    - **Stereo VU Meters**: Animated green $\rightarrow$ yellow $\rightarrow$ red peak meters for Deck A, Deck B, and Master output.
@@ -76,13 +76,9 @@ The audio pipeline is managed by [`WebRadioDecksEngine.js`](file:///Users/dennis
      - **Duplicate Track Detection & Highlighting**: Automatically detects and visually highlights songs that are cued in both decks (amber warning tag) or queued multiple times within the same deck (red warning tag).
      - **Playlist Saving & JSON Export/Import**: Save setlists locally, manage saved setlists in a dedicated modal, export complete queues to structured `.json` files, and import setlist files directly back into active queues.
      - **Track & Cumulative Playlist Durations**: Automatic duration extraction for all imported/dropped files, with live cumulative playlist runtimes for Deck A, Deck B, and total setlist time.
-   - **Live Radio Broadcasting & Streaming**:
-     - **WebRTC WHIP Streaming**: Ultra-low latency broadcast ingestion to Cloudflare Stream, OvenMediaEngine, Janus, LiveKit, MediaSoup, and Restream.
-     - **Icecast 2 Streaming**: High-fidelity Ogg Opus/WebM HTTP chunked PUT and WebSocket bridge streaming with mount point and source password authentication.
-     - **Shoutcast Streaming**: Direct Shoutcast streaming with SID and password authentication.
-     - **WebRTC P2P Direct Stream**: Zero-server peer-to-peer broadcast mode for direct browser-to-browser listening.
-     - **Master Audio Live Tapping**: Real-time stereo capture of console mix, crossfader, EQs, and filters.
-     - **ON AIR Console & Diagnostics**: Neon pulsing ON AIR badge, broadcast timer, live bitrate, MBs sent, and stream event logs.
+   - **Audio Device Routing & B.U.T.T. Setup (Myriad Cloud)**:
+     - **Master Audio Soundcard Routing**: Direct audio output device selection routing master stereo audio into virtual soundcards (BlackHole, VB-Audio Cable, Loopback) for ingestion by standalone broadcast encoders (B.U.T.T.) to stream reliably to Myriad Cloud and external Icecast/Shoutcast servers.
+     - **Screen Wake Lock & Keep-Alive**: Prevents display dimming and OS sleep timers during live broadcasts, with background audio keep-alive to avoid browser tab throttling.
    - **Auto-Deck Relay Play (Continuous Playback)**:
      - Automatically starts the opposite deck (Deck A $\leftrightarrow$ Deck B) when the active track reaches the end.
      - **Auto-Crossfade**: Smoothly animates the equal-power crossfader to the active deck.
@@ -93,11 +89,11 @@ The audio pipeline is managed by [`WebRadioDecksEngine.js`](file:///Users/dennis
 ## 3. Project Structure
 
 - [`version.json`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/version.json): Central version number, release metadata, and structured changelog history.
-- [`index.html`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/index.html): HTML5 structure for dual-deck DJ console, central mixer, waveforms, jog wheels, nested tabbed library & cued playlists, broadcasting console, version badges, modal dialog, and track library.
-- [`style.css`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/style.css): Custom dark high-tech styling for hardware UI, rotary knobs, sliders, tab navigation, dual playlist queues, broadcasting badges, version tags, modal popups, and LED meters.
-- [`WebRadioDecksEngine.js`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/WebRadioDecksEngine.js): Core Web Audio engine complying with [`codebible.md`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/codebible.md), equipped with master MediaStream capture.
-- [`broadcast.js`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/broadcast.js): Live radio broadcasting manager supporting WebRTC WHIP, Icecast 2, Shoutcast, and P2P direct streaming.
-- [`app.js`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/app.js): DOM controller, scrolling canvas rendering, gesture interactions, tab switcher, cued playlists manager, broadcast UI controller, version modal loader, folder scanner, and keyboard bindings.
+- [`manual.json`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/manual.json): User manual and keyboard shortcut documentation loaded dynamically into the interactive manual modal.
+- [`index.html`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/index.html): HTML5 structure for dual-deck DJ console, central mixer, waveforms, jog wheels, nested tabbed library & cued playlists, version badges, user manual modal, audio routing modal, and track library.
+- [`style.css`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/style.css): Custom dark high-tech styling for hardware UI, rotary knobs, sliders, tab navigation, dual playlist queues, user manual search & layout, version tags, modal popups, and LED meters.
+- [`WebRadioDecksEngine.js`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/WebRadioDecksEngine.js): Core Web Audio engine complying with [`codebible.md`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/codebible.md), equipped with master audio soundcard device routing.
+- [`app.js`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/app.js): DOM controller, scrolling canvas rendering, gesture interactions, tab switcher, cued playlists manager, user manual search/renderer, audio routing controller, version modal loader, folder scanner, and keyboard bindings.
 - [`midi.js`](file:///Users/denniscollins/Library/CloudStorage/OneDrive-MurdochUniversity/PhD/research/WebDJRadio/midi.js): Web MIDI API controller manager, presets, and MIDI learn subsystem.
 
 ---
@@ -108,10 +104,16 @@ The audio pipeline is managed by [`WebRadioDecksEngine.js`](file:///Users/dennis
 |---|---|
 | <kbd>Space</kbd> | Play / Pause Deck A |
 | <kbd>Enter</kbd> | Play / Pause Deck B |
-| <kbd>P</kbd> | Toggle Auto-Deck Relay Play (Continuous Mode) |
 | <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> <kbd>R</kbd> | Trigger Hot Cues 1..4 (Deck A) |
 | <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> | Trigger Hot Cues 1..4 (Deck B) |
 | <kbd>←</kbd> / <kbd>→</kbd> | Shift Crossfader Left / Right |
+| <kbd>P</kbd> | Toggle Auto-Deck Relay Play (Continuous Broadcast) |
+| <kbd>Tab</kbd> / <kbd>`</kbd> | Toggle between Studio Console & Music Management |
+| <kbd>X</kbd> | Toggle Studio Software FX Rack |
+| <kbd>Shift</kbd> + <kbd>M</kbd> | Toggle USB MIDI Controller Setup |
+| <kbd>?</kbd> / <kbd>H</kbd> / <kbd>F1</kbd> | Open Help Guide & Keyboard Shortcuts |
+| <kbd>Delete</kbd> / <kbd>Backspace</kbd> | Delete selected track from Track Library |
+| <kbd>Escape</kbd> | Close any open modal dialog |
 
 ---
 

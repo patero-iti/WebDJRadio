@@ -244,19 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const vuMaster = document.getElementById('vu-master');
   const deckLoadedTrackObj = { A: null, B: null };
 
-  // DOM Elements - Microphone / Live Input
-  const micElements = {
-    volSlider: document.getElementById('vol-mic'),
-    vuFill: document.getElementById('vu-mic'),
-    btnToggle: document.getElementById('btn-mic-toggle'),
-    btnText: document.getElementById('mic-btn-text'),
-    led: document.getElementById('mic-led'),
-    btnTalkover: document.getElementById('btn-talkover-toggle'),
-    artBox: document.getElementById('mixer-art-mic'),
-    artPlaceholder: document.getElementById('mixer-art-placeholder-mic'),
-    mixerStatusText: document.getElementById('mixer-mic-status-text')
-  };
-
   // DOM Elements - Auto-Deck Relay
   const btnAutoRelay = document.getElementById('btn-auto-relay');
   const chkAutoCrossfade = document.getElementById('chk-auto-crossfade');
@@ -2619,24 +2606,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalSamples = channelData.length;
     const amp = height / 2;
 
-    // 1. Draw Beat Grid Lines
+    // 1. Draw Beat Grid Lines & Downbeat Markers
     const bpm = deck.bpm || 120;
     const secondsPerBeat = 60 / bpm;
-    const firstBeatIndex = Math.floor(startTime / secondsPerBeat);
-    const lastBeatIndex = Math.ceil(endTime / secondsPerBeat);
+    const gridOffset = deck.gridOffset || 0.0;
+    const firstBeatIndex = Math.floor((startTime - gridOffset) / secondsPerBeat);
+    const lastBeatIndex = Math.ceil((endTime - gridOffset) / secondsPerBeat);
 
     ctx.lineWidth = 1;
     for (let b = firstBeatIndex; b <= lastBeatIndex; b++) {
-      const beatTime = b * secondsPerBeat;
+      const beatTime = gridOffset + (b * secondsPerBeat);
       if (beatTime < 0 || beatTime > duration) continue;
 
       const x = ((beatTime - startTime) / WINDOW_SEC) * width;
       if (x >= 0 && x <= width) {
-        ctx.strokeStyle = (b % 4 === 0) ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.08)';
+        const isDownbeat = ((b % 4) + 4) % 4 === 0;
+        ctx.strokeStyle = isDownbeat ? 'rgba(255, 60, 60, 0.55)' : 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = isDownbeat ? 1.5 : 1;
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
         ctx.stroke();
+
+        if (isDownbeat) {
+          ctx.fillStyle = 'rgba(255, 80, 80, 0.75)';
+          ctx.font = 'bold 9px monospace';
+          ctx.fillText('1', x + 3, 11);
+        }
       }
     }
 
@@ -2743,10 +2739,12 @@ document.addEventListener('DOMContentLoaded', () => {
       engine.cue(deckId);
     });
 
-    // Sync button (Match BPM of other deck)
+    // Beat Sync button (Toggle Beatmatching, Phase Lock & Snap)
     deckElem.btnSync.addEventListener('click', () => {
       const otherDeckId = deckId === 'A' ? 'B' : 'A';
-      engine.syncBPM(deckId, otherDeckId);
+      const isSynced = engine.toggleSync(deckId);
+      deckElem.btnSync.classList.toggle('synced', isSynced);
+
       const newPitchPct = ((engine.decks[deckId].playbackRate - 1.0) * 100).toFixed(1);
       deckElem.pitchSlider.value = engine.decks[deckId].playbackRate - 1.0;
       deckElem.pitchVal.textContent = `${newPitchPct >= 0 ? '+' : ''}${newPitchPct}%`;
@@ -2755,6 +2753,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pitch Slider
     deckElem.pitchSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
+      // Disengage sync on this deck if manually shifting pitch
+      if (engine.decks[deckId].syncActive) {
+        engine.decks[deckId].syncActive = false;
+        deckElem.btnSync.classList.remove('synced');
+      }
       engine.setPlaybackRate(deckId, 1.0 + val);
       const pct = (val * 100).toFixed(1);
       deckElem.pitchVal.textContent = `${pct >= 0 ? '+' : ''}${pct}%`;
@@ -2843,66 +2846,6 @@ document.addEventListener('DOMContentLoaded', () => {
   crossfader.addEventListener('input', (e) => {
     engine.setCrossfader(e.target.value);
   });
-
-  // -------------------------------------------------------------
-  // 5.1. Microphone / Live Audio Input Mixer Channel
-  // -------------------------------------------------------------
-  const savedMicVolume = localStorage.getItem('webdj_mic_volume');
-  if (savedMicVolume !== null && micElements.volSlider) {
-    micElements.volSlider.value = savedMicVolume;
-    engine.setMicVolume(parseFloat(savedMicVolume));
-  }
-
-  if (micElements.volSlider) {
-    micElements.volSlider.addEventListener('input', (e) => {
-      const vol = parseFloat(e.target.value);
-      engine.setMicVolume(vol);
-      localStorage.setItem('webdj_mic_volume', vol);
-    });
-  }
-
-  async function updateMicUIState(isActive) {
-    if (micElements.btnToggle) {
-      micElements.btnToggle.classList.toggle('active', isActive);
-    }
-    if (micElements.btnText) {
-      micElements.btnText.textContent = isActive ? 'ON AIR' : 'MIC';
-    }
-    if (micElements.artBox) {
-      micElements.artBox.classList.toggle('active-on-air', isActive);
-    }
-    if (micElements.mixerStatusText) {
-      micElements.mixerStatusText.textContent = isActive ? 'ON AIR' : 'MUTED';
-    }
-    const modalTestBtn = document.getElementById('btn-modal-test-mic');
-    if (modalTestBtn) {
-      modalTestBtn.textContent = isActive ? '🔴 Mute Mic (Live)' : '🎙️ Connect / Test Mic';
-      modalTestBtn.style.background = isActive ? 'rgba(255, 23, 68, 0.2)' : '';
-      modalTestBtn.style.borderColor = isActive ? '#ff1744' : '';
-    }
-    audioStatusText.textContent = isActive
-      ? 'Microphone: LIVE (ON AIR - Mixed to Master & Stream)'
-      : 'Microphone: MUTED';
-  }
-
-  if (micElements.btnToggle) {
-    micElements.btnToggle.addEventListener('click', async () => {
-      await unlockAudioContext();
-      const newState = await engine.setMicActive(!engine.isMicActive);
-      updateMicUIState(newState);
-    });
-  }
-
-  if (micElements.btnTalkover) {
-    micElements.btnTalkover.addEventListener('click', () => {
-      const newState = !engine.talkoverDucking;
-      engine.setTalkoverDucking(newState);
-      micElements.btnTalkover.classList.toggle('active', newState);
-      audioStatusText.textContent = newState
-        ? 'Talkover Auto-Ducking: ENABLED (-9dB music ducking when mic active)'
-        : 'Talkover Auto-Ducking: DISABLED';
-    });
-  }
 
   // -------------------------------------------------------------
   // 6.1. Auto-Deck Relay Play & Auto-Queue Controller
@@ -3324,11 +3267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         break;
       }
-      case 'KeyB': {
-        const bm = document.getElementById('broadcast-modal');
-        if (bm) bm.style.display = (bm.style.display === 'none' || !bm.style.display) ? 'flex' : 'none';
-        break;
-      }
       case 'KeyX': {
         const fx = document.getElementById('fx-modal');
         if (fx) fx.style.display = (fx.style.display === 'none' || !fx.style.display) ? 'flex' : 'none';
@@ -3338,8 +3276,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.shiftKey) {
           const mm = document.getElementById('midi-modal');
           if (mm) mm.style.display = (mm.style.display === 'none' || !mm.style.display) ? 'flex' : 'none';
-        } else {
-          if (micElements.btnToggle) micElements.btnToggle.click();
+        }
+        break;
+      }
+      case 'KeyH':
+      case 'F1': {
+        e.preventDefault();
+        const man = document.getElementById('manual-modal');
+        if (man) {
+          man.style.display = (man.style.display === 'none' || !man.style.display) ? 'flex' : 'none';
+          if (man.style.display === 'flex' && typeof openUserManual === 'function') openUserManual();
+        }
+        break;
+      }
+      case 'Slash': {
+        if (e.shiftKey) {
+          e.preventDefault();
+          const man = document.getElementById('manual-modal');
+          if (man) {
+            man.style.display = (man.style.display === 'none' || !man.style.display) ? 'flex' : 'none';
+            if (man.style.display === 'flex' && typeof openUserManual === 'function') openUserManual();
+          }
         }
         break;
       }
@@ -3528,14 +3485,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const levelA = engine.getDeckPeakLevel('A');
     const levelB = engine.getDeckPeakLevel('B');
     const levelMaster = engine.getMasterPeakLevel();
-    const levelMic = (engine.getMicPeakLevel ? engine.getMicPeakLevel() : 0);
     const levelCarts = (engine.getCartPeakLevel ? engine.getCartPeakLevel() : 0);
 
     deckAElements.vuFill.style.height = `${Math.min(100, levelA * 150)}%`;
     deckBElements.vuFill.style.height = `${Math.min(100, levelB * 150)}%`;
-    if (micElements.vuFill) micElements.vuFill.style.height = `${Math.min(100, levelMic * 150)}%`;
     if (vuCarts) vuCarts.style.height = `${Math.min(100, levelCarts * 150)}%`;
     vuMaster.style.height = `${Math.min(100, levelMaster * 150)}%`;
+
+    // Real-Time Beat Phase Meter & Sync Status
+    const phaseCursor = document.getElementById('phase-cursor');
+    const phaseTagA = document.getElementById('phase-tag-a');
+    const phaseTagB = document.getElementById('phase-tag-b');
+
+    if (phaseCursor) {
+      if (deckA.isPlaying && deckB.isPlaying && deckA.bpm && deckB.bpm) {
+        const diff = engine.getPhaseDifference('A', 'B');
+        const cursorPct = Math.max(4, Math.min(96, 50 + (diff * 92)));
+        phaseCursor.style.left = `${cursorPct}%`;
+
+        const absDiff = Math.abs(diff);
+        if (absDiff < 0.04) {
+          phaseCursor.className = 'phase-cursor in-phase';
+        } else if (absDiff < 0.14) {
+          phaseCursor.className = 'phase-cursor drifting';
+        } else {
+          phaseCursor.className = 'phase-cursor off-phase';
+        }
+
+        if (phaseTagA) phaseTagA.classList.toggle('active', deckA.syncActive || !deckB.syncActive);
+        if (phaseTagB) phaseTagB.classList.toggle('active', deckB.syncActive);
+      } else {
+        phaseCursor.style.left = '50%';
+        phaseCursor.className = 'phase-cursor';
+        if (phaseTagA) phaseTagA.classList.toggle('active', deckA.isPlaying);
+        if (phaseTagB) phaseTagB.classList.toggle('active', deckB.isPlaying);
+      }
+    }
+
+    if (deckAElements.btnSync) deckAElements.btnSync.classList.toggle('synced', !!deckA.syncActive);
+    if (deckBElements.btnSync) deckBElements.btnSync.classList.toggle('synced', !!deckB.syncActive);
 
     // Real-Time CART Wall Status, Timers & Progress Bars
     let activeCartsCount = 0;
@@ -3587,6 +3575,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Start UI animation loop
   requestAnimationFrame(updateUIRefresh);
+
+  // Hook dynamic master sync tempo propagation
+  engine.onSyncRateChanged = (deckId, newRate) => {
+    const deckElem = deckId === 'A' ? deckAElements : deckBElements;
+    const newPitchPct = ((newRate - 1.0) * 100).toFixed(1);
+    deckElem.pitchSlider.value = newRate - 1.0;
+    deckElem.pitchVal.textContent = `${newPitchPct >= 0 ? '+' : ''}${newPitchPct}%`;
+  };
 
   // Initialize demo tracks
   initDemoTracks();
@@ -3649,6 +3645,218 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // -------------------------------------------------------------
+  // 10b. User Manual & Shortcuts Subsystem
+  // -------------------------------------------------------------
+  let cachedManualData = null;
+  let activeManualSectionId = 'quickstart';
+
+  const btnManual = document.getElementById('btn-manual');
+  const manualModal = document.getElementById('manual-modal');
+  const btnCloseManualModal = document.getElementById('btn-close-manual-modal');
+  const manualSearchInput = document.getElementById('manual-search-input');
+  const manualSearchClear = document.getElementById('manual-search-clear');
+  const manualNav = document.getElementById('manual-nav');
+  const manualContentView = document.getElementById('manual-content-view');
+  const manualVersionTag = document.getElementById('manual-version-tag');
+
+  function renderManualMarkdown(text) {
+    if (!text) return '';
+    // Format markdown table if present
+    if (text.includes('|---|') || text.includes('| --- |')) {
+      const lines = text.trim().split('\n');
+      let html = '<table class="manual-shortcuts-table"><thead><tr>';
+      const headerCols = lines[0].split('|').map(s => s.trim()).filter(Boolean);
+      headerCols.forEach(col => { html += `<th>${col}</th>`; });
+      html += '</tr></thead><tbody>';
+      for (let i = 2; i < lines.length; i++) {
+        const rowCols = lines[i].split('|').map(s => s.trim()).filter(Boolean);
+        if (rowCols.length > 0) {
+          html += '<tr>' + rowCols.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        }
+      }
+      html += '</tbody></table>';
+      return html;
+    }
+
+    const paragraphs = text.split('\n\n');
+    return paragraphs.map(p => {
+      p = p.trim();
+      if (!p) return '';
+      if (p.startsWith('- ')) {
+        const items = p.split('\n- ').map(it => it.replace(/^- /, '').trim());
+        return `<ul>${items.map(it => `<li>${formatManualInline(it)}</li>`).join('')}</ul>`;
+      }
+      if (/^\d+\.\s/.test(p)) {
+        const items = p.split(/\n(?=\d+\.\s)/).map(it => it.replace(/^\d+\.\s*/, '').trim());
+        return `<ol>${items.map(it => `<li>${formatManualInline(it)}</li>`).join('')}</ol>`;
+      }
+      return `<p>${formatManualInline(p)}</p>`;
+    }).join('');
+  }
+
+  function formatManualInline(str) {
+    return str
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+  }
+
+  function renderManualContent(filterQuery = '') {
+    if (!cachedManualData || !manualContentView) return;
+    const q = filterQuery.trim().toLowerCase();
+
+    if (q) {
+      // Search mode across all sections
+      let matchCount = 0;
+      let html = '';
+
+      cachedManualData.sections.forEach(sec => {
+        const matchingArticles = sec.articles.filter(art => 
+          art.heading.toLowerCase().includes(q) ||
+          art.body.toLowerCase().includes(q) ||
+          sec.title.toLowerCase().includes(q) ||
+          sec.summary.toLowerCase().includes(q)
+        );
+
+        if (matchingArticles.length > 0) {
+          matchCount += matchingArticles.length;
+          html += `
+            <div class="manual-section-card">
+              <div class="manual-section-header">
+                <div class="manual-section-title">${sec.icon} ${escapeHtml(sec.title)}</div>
+                <div class="manual-section-summary">${escapeHtml(sec.summary)}</div>
+              </div>
+              ${matchingArticles.map(art => `
+                <div class="manual-article">
+                  <div class="manual-article-heading">${escapeHtml(art.heading)}</div>
+                  <div class="manual-article-body">${renderManualMarkdown(art.body)}</div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+      });
+
+      if (matchCount === 0) {
+        manualContentView.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: var(--text-dim);">
+            <div style="font-size: 32px; margin-bottom: 12px;">🔍</div>
+            <div style="font-size: 15px; font-weight: 700; color: var(--text-main);">No matching help topics found</div>
+            <div style="font-size: 12px; margin-top: 6px;">Try searching for "crossfader", "hot cue", "relay", "B.U.T.T.", "shortcuts", or "loop".</div>
+          </div>
+        `;
+      } else {
+        manualContentView.innerHTML = html;
+      }
+      return;
+    }
+
+    // Normal section view
+    const section = cachedManualData.sections.find(s => s.id === activeManualSectionId) || cachedManualData.sections[0];
+    if (!section) return;
+
+    manualContentView.innerHTML = `
+      <div class="manual-section-card">
+        <div class="manual-section-header">
+          <div class="manual-section-title">${section.icon} ${escapeHtml(section.title)}</div>
+          <div class="manual-section-summary">${escapeHtml(section.summary)}</div>
+        </div>
+        ${section.articles.map(art => `
+          <div class="manual-article">
+            <div class="manual-article-heading">${escapeHtml(art.heading)}</div>
+            <div class="manual-article-body">${renderManualMarkdown(art.body)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    manualContentView.scrollTop = 0;
+  }
+
+  function renderManualNav() {
+    if (!cachedManualData || !manualNav) return;
+    manualNav.innerHTML = cachedManualData.sections.map(sec => `
+      <button type="button" class="manual-nav-btn ${sec.id === activeManualSectionId ? 'active' : ''}" data-section-id="${sec.id}">
+        <span class="manual-nav-icon">${sec.icon}</span>
+        <span>${escapeHtml(sec.title)}</span>
+      </button>
+    `).join('');
+
+    manualNav.querySelectorAll('.manual-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeManualSectionId = btn.dataset.sectionId;
+        if (manualSearchInput) {
+          manualSearchInput.value = '';
+          if (manualSearchClear) manualSearchClear.style.display = 'none';
+        }
+        manualNav.querySelectorAll('.manual-nav-btn').forEach(b => b.classList.toggle('active', b === btn));
+        renderManualContent();
+      });
+    });
+  }
+
+  async function loadManualData() {
+    if (cachedManualData) return;
+    try {
+      const res = await fetch('manual.json');
+      if (!res.ok) return;
+      cachedManualData = await res.json();
+      if (manualVersionTag && cachedManualData.version) {
+        manualVersionTag.textContent = `v${cachedManualData.version}`;
+      }
+      renderManualNav();
+      renderManualContent();
+    } catch (err) {
+      console.warn('Could not load manual.json metadata:', err);
+    }
+  }
+
+  function openUserManual() {
+    if (manualModal) {
+      manualModal.style.display = 'flex';
+      loadManualData().then(() => {
+        renderManualNav();
+        renderManualContent(manualSearchInput ? manualSearchInput.value : '');
+        if (manualSearchInput) manualSearchInput.focus();
+      });
+    }
+  }
+
+  window.openUserManual = openUserManual;
+
+  if (btnManual) {
+    btnManual.addEventListener('click', openUserManual);
+  }
+
+  if (btnCloseManualModal && manualModal) {
+    btnCloseManualModal.addEventListener('click', () => {
+      manualModal.style.display = 'none';
+    });
+    manualModal.addEventListener('click', (e) => {
+      if (e.target === manualModal) manualModal.style.display = 'none';
+    });
+  }
+
+  if (manualSearchInput) {
+    manualSearchInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (manualSearchClear) manualSearchClear.style.display = val ? 'inline-block' : 'none';
+      renderManualContent(val);
+    });
+  }
+
+  if (manualSearchClear && manualSearchInput) {
+    manualSearchClear.addEventListener('click', () => {
+      manualSearchInput.value = '';
+      manualSearchClear.style.display = 'none';
+      manualSearchInput.focus();
+      renderManualContent();
+    });
+  }
+
+  // Preload manual in background
+  loadManualData();
 
   // -------------------------------------------------------------
   // 11. Studio Hub Clocks, Live Weather & Now Playing Engine (Radio C)
@@ -4288,7 +4496,29 @@ document.addEventListener('DOMContentLoaded', () => {
       artworkUrl: null
     };
 
-    // 1. Query TheAudioDB API (Free open artist search endpoint & Track/Album Thumbnails)
+    // 1. Query iTunes Search API (High reliability, fast, no 503 rate limits, 600x600 Cover Art, Album, Year, Genre)
+    if (cleanTitle) {
+      try {
+        const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(cleanArtist + ' ' + cleanTitle)}&entity=song&limit=1`;
+        const resItunes = await fetch(itunesUrl);
+        if (resItunes.ok) {
+          const dataItunes = await resItunes.json();
+          if (dataItunes && dataItunes.results && dataItunes.results.length > 0) {
+            const item = dataItunes.results[0];
+            if (item.collectionName) fetchedData.albumTitle = item.collectionName;
+            if (item.releaseDate) fetchedData.releaseDate = item.releaseDate.substring(0, 4);
+            if (item.primaryGenreName && !fetchedData.artistGenre) fetchedData.artistGenre = item.primaryGenreName;
+            if (item.artworkUrl100) {
+              fetchedData.artworkUrl = item.artworkUrl100.replace('100x100bb.jpg', '600x600bb.jpg');
+            }
+          }
+        }
+      } catch (e) {
+        // iTunes API query fallback
+      }
+    }
+
+    // 2. Query TheAudioDB API (Free open artist search endpoint & Track/Album Thumbnails / Artist Bios)
     try {
       const audioDbUrl = `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(cleanArtist)}`;
       const resAdb = await fetch(audioDbUrl);
@@ -4304,15 +4534,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
           if (a.strCountry) fetchedData.artistCountry = a.strCountry;
-          if (a.strGenre) fetchedData.artistGenre = a.strGenre;
+          if (a.strGenre && !fetchedData.artistGenre) fetchedData.artistGenre = a.strGenre;
           if (a.intFormedYear && a.intFormedYear !== '0') fetchedData.formedYear = a.intFormedYear;
           else if (a.intBornYear && a.intBornYear !== '0') fetchedData.formedYear = a.intBornYear;
           if (a.strArtistThumb && !fetchedData.artworkUrl) fetchedData.artworkUrl = a.strArtistThumb;
         }
       }
 
-      // Check track/album specific artwork on TheAudioDB if cleanTitle is present
-      if (cleanTitle) {
+      // Check track/album specific artwork on TheAudioDB if cleanTitle is present and artwork not found yet
+      if (cleanTitle && !fetchedData.artworkUrl) {
         try {
           const trackAdbUrl = `https://www.theaudiodb.com/api/v1/json/2/searchtrack.php?s=${encodeURIComponent(cleanArtist)}&t=${encodeURIComponent(cleanTitle)}`;
           const resTrackAdb = await fetch(trackAdbUrl);
@@ -4329,44 +4559,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     } catch (e) {
-      console.warn('TheAudioDB fetch notice:', e);
-    }
-
-    // 2. Query MusicBrainz API & Cover Art Archive (Recording, Releases, Record Labels, Front Covers)
-    if (cleanTitle) {
-      try {
-        const mbUrl = `https://musicbrainz.org/ws/2/recording/?query=recording:"${encodeURIComponent(cleanTitle)}" AND artist:"${encodeURIComponent(cleanArtist)}"&fmt=json`;
-        const resMb = await fetch(mbUrl);
-        if (resMb.ok) {
-          const dataMb = await resMb.json();
-          if (dataMb && dataMb.recordings && dataMb.recordings.length > 0) {
-            const rec = dataMb.recordings[0];
-            if (rec.releases && rec.releases.length > 0) {
-              const rel = rec.releases[0];
-              if (rel.title) fetchedData.albumTitle = rel.title;
-              if (rel.date) fetchedData.releaseDate = rel.date.substring(0, 4);
-              if (rel['label-info-list'] && rel['label-info-list'].length > 0) {
-                const labelObj = rel['label-info-list'][0].label;
-                if (labelObj && labelObj.name) fetchedData.recordLabel = labelObj.name;
-              }
-              // Check Cover Art Archive if cover art is still missing
-              if (rel.id && (!fetchedData.artworkUrl || fetchedData.artworkUrl.length === 0)) {
-                try {
-                  const caaUrl = `https://coverartarchive.org/release/${rel.id}/front-250.jpg`;
-                  const caaCheck = await fetch(caaUrl, { method: 'HEAD' });
-                  if (caaCheck.ok) {
-                    fetchedData.artworkUrl = caaUrl;
-                  }
-                } catch (e) {
-                  // Cover Art Archive head check failed silently
-                }
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('MusicBrainz fetch notice:', e);
-      }
+      // TheAudioDB fetch notice
     }
 
     // 3. Fallback / Complementary: Wikipedia REST API Summary & Thumbnail
@@ -5028,21 +5221,6 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
 
-        // Live Mic Trigger updates
-        if (action === 'mic_toggle') {
-          const micBtn = document.getElementById('btn-mic-toggle');
-          if (micBtn) {
-            micBtn.classList.add('midi-indicator-flash');
-            setTimeout(() => micBtn.classList.remove('midi-indicator-flash'), 300);
-          }
-        }
-        if (action === 'mic_talkover') {
-          const talkBtn = document.getElementById('btn-talkover-toggle');
-          if (talkBtn) {
-            talkBtn.classList.add('midi-indicator-flash');
-            setTimeout(() => talkBtn.classList.remove('midi-indicator-flash'), 300);
-          }
-        }
 
         // On-Deck FX Trigger updates (Desktop & Touch Ribbon racks)
         if (action && action.startsWith('fx_') && action.endsWith('_toggle') && deck) {
@@ -5207,11 +5385,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (action === 'cart_volume') {
           const slider = document.getElementById('vol-carts');
           if (slider) slider.value = normValue;
-        }
-        // 9. Live Mic Volume / Gain Slider (scaled 0.0 to 1.5)
-        else if (action === 'mic_volume') {
-          const slider = document.getElementById('vol-mic');
-          if (slider) slider.value = (normValue * 1.5).toFixed(2);
         }
       }
     };
@@ -6299,63 +6472,15 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // =======================================================================
-  // Live Radio Broadcasting Subsystem (WebRTC WHIP, Icecast, Shoutcast)
+  // Audio Settings & Output Device Routing (B.U.T.T. / Virtual Soundcards)
   // =======================================================================
-  (function initBroadcastSubsystem() {
-    if (typeof RadioBroadcastManager === 'undefined') return;
-    const broadcastManager = new RadioBroadcastManager(engine);
+  (function initAudioRoutingSubsystem() {
+    const audioModal = document.getElementById('audio-modal');
+    const btnAudioPanel = document.getElementById('btn-audio-panel');
+    const btnCloseAudioModal = document.getElementById('btn-close-audio-modal');
 
-    // Modal elements
-    const broadcastModal = document.getElementById('broadcast-modal');
-    const btnBroadcastPanel = document.getElementById('btn-broadcast-panel');
-    const btnCloseBroadcastModal = document.getElementById('btn-close-broadcast-modal');
-    const btnModalToggleBroadcast = document.getElementById('btn-modal-toggle-broadcast');
-    const modalToggleBroadcastText = document.getElementById('modal-toggle-broadcast-text');
-    const modalBroadcastDot = document.getElementById('modal-broadcast-dot');
-    const modalBroadcastStatusText = document.getElementById('modal-broadcast-status-text');
-    const modalBroadcastTimer = document.getElementById('modal-broadcast-timer');
-    const broadcastStatusBanner = document.getElementById('broadcast-status-banner');
-    const broadcastLogBox = document.getElementById('broadcast-log-box');
-
-    // Header & Mixer controls
-    const headerBroadcastDot = document.getElementById('header-broadcast-dot');
-    const headerBroadcastText = document.getElementById('header-broadcast-text');
-    const btnMixerBroadcast = document.getElementById('btn-mixer-broadcast');
-    const mixerBroadcastStatus = document.getElementById('mixer-broadcast-status');
-    const mixerBroadcastBtnText = document.getElementById('mixer-broadcast-btn-text');
-    const mixerBroadcastTimer = document.getElementById('mixer-broadcast-timer');
-    const mixerBroadcastMode = document.getElementById('mixer-broadcast-mode');
-
-    // Protocol tab buttons & contents
-    const tabs = {
-      webrtc: { btn: document.getElementById('tab-broadcast-webrtc'), content: document.getElementById('bcontent-webrtc') },
-      icecast: { btn: document.getElementById('tab-broadcast-icecast'), content: document.getElementById('bcontent-icecast') },
-      butt: { btn: document.getElementById('tab-broadcast-butt'), content: document.getElementById('bcontent-butt') },
-      shoutcast: { btn: document.getElementById('tab-broadcast-shoutcast'), content: document.getElementById('bcontent-shoutcast') },
-      p2p: { btn: document.getElementById('tab-broadcast-p2p'), content: document.getElementById('bcontent-p2p') }
-    };
-
-    let activeProtocol = broadcastManager.config.mode || 'webrtc_whip';
-
-    function switchProtocolTab(key) {
-      activeProtocol = key === 'webrtc' ? 'webrtc_whip' : (key === 'p2p' ? 'webrtc_p2p' : key);
-      Object.entries(tabs).forEach(([k, tab]) => {
-        if (!tab.btn || !tab.content) return;
-        const isActive = k === key;
-        tab.btn.classList.toggle('active', isActive);
-        tab.content.style.display = isActive ? 'block' : 'none';
-      });
-      if (mixerBroadcastMode) {
-        mixerBroadcastMode.textContent = key === 'webrtc' ? 'WebRTC WHIP' : (key === 'p2p' ? 'P2P Stream' : (key === 'butt' ? 'B.U.T.T. Direct' : key.toUpperCase()));
-      }
-      if (key === 'butt') {
-        refreshAudioOutputDevices();
-        refreshAudioInputDevices();
-      }
-    }
-
-    // Audio Output Device Routing (e.g. BlackHole, Loopback into B.U.T.T.)
-    const audioDeviceSelect = document.getElementById('bcast-audio-device-select');
+    // Audio Output Device Routing
+    const audioDeviceSelect = document.getElementById('audio-device-select');
     const btnRefreshAudioDevices = document.getElementById('btn-refresh-audio-devices');
     const audioDeviceStatus = document.getElementById('audio-device-status');
 
@@ -6363,9 +6488,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!audioDeviceSelect) return;
       try {
         const devices = await WebRadioDecksEngine.getAudioOutputDevices(requestPermission);
-        const currentVal = audioDeviceSelect.value;
+        const savedDevice = localStorage.getItem('webdj_audio_output_device') || '';
+        const currentVal = audioDeviceSelect.value || savedDevice;
         audioDeviceSelect.innerHTML = '<option value="">Default Audio Output (Speakers / Headphones)</option>';
-        
+
         let hasBlankLabels = false;
         devices.forEach(d => {
           if (d.deviceId === 'default') return;
@@ -6399,6 +6525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (audioDeviceSelect) {
       audioDeviceSelect.addEventListener('change', async () => {
         const deviceId = audioDeviceSelect.value;
+        localStorage.setItem('webdj_audio_output_device', deviceId);
         const success = await engine.setOutputDevice(deviceId);
         if (audioDeviceStatus) {
           const selectedText = audioDeviceSelect.options[audioDeviceSelect.selectedIndex]?.text || 'System Default';
@@ -6411,365 +6538,35 @@ document.addEventListener('DOMContentLoaded', () => {
       btnRefreshAudioDevices.addEventListener('click', () => refreshAudioOutputDevices(true));
     }
 
-    // Audio Input Device Routing (Microphone, Bluetooth, Audio Interface In)
-    const audioInputSelect = document.getElementById('bcast-audio-input-select');
-    const btnRefreshAudioInputs = document.getElementById('btn-refresh-audio-inputs');
-    const audioInputStatus = document.getElementById('audio-input-status');
-    const btnModalTestMic = document.getElementById('btn-modal-test-mic');
-    const chkMicRawMode = document.getElementById('chk-mic-raw-mode');
-    const chkMicEchoCancel = document.getElementById('chk-mic-echo-cancel');
-    const chkMicNoiseSuppress = document.getElementById('chk-mic-noise-suppress');
-
-    function getMicProcessingOptions() {
-      const isRaw = chkMicRawMode ? chkMicRawMode.checked : true;
-      if (isRaw) {
-        return {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false
-        };
-      }
-      return {
-        echoCancellation: chkMicEchoCancel ? chkMicEchoCancel.checked : false,
-        noiseSuppression: chkMicNoiseSuppress ? chkMicNoiseSuppress.checked : false,
-        autoGainControl: false
-      };
-    }
-
-    async function applyMicDeviceAndOptions() {
-      const deviceId = audioInputSelect ? audioInputSelect.value : (engine.micDeviceId || '');
-      const opts = getMicProcessingOptions();
-      await engine.setAudioInputDevice(deviceId, opts);
-    }
-
-    if (chkMicRawMode) {
-      chkMicRawMode.addEventListener('change', () => {
-        if (chkMicRawMode.checked) {
-          if (chkMicEchoCancel) chkMicEchoCancel.checked = false;
-          if (chkMicNoiseSuppress) chkMicNoiseSuppress.checked = false;
-        }
-        applyMicDeviceAndOptions();
-      });
-    }
-
-    if (chkMicEchoCancel) {
-      chkMicEchoCancel.addEventListener('change', () => {
-        if (chkMicEchoCancel.checked && chkMicRawMode) {
-          chkMicRawMode.checked = false;
-        }
-        applyMicDeviceAndOptions();
-      });
-    }
-
-    if (chkMicNoiseSuppress) {
-      chkMicNoiseSuppress.addEventListener('change', () => {
-        if (chkMicNoiseSuppress.checked && chkMicRawMode) {
-          chkMicRawMode.checked = false;
-        }
-        applyMicDeviceAndOptions();
-      });
-    }
-
-    const chkMicLocalMonitor = document.getElementById('chk-mic-local-monitor');
-    if (chkMicLocalMonitor) {
-      chkMicLocalMonitor.addEventListener('change', () => {
-        engine.setMicLocalMonitor(chkMicLocalMonitor.checked);
-        localStorage.setItem('webdj_mic_local_monitor', chkMicLocalMonitor.checked ? 'true' : 'false');
-      });
-      const savedMonitor = localStorage.getItem('webdj_mic_local_monitor');
-      if (savedMonitor !== null) {
-        chkMicLocalMonitor.checked = savedMonitor === 'true';
-        engine.setMicLocalMonitor(chkMicLocalMonitor.checked);
-      }
-    }
-
-    async function refreshAudioInputDevices(requestPermission = false) {
-      if (!audioInputSelect) return;
-      try {
-        const devices = await WebRadioDecksEngine.getAudioInputDevices(requestPermission);
-        const savedInput = localStorage.getItem('webdj_mic_device');
-        const currentVal = audioInputSelect.value || savedInput || '';
-        audioInputSelect.innerHTML = '<option value="">Default Audio Input (Internal Microphone)</option>';
-        
-        let hasBlankLabels = false;
-        devices.forEach(d => {
-          if (d.deviceId === 'default') return;
-          const opt = document.createElement('option');
-          opt.value = d.deviceId;
-          if (!d.label) {
-            hasBlankLabels = true;
-            opt.textContent = `Microphone / Input (${d.deviceId.slice(0, 8)}...)`;
-          } else {
-            opt.textContent = d.label;
-          }
-          if (d.deviceId === currentVal) opt.selected = true;
-          audioInputSelect.appendChild(opt);
-        });
-
-        if (audioInputStatus) {
-          if (hasBlankLabels) {
-            audioInputStatus.innerHTML = `⚠️ Input names hidden. Click <strong>🔄 Refresh</strong> & allow microphone permission to show Bluetooth / Audio Interface names.`;
-          } else if (audioInputSelect.value) {
-            const selectedText = audioInputSelect.options[audioInputSelect.selectedIndex]?.text || 'Custom Input';
-            audioInputStatus.textContent = `Active Input: ${selectedText}`;
-          } else {
-            audioInputStatus.textContent = `Active Input: System Default (Internal Mic)`;
-          }
-        }
-      } catch (err) {
-        console.warn('Could not enumerate audio inputs:', err);
-      }
-    }
-
-    if (audioInputSelect) {
-      audioInputSelect.addEventListener('change', async () => {
-        const deviceId = audioInputSelect.value;
-        localStorage.setItem('webdj_mic_device', deviceId);
-        await applyMicDeviceAndOptions();
-        if (audioInputStatus) {
-          const selectedText = audioInputSelect.options[audioInputSelect.selectedIndex]?.text || 'System Default';
-          audioInputStatus.textContent = `Active Input: ${selectedText}`;
-        }
-      });
-    }
-
-    if (btnRefreshAudioInputs) {
-      btnRefreshAudioInputs.addEventListener('click', () => refreshAudioInputDevices(true));
-    }
-
-    if (btnModalTestMic) {
-      btnModalTestMic.addEventListener('click', async () => {
-        await unlockAudioContext();
-        const newState = await engine.setMicActive(!engine.isMicActive);
-        updateMicUIState(newState);
-      });
-    }
-
-    // Initial load of saved input device
-    const initialSavedMicDevice = localStorage.getItem('webdj_mic_device');
-    if (initialSavedMicDevice) {
-      engine.micDeviceId = initialSavedMicDevice;
-    }
-
-    // Mic Input Channel Mode / Mono Routing (e.g. Behringer UMC202HD, Focusrite Scarlett)
-    const micChannelModeSelect = document.getElementById('bcast-mic-channel-mode');
-    if (micChannelModeSelect) {
-      const savedMode = localStorage.getItem('webdj_mic_channel_mode') || 'mono-left';
-      micChannelModeSelect.value = savedMode;
-      engine.setMicChannelMode(savedMode);
-
-      micChannelModeSelect.addEventListener('change', () => {
-        const mode = micChannelModeSelect.value;
-        engine.setMicChannelMode(mode);
-        localStorage.setItem('webdj_mic_channel_mode', mode);
-      });
-    }
-
     if (navigator.mediaDevices && typeof navigator.mediaDevices.addEventListener === 'function') {
       navigator.mediaDevices.addEventListener('devicechange', () => {
         refreshAudioOutputDevices(false);
-        refreshAudioInputDevices(false);
       });
     }
 
-    Object.entries(tabs).forEach(([k, tab]) => {
-      if (tab.btn) tab.btn.addEventListener('click', () => switchProtocolTab(k));
-    });
-
-    // Populate inputs from saved config
-    function loadFormFromConfig() {
-      const cfg = broadcastManager.config;
-      if (cfg.webrtc) {
-        const urlEl = document.getElementById('bcast-webrtc-url');
-        const tokEl = document.getElementById('bcast-webrtc-token');
-        const brEl = document.getElementById('bcast-webrtc-bitrate');
-        const iceEl = document.getElementById('bcast-webrtc-ice');
-        if (urlEl) urlEl.value = cfg.webrtc.whipUrl || '';
-        if (tokEl) tokEl.value = cfg.webrtc.authToken || '';
-        if (brEl) brEl.value = cfg.webrtc.bitrate || 256;
-        if (iceEl) iceEl.value = cfg.webrtc.iceServers || 'stun:stun.l.google.com:19302';
-      }
-      if (cfg.icecast) {
-        const addrEl = document.getElementById('bcast-icecast-address');
-        const portEl = document.getElementById('bcast-icecast-port');
-        const mntEl = document.getElementById('bcast-icecast-mount');
-        const userEl = document.getElementById('bcast-icecast-user');
-        const passEl = document.getElementById('bcast-icecast-pass');
-        const sslEl = document.getElementById('bcast-icecast-ssl');
-        const brEl = document.getElementById('bcast-icecast-bitrate');
-        const nameEl = document.getElementById('bcast-icecast-name');
-        const genreEl = document.getElementById('bcast-icecast-genre');
-        const protoEl = document.getElementById('bcast-icecast-protocol');
-        if (addrEl) addrEl.value = cfg.icecast.address || 'localhost';
-        if (portEl) portEl.value = cfg.icecast.port || 8000;
-        if (mntEl) mntEl.value = cfg.icecast.mount || '/live.ogg';
-        if (userEl) userEl.value = cfg.icecast.user || 'source';
-        if (passEl) passEl.value = cfg.icecast.password || '';
-        if (sslEl) sslEl.value = cfg.icecast.ssl || 'http';
-        if (brEl) brEl.value = cfg.icecast.bitrate || 192;
-        if (nameEl) nameEl.value = cfg.icecast.stationName || 'WebDJ Radio Live';
-        if (genreEl) genreEl.value = cfg.icecast.genre || 'Electronic / DJ Mix';
-        if (protoEl) protoEl.value = cfg.icecast.protocol || 'http_put';
-      }
-      if (cfg.shoutcast) {
-        const srvEl = document.getElementById('bcast-shoutcast-server');
-        const sidEl = document.getElementById('bcast-shoutcast-sid');
-        const passEl = document.getElementById('bcast-shoutcast-pass');
-        const brEl = document.getElementById('bcast-shoutcast-bitrate');
-        const nameEl = document.getElementById('bcast-shoutcast-name');
-        if (srvEl) srvEl.value = cfg.shoutcast.serverUrl || 'http://localhost:8000';
-        if (sidEl) sidEl.value = cfg.shoutcast.streamId || 1;
-        if (passEl) passEl.value = cfg.shoutcast.password || '';
-        if (brEl) brEl.value = cfg.shoutcast.bitrate || 192;
-        if (nameEl) nameEl.value = cfg.shoutcast.stationName || 'WebDJ Radio Live';
-      }
-
-      if (cfg.mode === 'icecast') switchProtocolTab('icecast');
-      else if (cfg.mode === 'shoutcast') switchProtocolTab('shoutcast');
-      else if (cfg.mode === 'webrtc_p2p') switchProtocolTab('p2p');
-      else switchProtocolTab('webrtc');
-    }
-
-    function gatherConfigFromForm() {
-      return {
-        mode: activeProtocol,
-        webrtc: {
-          whipUrl: document.getElementById('bcast-webrtc-url')?.value.trim() || '',
-          authToken: document.getElementById('bcast-webrtc-token')?.value.trim() || '',
-          bitrate: parseInt(document.getElementById('bcast-webrtc-bitrate')?.value || '256'),
-          iceServers: document.getElementById('bcast-webrtc-ice')?.value.trim() || 'stun:stun.l.google.com:19302'
-        },
-        icecast: {
-          address: document.getElementById('bcast-icecast-address')?.value.trim() || 'localhost',
-          port: parseInt(document.getElementById('bcast-icecast-port')?.value || '8000'),
-          mount: document.getElementById('bcast-icecast-mount')?.value.trim() || '/live.ogg',
-          user: document.getElementById('bcast-icecast-user')?.value.trim() || 'source',
-          password: document.getElementById('bcast-icecast-pass')?.value || '',
-          ssl: document.getElementById('bcast-icecast-ssl')?.value || 'http',
-          bitrate: parseInt(document.getElementById('bcast-icecast-bitrate')?.value || '192'),
-          stationName: document.getElementById('bcast-icecast-name')?.value.trim() || 'WebDJ Radio Live',
-          genre: document.getElementById('bcast-icecast-genre')?.value.trim() || 'Electronic / DJ Mix',
-          protocol: document.getElementById('bcast-icecast-protocol')?.value || 'http_put'
-        },
-        shoutcast: {
-          serverUrl: document.getElementById('bcast-shoutcast-server')?.value.trim() || 'http://localhost:8000',
-          streamId: parseInt(document.getElementById('bcast-shoutcast-sid')?.value || '1'),
-          password: document.getElementById('bcast-shoutcast-pass')?.value || '',
-          bitrate: parseInt(document.getElementById('bcast-shoutcast-bitrate')?.value || '192'),
-          stationName: document.getElementById('bcast-shoutcast-name')?.value.trim() || 'WebDJ Radio Live'
-        }
-      };
-    }
-
-    loadFormFromConfig();
-
-    // Logger
-    broadcastManager.onLog = (msg, type) => {
-      if (!broadcastLogBox) return;
-      const entry = document.createElement('div');
-      entry.className = `log-entry log-${type || 'info'}`;
-      entry.textContent = msg;
-      broadcastLogBox.appendChild(entry);
-      broadcastLogBox.scrollTop = broadcastLogBox.scrollHeight;
-    };
-
-    // State changes handler
-    broadcastManager.onStateChange = (state, err) => {
-      const isLive = state === 'connected';
-      const isConnecting = state === 'connecting';
-
-      // Header button
-      if (btnBroadcastPanel) btnBroadcastPanel.classList.toggle('is-live', isLive);
-      if (headerBroadcastDot) headerBroadcastDot.classList.toggle('active', isLive);
-      if (headerBroadcastText) headerBroadcastText.textContent = isLive ? '🔴 LIVE ON AIR' : '📡 Broadcast';
-
-      // Mixer console
-      const mixerCard = document.querySelector('.broadcast-mixer-card');
-      if (mixerCard) mixerCard.classList.toggle('is-live', isLive);
-      if (mixerBroadcastStatus) {
-        mixerBroadcastStatus.textContent = isLive ? 'ON AIR' : (isConnecting ? 'CONNECTING' : (state === 'error' ? 'ERROR' : 'OFFLINE'));
-        mixerBroadcastStatus.classList.toggle('live', isLive);
-      }
-      if (mixerBroadcastBtnText) mixerBroadcastBtnText.textContent = isLive ? 'STOP STREAM' : (isConnecting ? 'CONNECTING…' : 'GO LIVE');
-
-      // Modal banner
-      if (broadcastStatusBanner) broadcastStatusBanner.classList.toggle('is-live', isLive);
-      if (modalBroadcastDot) modalBroadcastDot.classList.toggle('active', isLive);
-      if (modalBroadcastStatusText) {
-        modalBroadcastStatusText.textContent = isLive ? 'LIVE ON AIR' : (isConnecting ? 'CONNECTING…' : (state === 'error' ? `ERROR: ${err || 'Failed'}` : 'OFFLINE'));
-      }
-      if (modalToggleBroadcastText) modalToggleBroadcastText.textContent = isLive ? '⏹ STOP STREAM' : (isConnecting ? '⏳ CONNECTING…' : '🔴 GO LIVE');
-
-      // P2P SDP offer textarea
-      if (activeProtocol === 'webrtc_p2p' && broadcastManager.peerConnection?.localDescription) {
-        const p2pArea = document.getElementById('bcast-p2p-sdp');
-        if (p2pArea) p2pArea.value = JSON.stringify(broadcastManager.peerConnection.localDescription);
-      }
-    };
-
-    // Toggle broadcast execution
-    async function toggleBroadcast() {
-      if (broadcastManager.isBroadcasting) {
-        broadcastManager.stopBroadcast();
-      } else {
-        const cfg = gatherConfigFromForm();
-        await broadcastManager.startBroadcast(cfg);
-      }
-    }
-
-    if (btnModalToggleBroadcast) btnModalToggleBroadcast.addEventListener('click', toggleBroadcast);
-    if (btnMixerBroadcast) btnMixerBroadcast.addEventListener('click', () => {
-      if (!broadcastManager.isBroadcasting) {
-        if (broadcastModal) broadcastModal.style.display = 'flex';
-      } else {
-        toggleBroadcast();
-      }
-    });
-
-    if (btnBroadcastPanel && broadcastModal) {
-      btnBroadcastPanel.addEventListener('click', () => {
-        broadcastModal.style.display = 'flex';
+    // Modal open / close handlers
+    if (btnAudioPanel && audioModal) {
+      btnAudioPanel.addEventListener('click', () => {
+        audioModal.style.display = 'flex';
+        refreshAudioOutputDevices(false);
       });
     }
 
-    if (btnCloseBroadcastModal && broadcastModal) {
-      btnCloseBroadcastModal.addEventListener('click', () => {
-        broadcastModal.style.display = 'none';
+    if (btnCloseAudioModal && audioModal) {
+      btnCloseAudioModal.addEventListener('click', () => {
+        audioModal.style.display = 'none';
       });
-      broadcastModal.addEventListener('click', (e) => {
-        if (e.target === broadcastModal) broadcastModal.style.display = 'none';
+      audioModal.addEventListener('click', (e) => {
+        if (e.target === audioModal) audioModal.style.display = 'none';
       });
     }
 
-    // Stats interval update
-    setInterval(() => {
-      const stats = broadcastManager.getStats();
-      const timeStr = formatDuration(stats.elapsedSec);
-
-      if (mixerBroadcastTimer) mixerBroadcastTimer.textContent = stats.isBroadcasting ? timeStr : '00:00:00';
-      if (modalBroadcastTimer) modalBroadcastTimer.textContent = stats.isBroadcasting ? timeStr : '00:00:00';
-
-      const statDataSent = document.getElementById('stat-data-sent');
-      const statAvgBitrate = document.getElementById('stat-avg-bitrate');
-      const statNowPlaying = document.getElementById('stat-now-playing');
-
-      if (statDataSent) statDataSent.textContent = `${stats.mbSent} MB`;
-      if (statAvgBitrate) statAvgBitrate.textContent = stats.isBroadcasting && stats.bitrateKbps > 0 ? `${stats.bitrateKbps} kbps` : '-- kbps';
-      if (statNowPlaying) statNowPlaying.textContent = stats.nowPlaying;
-    }, 1000);
-
-    // Track metadata update hook
-    function updateBroadcastTrackMeta() {
-      const activeDeck = engine.crossfaderPosition < 0.5 ? 'A' : 'B';
-      const deckElem = activeDeck === 'A' ? deckAElements : deckBElements;
-      const title = deckElem.title.textContent || 'DJ Live Mix';
-      const artist = deckElem.artist.textContent || 'WebDJRadio';
-      broadcastManager.updateMetadata(title, artist);
+    // Initial load of saved output device
+    const initialSavedDevice = localStorage.getItem('webdj_audio_output_device');
+    if (initialSavedDevice) {
+      engine.setOutputDevice(initialSavedDevice);
     }
-
-    if (deckAElements.btnPlay) deckAElements.btnPlay.addEventListener('click', () => setTimeout(updateBroadcastTrackMeta, 200));
-    if (deckBElements.btnPlay) deckBElements.btnPlay.addEventListener('click', () => setTimeout(updateBroadcastTrackMeta, 200));
-    if (crossfader) crossfader.addEventListener('input', updateBroadcastTrackMeta);
+    refreshAudioOutputDevices(false);
   })();
 
 });

@@ -659,9 +659,74 @@ const AudioDSPAnalyzer = (function() {
     }
   }
 
+  /**
+   * Finds the first prominent beat transient (downbeat offset) in seconds.
+   * Scans the first 4 seconds of audio to locate the initial kick/transient onset.
+   */
+  function findFirstDownbeat(audioBuffer, bpm = 124.0) {
+    if (!audioBuffer || audioBuffer.duration <= 0) return 0.0;
+    try {
+      const channelData = audioBuffer.getChannelData(0);
+      const sampleRate = audioBuffer.sampleRate;
+      const scanSeconds = Math.min(4.0, audioBuffer.duration);
+      const scanSamples = Math.floor(scanSeconds * sampleRate);
+
+      // Low-pass filter to isolate kick transients below 160Hz
+      const rc = 1.0 / (2.0 * Math.PI * 160);
+      const dt = 1.0 / sampleRate;
+      const alpha = dt / (rc + dt);
+      
+      const frameSize = Math.floor(sampleRate * 0.01); // 10ms frames
+      const numFrames = Math.floor(scanSamples / frameSize);
+      const energies = new Float32Array(numFrames);
+
+      let prev = 0;
+      let maxEnergy = 0;
+      for (let f = 0; f < numFrames; f++) {
+        let sum = 0;
+        const offset = f * frameSize;
+        for (let i = 0; i < frameSize; i++) {
+          prev = prev + alpha * (channelData[offset + i] - prev);
+          sum += prev * prev;
+        }
+        energies[f] = Math.sqrt(sum / frameSize);
+        if (energies[f] > maxEnergy) maxEnergy = energies[f];
+      }
+
+      if (maxEnergy < 0.005) return 0.0;
+
+      // Threshold is 22% of peak energy in the intro
+      const threshold = maxEnergy * 0.22;
+      for (let f = 1; f < numFrames; f++) {
+        if (energies[f] >= threshold && (energies[f] - energies[f - 1]) > (threshold * 0.35)) {
+          const startSample = (f - 1) * frameSize;
+          const endSample = Math.min(scanSamples, (f + 1) * frameSize);
+          let peakSample = startSample;
+          let peakVal = 0;
+          for (let s = startSample; s < endSample; s++) {
+            const v = Math.abs(channelData[s]);
+            if (v > peakVal) {
+              peakVal = v;
+              peakSample = s;
+            }
+          }
+          const downbeatTime = peakSample / sampleRate;
+          const beatSec = 60.0 / bpm;
+          return Math.round((downbeatTime % beatSec) * 1000) / 1000;
+        }
+      }
+      return 0.0;
+    } catch (err) {
+      console.warn('Downbeat detection fallback:', err);
+      return 0.0;
+    }
+  }
+
   return {
     analyzeBPM,
     analyzeKey,
+    findFirstDownbeat,
     PITCH_NAMES
   };
 })();
+
